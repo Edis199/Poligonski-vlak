@@ -98,8 +98,12 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     if (!confirm("Nisu svi uglovi uneseni. Nastaviti svejedno?")) return;
   }
 
-  // nazivi novih tačaka = srednji nazivi (bez prvog/zadnjeg)
-  const naziviNovih = nazivi.slice(1, nazivi.length - 1);
+  // Naziv u svakom redu = prednja (sljedeća) tačka te stanice.
+  // Nove tačke su prednje tačke stanica od prve do pretposljednje stranice:
+  // to su nazivi[0 .. brojStranica-2]. Zadnja stranica završava na krajnjoj
+  // datoj tački (naziv unesen u polju C). broj stranica = broj dužina.
+  const brStranicaUI = duzine.filter((d) => !isNaN(d)).length;
+  const naziviNovih = nazivi.slice(0, Math.max(0, brStranicaUI - 1));
 
   // uglove parsiramo preko Girus.parsirajUgao (razumije i "57°25'08\"" i "57.2508")
   // pa ih vraćamo u SSS.MMSS zapis koji jezgra očekuje
