@@ -566,9 +566,111 @@ function obrazac28P(rez) {
   </table>`;
 }
 
+/* --------- OBRAZAC "K": Izravnanje visina (nadmorske visine) ---------
+   rez = rezultat iz Visine.izravnajVisine(...):
+     rez.redovi[] = { od, do, prvoMjerenje, drugoMjerenje, dHsred,
+                      razlikaDvostruko, maxDozMM, popravka, dHpopr, odstojanjeKm }
+     rez.tocke[]  = { naziv, H }
+   Prikaz vjeran Excel "Obrazac K".                                         */
+function obrazacK(rez) {
+  // visinska mapa po nazivu tačke
+  const Hmap = {};
+  (rez.tocke || []).forEach((t) => { Hmap[t.naziv] = t.H; });
+
+  let redovi = "";
+  const red = rez.redovi || [];
+  red.forEach((r, i) => {
+    const Hod = Hmap[r.od];
+    redovi += `
+      <tr>
+        <td class="c tz-stanica2"><b>${r.od}</b></td>
+        <td class="c"></td>
+        <td class="d"></td><td class="d"></td><td class="d"></td>
+        <td class="d"></td><td class="d"></td><td class="d"></td><td class="d"></td>
+        <td class="d"><b>${fz(Hod, 3)}</b></td>
+      </tr>
+      <tr class="tz-vi">
+        <td class="c"></td>
+        <td class="c">K&#8209;1 / TO&nbsp;28P</td>
+        <td class="d">${fz(r.prvoMjerenje, 3)}</td>
+        <td class="d">${fz(r.drugoMjerenje, 3)}</td>
+        <td class="d">${fz(r.dHsred, 3)}</td>
+        <td class="d">${r.razlikaDvostruko}</td>
+        <td class="d">${r.maxDozMM}</td>
+        <td class="d">${fz(r.popravka, 3)}</td>
+        <td class="d">${fz(r.dHpopr, 3)}</td>
+        <td class="d"></td>
+      </tr>`;
+  });
+  // zadnja tačka (krajnja) — samo visina
+  const zadnja = red.length ? red[red.length - 1].do : null;
+  if (zadnja) {
+    redovi += `
+      <tr>
+        <td class="c tz-stanica2"><b>${zadnja}</b></td>
+        <td class="c"></td>
+        <td class="d"></td><td class="d"></td><td class="d"></td>
+        <td class="d"></td><td class="d"></td><td class="d"></td><td class="d"></td>
+        <td class="d"><b>${fz(Hmap[zadnja], 3)}</b></td>
+      </tr>`;
+  }
+
+  // suma red
+  const sPrvo = rez.redovi.reduce((s, r) => s + r.prvoMjerenje, 0);
+  const sDrugo = rez.redovi.reduce((s, r) => s + r.drugoMjerenje, 0);
+  const sSred = rez.sumaDH;
+  const sPopr = rez.redovi.reduce((s, r) => s + r.popravka, 0);
+  const sDHpopr = rez.redovi.reduce((s, r) => s + r.dHpopr, 0);
+  const fhMM = Math.round(rez.fh * 1000);
+  const dopMM = Math.round(rez.dopustenoFh * 1000);
+  const ok = rez.visinskiOK ? "zadovoljava" : "NE zadovoljava";
+
+  const suma = `
+    <tr class="tz-sum">
+      <td class="c" colspan="2" style="text-align:right"><b>&Sigma;</b></td>
+      <td class="d"><b>${fz(sPrvo, 3)}</b></td>
+      <td class="d"><b>${fz(sDrugo, 3)}</b></td>
+      <td class="d"><b>${fz(sSred, 3)}</b></td>
+      <td class="d"></td>
+      <td class="d"></td>
+      <td class="d"><b>${fz(sPopr, 3)}</b></td>
+      <td class="d"><b>${fz(sDHpopr, 3)}</b></td>
+      <td class="d"></td>
+    </tr>
+    <tr class="tz-sum">
+      <td colspan="10" style="text-align:center">
+        f<sub>h</sub> = <b>${fhMM} mm</b> &nbsp;&nbsp;|&nbsp;&nbsp;
+        dozvoljeno &Delta;h = <b>&plusmn;${dopMM} mm</b> &nbsp;(${ok})
+      </td>
+    </tr>`;
+
+  return `
+  <div class="obrazac-naslov-linija">Obrazac „K" — Izravnanje visina</div>
+  <table class="obrazac obrazacK">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th rowspan="2">Brojevi<br>tačaka</th>
+        <th rowspan="2">Podaci<br>uzeti</th>
+        <th colspan="3">Visinske razlike (m)</th>
+        <th rowspan="2">Razlike<br>dvostr.<br>mjer.</th>
+        <th rowspan="2">Maks.<br>dozvolj.<br>(mm)</th>
+        <th rowspan="2">Popravke<br>V<sub>i</sub> (m)</th>
+        <th rowspan="2">Poprav-<br>ljene<br>&Delta;H (m)</th>
+        <th rowspan="2">Nadmor.<br>visine<br>(m)</th>
+      </tr>
+      <tr class="zaglavlje-red">
+        <th>Prvo<br>mjer.</th>
+        <th>Drugo<br>mjer.</th>
+        <th>Sredina<br>(&Delta;H)</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}${suma}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK };
 }

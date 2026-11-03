@@ -85,6 +85,17 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
   redovi.forEach((r) => {
     r.popravka = round((fh / sumaOdst) * r.odstojanjeKm, 3);
     r.dHpopr = round(r.dHsred + r.popravka, 3);
+
+    // --- dodatni podaci za Obrazac "K" (izravnanje visina) ---
+    // Prvo mjerenje = ΔH naprijed; Drugo mjerenje = ΔH nazad sa predznakom prvog
+    r.prvoMjerenje = round(r.dHnaprijed, 3);
+    const predznak = r.dHnaprijed < 0 ? -1 : 1;
+    r.drugoMjerenje = round(predznak * Math.abs(r.dHnazad), 3);
+    // Razlike dvostrukog mjerenja (Excel: (Drugo − Prvo)·100, u mm)
+    r.razlikaDvostruko = round((r.drugoMjerenje - r.prvoMjerenje) * 100, 0);
+    // Maksimalno dozvoljeno po stranici: 0.00075·(1+cot²(z))·D  [m] -> ·100 [mm]
+    const c = cot(r.zenitNaprijed);
+    r.maxDozMM = round(0.00075 * (1 + c * c) * r.duzina * 100, 0);
   });
 
   // Nadmorske visine

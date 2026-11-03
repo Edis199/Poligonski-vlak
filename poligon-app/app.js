@@ -567,7 +567,7 @@ document.getElementById("stampajObrazac").addEventListener("click", () => {
 document.getElementById("stampajSve").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   // svi dostupni obrasci, redom (samo oni koji su napravljeni)
-  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "o25"]);
+  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "tok", "o25"]);
 });
 
 // Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
@@ -691,6 +691,10 @@ function generirajObrazacHTML(kod) {
     return zadnjiRezultatVisine && !zadnjiRezultatVisine.greska
       ? window.Obrasci.obrazac28P(zadnjiRezultatVisine) : "";
   }
+  if (kod === "tok") {
+    return zadnjiRezultatVisine && !zadnjiRezultatVisine.greska
+      ? window.Obrasci.obrazacK(zadnjiRezultatVisine) : "";
+  }
   if (kod === "o19") {
     return zadnjiRezultat ? window.Obrasci.obrazac19(zadnjiRezultat, { nazivA: tekst("A_naziv") }) : "";
   }
@@ -752,10 +756,14 @@ function prikaziObrazac() {
     } else {
       el.innerHTML = window.Obrasci.obrazac28P(zadnjiRezultatVisine);
     }
+  } else if (trenutniObrazac === "tok") {
+    if (!zadnjiRezultatVisine || zadnjiRezultatVisine.greska) {
+      el.innerHTML = `<div class="info">Za ovaj obrazac učitajte tahimetrijski zapisnik (mjerenja) i unesite nadmorske visine H za tačke B i C, pa kliknite „Izračunaj izravnanje".</div>`;
+    } else {
+      el.innerHTML = window.Obrasci.obrazacK(zadnjiRezultatVisine);
+    }
   } else {
-    // obrasci koji još nisu napravljeni
-    const nazivi = { tok:"TO K" };
-    el.innerHTML = `<div class="info">Obrazac <b>${nazivi[trenutniObrazac] || trenutniObrazac}</b> je u pripremi — dodajemo ga uskoro.</div>`;
+    el.innerHTML = `<div class="info">Obrazac <b>${trenutniObrazac}</b> je u pripremi.</div>`;
   }
   oznaciAktivniObrazac();
 }
