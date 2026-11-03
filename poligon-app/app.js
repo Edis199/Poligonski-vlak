@@ -577,7 +577,11 @@ function ispisiObrasce(lista) {
   let html = "";
   lista.forEach((kod) => {
     const sadrzaj = generirajObrazacHTML(kod);
-    if (sadrzaj) html += `<div class="obrazac-stranica">${sadrzaj}</div>`;
+    if (sadrzaj) {
+      // TO 1 i 2 ide u landscape (položeno), ostali portrait (uspravno)
+      const klasa = (kod === "to1i2") ? "obrazac-stranica polozeno" : "obrazac-stranica";
+      html += `<div class="${klasa}">${sadrzaj}</div>`;
+    }
   });
   el.innerHTML = html;
   document.body.classList.add("print-obrasci");

@@ -174,6 +174,10 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 
 /* Ispis OBRAZACA (kad body ima klasu print-obrasci) — svaki obrazac na A4 */
 @media print{
+  /* imenovane stranice: portrait (zadano) i landscape (samo TO 1 i 2) */
+  @page { size:A4 portrait; margin:10mm; }
+  @page polozeno { size:A4 landscape; margin:10mm; }
+
   body.print-obrasci{background:#fff}
   body.print-obrasci .kartice,
   body.print-obrasci .akcije,
@@ -186,11 +190,13 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci #obrasci h2,
   body.print-obrasci #obrasci .napomena{display:none}
   body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
-  /* svaki obrazac na zasebnom A4 listu */
-  body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
+  /* svaki obrazac na zasebnom A4 listu (portrait) */
+  body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page;page:uspravno}
+  /* obrazac koji treba položeno (TO 1 i 2) */
+  body.print-obrasci .obrazac-stranica.polozeno{page:polozeno}
   body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
   body.print-obrasci .obrazac tr{page-break-inside:avoid}
   /* da se boje (plava zaglavlja, crvene date tačke) ispišu */
   body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
-@page{ size:A4 landscape; margin:10mm; }
+@page uspravno { size:A4 portrait; margin:10mm; }
