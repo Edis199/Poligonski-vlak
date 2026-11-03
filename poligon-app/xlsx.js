@@ -97,38 +97,42 @@ function predlozakZapisnikXlsx() {
 
   // Redovi podataka (zaglavlja + primjer). Svaka ćelija: {v, s}
   const kolone = ["Stanica i","Vizura","Kod","Horizontalni ugao","Zenitni ugao",
-                  "Kosa dužina","Horizontalna dužina","Visina signala","Primjedba","Visina instrumenta"];
+                  "Kosa dužina","Horizontalna dužina","Visina signala","Primjedba"];
 
-  // primjer (kao TZ): P647 stanica, jedan girus + praznine
+  // primjer (kao TZ): stanica P647, pa visina instrumenta u redu ISPOD (ista kolona),
+  // pa jedan girus mjerenja. Visina instrumenta se više NE upisuje u zasebnu kolonu.
   const primjer = [
-    ["P647","P646","","254°28'48\"","89°19'50\"","76.019","","1.649","","1.694"],
-    ["","83","","347°37'52\"","90°09'14\"","68.084","","1.608","",""],
-    ["","83","","167°38'01\"","269°50'40\"","68.084","","1.608","",""],
-    ["","P646","","74°28'46\"","270°40'11\"","76.019","","1.649","",""],
-    ["","P646","","254°28'50\"","89°19'47\"","76.019","","1.649","",""],
-    ["","83","","347°37'56\"","90°09'12\"","68.084","","1.608","",""],
-    ["","83","","167°38'01\"","269°50'40\"","68.084","","1.608","",""],
-    ["","P646","","74°28'48\"","270°40'11\"","76.019","","1.649","",""],
+    ["P647","","","","","","","",""],            // stanica
+    ["1.694","","","","","","","",""],            // visina instrumenta (ispod stanice)
+    ["","P646","","254°28'48\"","89°19'50\"","76.019","","1.649",""],
+    ["","83","","347°37'52\"","90°09'14\"","68.084","","1.608",""],
+    ["","83","","167°38'01\"","269°50'40\"","68.084","","1.608",""],
+    ["","P646","","74°28'46\"","270°40'11\"","76.019","","1.649",""],
+    ["","P646","","254°28'50\"","89°19'47\"","76.019","","1.649",""],
+    ["","83","","347°37'56\"","90°09'12\"","68.084","","1.608",""],
+    ["","83","","167°38'01\"","269°50'40\"","68.084","","1.608",""],
+    ["","P646","","74°28'48\"","270°40'11\"","76.019","","1.649",""],
   ];
   // dodaj prazne redove za upisivanje
   const prazni = [];
-  for (let i = 0; i < 20; i++) prazni.push(new Array(10).fill(""));
+  for (let i = 0; i < 20; i++) prazni.push(new Array(9).fill(""));
   const sviRedovi = [kolone, ...primjer, ...prazni];
 
   // izgradi sheetData
-  const kolSlova = ["A","B","C","D","E","F","G","H","I","J"];
+  const kolSlova = ["A","B","C","D","E","F","G","H","I"];
   let rowsXml = "";
   sviRedovi.forEach((red, ri) => {
     const rnum = ri + 2; // red 1 je naslov (spojen), podaci kreću od reda 2
     let cells = "";
     red.forEach((val, ci) => {
       const ref = kolSlova[ci] + rnum;
+      // ri===0 -> zaglavlja (stil 2); prva kolona s vrijednošću -> stanica/vi (stil 4); ostalo (stil 3)
       const stil = (ri === 0) ? 2 : (ci === 0 && val ? 4 : 3);
       cells += `<c r="${ref}" s="${stil}" t="inlineStr"><is><t xml:space="preserve">${esc(val)}</t></is></c>`;
     });
     rowsXml += `<row r="${rnum}">${cells}</row>`;
   });
-  // red 1: naslov (spojen A1:J1)
+  // red 1: naslov (spojen A1:I1)
   const naslovRed = `<row r="1"><c r="A1" s="1" t="inlineStr"><is><t>TAHIMETRIJSKI ZAPISNIK</t></is></c></row>`;
 
   const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -136,10 +140,10 @@ function predlozakZapisnikXlsx() {
 <cols>
 <col min="1" max="1" width="11"/><col min="2" max="2" width="9"/><col min="3" max="3" width="6"/>
 <col min="4" max="5" width="16"/><col min="6" max="7" width="15"/><col min="8" max="8" width="12"/>
-<col min="9" max="9" width="14"/><col min="10" max="10" width="16"/>
+<col min="9" max="9" width="14"/>
 </cols>
 <sheetData>${naslovRed}${rowsXml}</sheetData>
-<mergeCells count="1"><mergeCell ref="A1:J1"/></mergeCells>
+<mergeCells count="1"><mergeCell ref="A1:I1"/></mergeCells>
 </worksheet>`;
 
   const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

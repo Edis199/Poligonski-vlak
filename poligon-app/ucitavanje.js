@@ -61,37 +61,62 @@ function ucitajRedove(redovi) {
 
   const stanice = [];       // niz { stanica, visinaInstr, mjerenja:[...] }
   let trenutna = null;
-  let zadnjaStanica = "";
-  let zadnjaVisina = "";
+
+  // postoji li zasebna kolona za visinu instrumenta (stari format)?
+  const imaKolonuVisine = (idx["visinainstrumenta"] !== undefined || idx["visinainstr"] !== undefined
+                           || idx["visinainstrumentam"] !== undefined || idx["vi"] !== undefined);
+
+  // visina instrumenta je broj s DECIMALOM (npr. 1.694 / 1,694); naziv tačke može biti cijeli broj (83)
+  const jeVisinaInstr = (s) => s !== "" && /^[0-9]+[.,][0-9]+$/.test(String(s).trim());
 
   for (let i = zaglRed + 1; i < redovi.length; i++) {
     const c = redovi[i];
-    let stan = uzmi(c, ["stanicai", "stanica"]);
-    let vis = uzmi(c, ["visinainstrumenta", "visinainstr", "visinainstrumenta(m)", "vi"]);
+    const prvaKol = uzmi(c, ["stanicai", "stanica"]);
+    const visKol = uzmi(c, ["visinainstrumenta", "visinainstr", "visinainstrumentam", "vi"]);
     const vizura = uzmi(c, ["vizura", "vuzura", "vizurnatacka"]);
     const kod = uzmi(c, ["kod"]);
     const horiz = uzmi(c, ["horizontalniugao", "horizontalni", "hz", "ha"]);
     const zenit = uzmi(c, ["zenitniugao", "zenitni", "vz", "z"]);
-    const kosa = uzmi(c, ["kosaduzina", "kosa", "sd"]);  // NE "duzina" (to je horizontalna, prazna)
+    const kosa = uzmi(c, ["kosaduzina", "kosa", "sd"]);
     const visSig = uzmi(c, ["visinasignala", "vissignala", "vs"]);
 
-    // ako nema stanice u retku -> nasljeđuje prethodnu
-    if (stan === "") stan = zadnjaStanica; else zadnjaStanica = stan;
-    if (vis === "") vis = zadnjaVisina; else zadnjaVisina = vis;
-
-    // ako nema vizure, preskoči (prazan red)
-    if (vizura === "" && horiz === "") continue;
-
-    if (!trenutna || trenutna.stanica !== stan) {
-      // visinu instrumenta normaliziramo (zarez -> tačka)
-      const visBroj = parseFloat(String(vis).replace(",", ".")) || 0;
-      trenutna = { stanica: stan, visinaInstr: visBroj, mjerenja: [] };
-      stanice.push(trenutna);
+    if (imaKolonuVisine) {
+      // --- STARI FORMAT: visina instrumenta u zasebnoj koloni ---
+      // prva kolona popunjena = naziv stanice (nasljeđuje se ako prazna)
+      let stan = prvaKol;
+      if (stan === "" && trenutna) stan = trenutna.stanica;
+      if (prvaKol !== "") {
+        const visBroj = parseFloat(String(visKol).replace(",", ".")) || 0;
+        trenutna = { stanica: prvaKol, visinaInstr: visBroj, mjerenja: [] };
+        stanice.push(trenutna);
+      }
+      if (vizura === "" && horiz === "") continue;
+      if (!trenutna) continue;
+      trenutna.mjerenja.push({
+        vizura, kod, horiz, zenit, kosa: parseFloat((kosa || "0").replace(",", ".")),
+        visinaSignala: parseFloat((visSig || "0").replace(",", "."))
+      });
+    } else {
+      // --- NOVI FORMAT: visina instrumenta u redu ISPOD stanice (ista kolona) ---
+      // red s visinom instrumenta (decimalan broj, bez vizure)
+      if (jeVisinaInstr(prvaKol) && vizura === "" && horiz === "") {
+        if (trenutna) trenutna.visinaInstr = parseFloat(String(prvaKol).replace(",", ".")) || 0;
+        continue;
+      }
+      // red s nazivom nove stanice (nije decimalan broj; nema vizure/horiz na tom redu)
+      if (prvaKol !== "" && vizura === "" && horiz === "") {
+        trenutna = { stanica: prvaKol, visinaInstr: 0, mjerenja: [] };
+        stanice.push(trenutna);
+        continue;
+      }
+      // red mjerenja
+      if (vizura === "" && horiz === "") continue;
+      if (!trenutna) continue;
+      trenutna.mjerenja.push({
+        vizura, kod, horiz, zenit, kosa: parseFloat((kosa || "0").replace(",", ".")),
+        visinaSignala: parseFloat((visSig || "0").replace(",", "."))
+      });
     }
-    trenutna.mjerenja.push({
-      vizura, kod, horiz, zenit, kosa: parseFloat((kosa || "0").replace(",", ".")),
-      visinaSignala: parseFloat((visSig || "0").replace(",", "."))
-    });
   }
 
   if (!stanice.length) throw new Error("Nije pronađeno nijedno mjerenje. Provjerite zaglavlje stupaca.");
