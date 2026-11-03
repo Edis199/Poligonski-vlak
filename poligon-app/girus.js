@@ -89,6 +89,8 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
   const visPrednja = [];
   let nazZadnja = null, nazPrednja = null;
 
+  const girusDetalji = []; // detaljni međurezultati za obrazac TO 1 i 2
+
   for (let g = 0; g < brGirusa; g++) {
     const baza = g * 4;
     const z1 = mjerenja[baza];     // zadnja, I
@@ -101,8 +103,23 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     const hz1 = parsirajUgao(z1.horiz), hp1 = parsirajUgao(p1.horiz);
     const hp2 = parsirajUgao(p2.horiz), hz2 = parsirajUgao(z2.horiz);
 
-    pravciZadnja.push(sredinaIIpolozaj(hz1, hz2));
-    pravciPrednja.push(sredinaIIpolozaj(hp1, hp2));
+    const srZad = sredinaIIpolozaj(hz1, hz2);
+    const srPre = sredinaIIpolozaj(hp1, hp2);
+    pravciZadnja.push(srZad);
+    pravciPrednja.push(srPre);
+
+    // detalji za obrazac TO 1 i 2 (I/II polugirus, 2C kolimacija, sredina)
+    // 2C = (I polugirus) - (II polugirus ∓ 180), u sekundama
+    const kolim = (iPolu, iiPolu) => {
+      let d = iPolu - (iiPolu - 180);
+      while (d > 180) d -= 360; while (d < -180) d += 360;
+      return Math.round(d * 3600); // sekunde
+    };
+    girusDetalji.push({
+      girus: g + 1,
+      zadnja: { vizura: z1.vizura, iPolu: hz1, iiPolu: hz2, dvoC: kolim(hz1, hz2), sredina: srZad },
+      prednja:{ vizura: p1.vizura, iPolu: hp1, iiPolu: hp2, dvoC: kolim(hp1, hp2), sredina: srPre },
+    });
 
     // zenitni: II položaj = 360 - z (pa sredina)
     const zz1 = parsirajUgao(z1.zenit), zz2 = parsirajUgao(z2.zenit);
@@ -142,7 +159,10 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     kosaZadnja: prosjek(kosaZadnja),
     visinaSignalaZadnja: prosjek(visZadnja),
     horizDuzinaZadnja: Math.abs(round(prosjek(kosaZadnja) * Math.sin((prosjek(zenitZadnja) * Math.PI) / 180), 3)),
-    brGirusa
+    brGirusa,
+    girusDetalji,
+    // redukovana sredina prednje (sredina iz svih girusa prednje - zadnje), = prelomni
+    reduk: { zadnja: 0, prednja: prelomni }
   };
 }
 

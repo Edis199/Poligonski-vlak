@@ -242,9 +242,83 @@ function obrazacTZ(ucitaneStanice, lokalitet) {
   </table>`;
 }
 
+/* --------- OBRAZAC TO 1 i 2: Girusno mjerenje horizontalnih pravaca ---------
+   obradjeneStanice = niz iz girusne obrade (svaka ima girusDetalji, pravci...)   */
+function obrazac1i2(obradjeneStanice) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+  const sekZnak = (s) => (s === "" || s === null || isNaN(s)) ? "" : (s > 0 ? "+" : "") + s;
+
+  let redovi = "";
+  (obradjeneStanice || []).forEach((st) => {
+    if (st.greska || !st.girusDetalji) return;
+    const brG = st.girusDetalji.length;
+
+    st.girusDetalji.forEach((gd, gi) => {
+      const oznaka = (gi === 0) ? "I" : (gi === 1 ? "II" : `${gi + 1}`);
+      // prvi girus, prvi red = stanica naziv
+      const stanNaziv = (gi === 0) ? st.stanica : oznaka;
+
+      // red ZADNJA
+      const srZadRed = (gi === 0) ? ug(0) : "";  // redukovana zadnja uvijek 0 (orijentacija)
+      redovi += `<tr>
+        <td class="c"><b>${gi === 0 ? st.stanica : oznaka}</b></td>
+        <td class="c">${gd.zadnja.vizura}</td>
+        <td class="c">${ug(gd.zadnja.iPolu)}</td>
+        <td class="c">${ug(gd.zadnja.iiPolu)}</td>
+        <td class="c mali">${sekZnak(gd.zadnja.dvoC)}</td>
+        <td class="c">${ug(gd.zadnja.sredina)}</td>
+        <td class="c">${ug(0)}</td>
+        <td class="c">${gi === 0 ? ug(0) : ""}</td>
+      </tr>`;
+      // red PREDNJA
+      const redukPrednja = razlika360pub(gd.prednja.sredina, gd.zadnja.sredina);
+      const srGirusa = (gi === 0) ? ug(st.prelomniUgao) : "";
+      redovi += `<tr>
+        <td class="c">${gi === 0 ? "I" : (gi===1?"II":"")}</td>
+        <td class="c">${gd.prednja.vizura}</td>
+        <td class="c">${ug(gd.prednja.iPolu)}</td>
+        <td class="c">${ug(gd.prednja.iiPolu)}</td>
+        <td class="c mali">${sekZnak(gd.prednja.dvoC)}</td>
+        <td class="c">${ug(gd.prednja.sredina)}</td>
+        <td class="c">${ug(redukPrednja)}</td>
+        <td class="c">${srGirusa}</td>
+      </tr>`;
+      // razmak red između girusa/stanica
+      redovi += `<tr class="tz-vi"><td colspan="8">&nbsp;</td></tr>`;
+    });
+  });
+
+  return `
+  <div class="obrazac-naslov-linija">Trigonometrijski obrazac 1 i 2 &nbsp;&nbsp; Strana 1</div>
+  <table class="obrazac obrazac1i2">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th>Stanica<br>Girus</th>
+        <th>Vizurna<br>tačka</th>
+        <th>I Polugirus<br>A</th>
+        <th>II Polugirus<br>B</th>
+        <th>2C<br>kolim.</th>
+        <th>Sredina</th>
+        <th>Redukovana<br>sredina</th>
+        <th>Sredina iz<br>svih girusa</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}</tbody>
+  </table>`;
+}
+
+// javna razlika360 (prednja - zadnja) svedena u [0,360)
+function razlika360pub(a, b) {
+  let d = a - b;
+  while (d < 0) d += 360;
+  while (d >= 360) d -= 360;
+  return d;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2 };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2 };
 }
