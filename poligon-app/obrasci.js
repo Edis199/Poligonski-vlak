@@ -315,9 +315,64 @@ function razlika360pub(a, b) {
   return d;
 }
 
+/* --------- OBRAZAC TO 1V: Vertikalni (visinski) uglovi --------- */
+function obrazac1V(obradjeneStanice) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+
+  // jedan red para (stanica->vizura): KL, KD, zbroj, dvostruki visinski, srednji visinski ugao
+  function redPara(stanNaziv, vi, p) {
+    const zbroj = p.zbrojZen;                 // ≈ 360°
+    const dvostrukiVis = Math.abs(180 - p.zbrojZen) * 0;  // (ne koristi se direktno)
+    // srednji zenit -> visinski ugao se prikazuje kao srednji zenit (kao u Excelu, kolona 10)
+    const srednjiZen = p.srZenit;
+    return `
+      <tr>
+        <td class="c"><b>${stanNaziv}</b></td>
+        <td class="c">${p.vizura}</td>
+        <td class="c">${ug(p.zenitKL)}</td>
+        <td class="c">${ug(p.zenitKD)}</td>
+        <td class="c">${ug(zbroj)}</td>
+        <td class="c">${ug(srednjiZen)}</td>
+      </tr>
+      <tr class="tz-vi">
+        <td class="c">${vi ? fz(vi,3) : ""}</td>
+        <td class="c">${fz(p.visSignala,3)}</td>
+        <td colspan="3"></td>
+        <td class="c"><b>${ug(srednjiZen)}</b></td>
+      </tr>`;
+  }
+
+  let redovi = "";
+  (obradjeneStanice || []).forEach((st) => {
+    if (st.greska || !st.girusDetalji || !st.girusDetalji.length) return;
+    const gd = st.girusDetalji[0]; // vertikalni uglovi — iz prvog girusa
+    // red na zadnju i na prednju
+    redovi += redPara(st.stanica, st.visinaInstr, gd.zadnja);
+    redovi += redPara(st.stanica, st.visinaInstr, gd.prednja);
+    redovi += `<tr class="razmak"><td colspan="6">&nbsp;</td></tr>`;
+  });
+
+  return `
+  <div class="obrazac-naslov-linija">Trigonometrijski obrazac 1V</div>
+  <table class="obrazac obrazac1v">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th>Stanica<br>(vis. instr.)</th>
+        <th>Vizurna tačka<br>(vis. signala)</th>
+        <th>I Krug lijevo<br>K.L.</th>
+        <th>II Krug desno<br>K.D.</th>
+        <th>2(H.V.)=<br>K.L.+K.D.</th>
+        <th>Visinski<br>ugao</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2 };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2 };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V };
 }

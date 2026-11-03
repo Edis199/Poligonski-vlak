@@ -108,7 +108,15 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     pravciZadnja.push(srZad);
     pravciPrednja.push(srPre);
 
-    // detalji za obrazac TO 1 i 2 (I/II polugirus, 2C kolimacija, sredina)
+    // zenitni kutovi: K.L (I položaj) i K.D (II položaj); sredina = (KL + (360-KD))/2
+    const zz1 = parsirajUgao(z1.zenit), zz2 = parsirajUgao(z2.zenit); // zadnja: KL, KD
+    const zp1 = parsirajUgao(p1.zenit), zp2 = parsirajUgao(p2.zenit); // prednja: KL, KD
+    const srZenZad = zenitSredina(zz1, zz2);
+    const srZenPre = zenitSredina(zp1, zp2);
+    zenitZadnja.push(srZenZad);
+    zenitPrednja.push(srZenPre);
+
+    // detalji za obrazce TO 1 i 2 (horizontalno) i TO 1V (vertikalno)
     // 2C = (I polugirus) - (II polugirus ∓ 180), u sekundama
     const kolim = (iPolu, iiPolu) => {
       let d = iPolu - (iiPolu - 180);
@@ -117,15 +125,13 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     };
     girusDetalji.push({
       girus: g + 1,
-      zadnja: { vizura: z1.vizura, iPolu: hz1, iiPolu: hz2, dvoC: kolim(hz1, hz2), sredina: srZad },
-      prednja:{ vizura: p1.vizura, iPolu: hp1, iiPolu: hp2, dvoC: kolim(hp1, hp2), sredina: srPre },
+      zadnja: { vizura: z1.vizura, iPolu: hz1, iiPolu: hz2, dvoC: kolim(hz1, hz2), sredina: srZad,
+                visSignala: Number(z1.visinaSignala),
+                zenitKL: zz1, zenitKD: zz2, zbrojZen: zz1 + zz2, srZenit: srZenZad },
+      prednja:{ vizura: p1.vizura, iPolu: hp1, iiPolu: hp2, dvoC: kolim(hp1, hp2), sredina: srPre,
+                visSignala: Number(p1.visinaSignala),
+                zenitKL: zp1, zenitKD: zp2, zbrojZen: zp1 + zp2, srZenit: srZenPre },
     });
-
-    // zenitni: II položaj = 360 - z (pa sredina)
-    const zz1 = parsirajUgao(z1.zenit), zz2 = parsirajUgao(z2.zenit);
-    const zp1 = parsirajUgao(p1.zenit), zp2 = parsirajUgao(p2.zenit);
-    zenitZadnja.push(zenitSredina(zz1, zz2));
-    zenitPrednja.push(zenitSredina(zp1, zp2));
 
     kosaZadnja.push(prosjek([Number(z1.kosa), Number(z2.kosa)]));
     kosaPrednja.push(prosjek([Number(p1.kosa), Number(p2.kosa)]));
