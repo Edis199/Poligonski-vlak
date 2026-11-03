@@ -574,23 +574,100 @@ document.getElementById("stampajSve").addEventListener("click", () => {
 function ispisiObrasce(lista) {
   const el = document.getElementById("obrazacSadrzaj");
   const original = el.innerHTML;         // zapamti trenutni prikaz
+
+  // 1) složi sve obrasce
   let html = "";
   lista.forEach((kod) => {
     const sadrzaj = generirajObrazacHTML(kod);
-    if (sadrzaj) {
-      // TO 1 i 2 ide u landscape (položeno), ostali portrait (uspravno)
-      const klasa = (kod === "to1i2") ? "obrazac-stranica polozeno" : "obrazac-stranica";
-      html += `<div class="${klasa}">${sadrzaj}</div>`;
-    }
+    if (sadrzaj) html += `<div class="obrazac-stranica" data-kod="${kod}">${sadrzaj}</div>`;
   });
   el.innerHTML = html;
   document.body.classList.add("print-obrasci");
+
+  // 2) razbij svaki obrazac na A4 stranice po visini i dodaj "Strana N / M"
+  paginirajObrasce(el);
+
   window.print();
-  // vrati prikaz nakon ispisa
   setTimeout(() => {
     el.innerHTML = original;
     document.body.classList.remove("print-obrasci");
-  }, 500);
+  }, 600);
+}
+
+/* Razbija svaki obrazac (tablicu) na više A4 stranica po visini,
+   te na svaku fizičku stranicu stavlja oznaku "Strana N / M". */
+function paginirajObrasce(kontejner) {
+  // visina korisnog dijela A4 portrait (297mm - margine) u px (~96dpi).
+  // Uzimamo rezervu (umanjeno) da sadržaj sigurno stane unutar jedne fizičke strane.
+  const A4_VISINA_PX = Math.round(((297 - 20) / 25.4) * 96) - 70; // ≈ 977px
+  const obrasci = [...kontejner.querySelectorAll(".obrazac-stranica")];
+
+  obrasci.forEach((obr) => {
+    const tabela = obr.querySelector("table.obrazac");
+    if (!tabela) return;
+    const naslov = obr.querySelector(".obrazac-naslov-linija");
+    const thead = tabela.querySelector("thead");
+    const tbody = tabela.querySelector("tbody");
+    if (!tbody) return;
+
+    const redovi = [...tbody.children];
+    // procijeni koliko redova stane po stranici
+    const visinaNaslov = naslov ? naslov.offsetHeight + 8 : 0;
+    const visinaThead = thead ? thead.offsetHeight : 0;
+    const raspoloziva = A4_VISINA_PX - visinaNaslov - visinaThead - 30;
+
+    // izmjeri kumulativnu visinu redova i podijeli u grupe (stranice)
+    const grupe = [[]];
+    let h = 0;
+    redovi.forEach((tr) => {
+      const vh = tr.offsetHeight || 24;
+      if (h + vh > raspoloziva && grupe[grupe.length - 1].length > 0) {
+        grupe.push([]);
+        h = 0;
+      }
+      grupe[grupe.length - 1].push(tr);
+      h += vh;
+    });
+
+    const ukupno = grupe.length;
+    if (ukupno <= 1) {
+      // stane na jednu stranicu — samo dodaj oznaku strane
+      dodajOznakuStrane(obr, 1, 1);
+      return;
+    }
+
+    // više stranica: napravi zasebni .obrazac-stranica za svaku grupu
+    const naslovHTML = naslov ? naslov.outerHTML : "";
+    const theadHTML = thead ? thead.outerHTML : "";
+    const tabelaKlase = tabela.className;
+    const roditelj = obr.parentNode;
+    const refNext = obr.nextSibling;
+
+    grupe.forEach((grupa, gi) => {
+      const div = document.createElement("div");
+      div.className = "obrazac-stranica";
+      const telo = grupa.map((tr) => tr.outerHTML).join("");
+      div.innerHTML = naslovHTML +
+        `<table class="${tabelaKlase}">${theadHTML}<tbody>${telo}</tbody></table>`;
+      dodajOznakuStrane(div, gi + 1, ukupno);
+      roditelj.insertBefore(div, refNext);
+    });
+    obr.remove();
+  });
+
+  // zadnjoj fizičkoj stranici makni prijelom (da ne nastane prazna strana na kraju)
+  const sve = [...kontejner.querySelectorAll(".obrazac-stranica")];
+  if (sve.length) {
+    sve.forEach((s) => s.style.pageBreakAfter = "always");
+    sve[sve.length - 1].style.pageBreakAfter = "auto";
+  }
+}
+
+function dodajOznakuStrane(obr, broj, ukupno) {
+  const oznaka = document.createElement("div");
+  oznaka.className = "oznaka-strane";
+  oznaka.textContent = `Strana ${broj} / ${ukupno}`;
+  obr.insertBefore(oznaka, obr.firstChild);
 }
 
 // Vrati HTML jednog obrasca po kodu (bez promjene prikaza).

@@ -126,7 +126,7 @@ function obrazac19(r, ctx) {
   for (let i = 0; i < 4; i++) redovi += `<tr>${'<td>&nbsp;</td>'.repeat(PRAZNO)}</tr>`;
 
   return `
-  <div class="obrazac-naslov-linija">Trigonom. obrazac br.19 &nbsp;&nbsp;&nbsp; Str……..</div>
+  <div class="obrazac-naslov-linija">Trigonom. obrazac br.19</div>
   <table class="obrazac obrazac19">
     <thead>
       <tr class="zaglavlje-red">
@@ -223,8 +223,7 @@ function obrazacTZ(ucitaneStanice, lokalitet) {
       <tr><td colspan="9" class="naslov">TAHIMETRIJSKI ZAPISNIK</td></tr>
       <tr class="podnaslov-red">
         <td class="c" colspan="2" style="text-align:left">LOKALITET: ${lokalitet || ""}</td>
-        <td colspan="5"></td>
-        <td class="c">Strana:</td><td class="c">1</td>
+        <td colspan="7"></td>
       </tr>
       <tr class="zaglavlje-red">
         <th>Stanica i</th>
@@ -290,7 +289,7 @@ function obrazac1i2(obradjeneStanice) {
   });
 
   return `
-  <div class="obrazac-naslov-linija">Trigonometrijski obrazac 1 i 2 &nbsp;&nbsp; Strana 1</div>
+  <div class="obrazac-naslov-linija">Trigonometrijski obrazac 1 i 2</div>
   <table class="obrazac obrazac1i2">
     <thead>
       <tr class="zaglavlje-red">
