@@ -138,9 +138,10 @@ function izravnajUmetnutiVlak(ulaz) {
 
   const popravakUgla = fBeta / n;             // na svaki ugao jednako
 
-  // Dopušteno kutno odstupanje: 4.5" * sqrt(n)  (Excel: R49=0.0045 u SMS -> 4.5", *sqrt(n))
-  const dopustenoFbetaSek = 4.5 * Math.sqrt(n); // u sekundama
-  const fBetaSek = fBeta * 3600;                // fβ u sekundama
+  // Dopušteno kutno odstupanje (Excel R22=0.0045 u zapisu 0°MM'SS" = 0°00'45" = 45"),
+  // pomnoženo s √n:  dopušteno = 45" * √n
+  const dopustenoFbetaSek = 45 * Math.sqrt(n); // u sekundama
+  const fBetaSek = fBeta * 3600;               // fβ u sekundama
 
   // Popravljeni prelomni uglovi
   const betaPopr = beta.map((b) => b + popravakUgla);
