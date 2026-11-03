@@ -3,6 +3,8 @@
 let zadnjiRezultat = null;
 let zadnjiRezultatVisine = null;
 let obradjeneStanice = null;   // iz učitanog zapisnika (za visinsko izravnanje)
+let ucitaneStanice = null;     // sirova mjerenja iz zapisnika (za obrazac TZ)
+let lokalitet = "";            // naziv lokaliteta (opcionalno)
 
 /* ---------- Navigacija kartica ---------- */
 document.querySelectorAll(".kartica").forEach((btn) => {
@@ -482,6 +484,7 @@ function postaviStatus(poruka, uspjeh) {
 
 function obradiUcitaniCSV(tekst) {
   const stanice = window.Ucitavanje.ucitajCSV(tekst);
+  ucitaneStanice = stanice;   // sačuvaj sirova mjerenja za obrazac TZ
   const { obradjene, greske } = window.Ucitavanje.pripremiIzStanica(stanice);
 
   const validne = obradjene.filter((o) => !o.greska);
@@ -520,7 +523,7 @@ function obradiUcitaniCSV(tekst) {
 /* =====================================================================
    GEODETSKI OBRASCI (kartica 4)
    ===================================================================== */
-let trenutniObrazac = "o25";
+let trenutniObrazac = "tz";
 
 document.querySelectorAll("[data-obrazac]").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -541,6 +544,17 @@ function osvjeziObrasceAkoTreba(cilj) {
 
 function prikaziObrazac() {
   const el = document.getElementById("obrazacSadrzaj");
+  // TZ se može prikazati i bez izračuna (dovoljno je učitati zapisnik)
+  if (trenutniObrazac === "tz") {
+    if (!ucitaneStanice) {
+      el.innerHTML = `<div class="info">Učitajte tahimetrijski zapisnik (CSV) na kartici 1 da se prikaže ovaj obrazac.</div>`;
+      return;
+    }
+    el.innerHTML = window.Obrasci.obrazacTZ(ucitaneStanice, lokalitet);
+    oznaciAktivniObrazac();
+    return;
+  }
+
   if (!zadnjiRezultat) {
     el.innerHTML = `<div class="info">Prvo unesite podatke i kliknite „Izračunaj izravnanje" na kartici 1.</div>`;
     return;
@@ -548,10 +562,20 @@ function prikaziObrazac() {
   if (trenutniObrazac === "o25") {
     el.innerHTML = sloziObrazac25();
   } else if (trenutniObrazac === "o19") {
-    el.innerHTML = window.Obrasci.obrazac19(zadnjiRezultat, {
-      nazivA: tekst("A_naziv"),
-    });
+    el.innerHTML = window.Obrasci.obrazac19(zadnjiRezultat, { nazivA: tekst("A_naziv") });
+  } else {
+    // obrasci koji još nisu napravljeni
+    const nazivi = { to1i2:"TO 1 i 2", to1v:"TO 1V", to18d:"TO 18D", to8:"TO 8", to28p:"TO 28P", tok:"TO K" };
+    el.innerHTML = `<div class="info">Obrazac <b>${nazivi[trenutniObrazac] || trenutniObrazac}</b> je u pripremi — dodajemo ga uskoro.</div>`;
   }
+  oznaciAktivniObrazac();
+}
+
+// vizualno označi koji je obrazac odabran
+function oznaciAktivniObrazac() {
+  document.querySelectorAll("[data-obrazac]").forEach((b) => {
+    b.classList.toggle("odabran", b.dataset.obrazac === trenutniObrazac);
+  });
 }
 
 function sloziObrazac25() {

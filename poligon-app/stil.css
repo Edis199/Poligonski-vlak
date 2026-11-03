@@ -156,6 +156,13 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 }
 /* red s pod-zaglavljem Δy/Δx — niži i diskretniji */
 .obrazac19 .zaglavlje-red.pod th{height:auto;padding:4px 10px;font-size:13px;color:var(--siva);background:#f6f9fd}
+/* TZ obrazac */
+.obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:600}
+.obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:700}
+.obrazacTZ .tz-vi td{color:var(--siva)}
+/* odabrani obrazac — istaknut gumb */
+.obrazac-izbor{flex-wrap:wrap}
+.dugme.odabran{background:var(--plava);color:#fff;border-color:var(--plava)}
 /* mali redovi popravke vβ — niži */
 .obrazac19 tr.tanko td{padding:2px 10px;height:auto}
 .obrazac19 tr.tanko td .mali{font-size:11px}

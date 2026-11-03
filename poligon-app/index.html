@@ -146,9 +146,18 @@
   <section id="obrasci" class="panel">
     <h2>Geodetski obrasci</h2>
     <p class="napomena">Službeni obrasci popunjeni rezultatima izravnanja. Svaki se može ispisati ili spremiti u PDF.</p>
-    <div class="alatna">
-      <button class="dugme" data-obrazac="o25">Obrazac 25 — Spisak koordinata</button>
-      <button class="dugme" data-obrazac="o19">Obrazac 19 — Izravnanje vlaka</button>
+    <div class="alatna obrazac-izbor">
+      <button class="dugme" data-obrazac="tz">TZ — Tahimetrijski zapisnik</button>
+      <button class="dugme" data-obrazac="to1i2">TO 1 i 2</button>
+      <button class="dugme" data-obrazac="to1v">TO 1V</button>
+      <button class="dugme" data-obrazac="to18d">TO 18D</button>
+      <button class="dugme" data-obrazac="to8">TO 8</button>
+      <button class="dugme" data-obrazac="o19">TO 19 — Izravnanje</button>
+      <button class="dugme" data-obrazac="to28p">TO 28P</button>
+      <button class="dugme" data-obrazac="tok">TO K</button>
+      <button class="dugme" data-obrazac="o25">TO 25 — Spisak koordinata</button>
+    </div>
+    <div class="akcije" style="margin-top:8px">
       <button id="stampajObrazac" class="dugme primarno">Ispis / PDF ovog obrasca</button>
     </div>
     <div id="obrazacSadrzaj" class="obrazac-okvir"></div>

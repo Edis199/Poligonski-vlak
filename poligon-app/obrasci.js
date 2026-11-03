@@ -168,9 +168,83 @@ function formatBigAngle(dec){
   return (neg?"-":"")+`${s}°,${p(m)}'${p(se)}"`;
 }
 
+/* --------- OBRAZAC TZ: Tahimetrijski zapisnik ---------
+   ucitaneStanice = [{ stanica, visinaInstr, mjerenja:[{vizura,kod,horiz,zenit,kosa,visinaSignala}] }]
+   Prikazuje sirova mjerenja (ista koja su učitana), s izračunatom
+   horizontalnom dužinom = |kosa · sin(zenit)|.                          */
+function obrazacTZ(ucitaneStanice, lokalitet) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  // parsiraj ugao pa formatiraj natrag u °,mm'ss" (kao original)
+  const ugStr = (v) => {
+    const dec = G.parsirajUgao(v);
+    if (dec === null) return "";
+    return G.decUStr(dec).replace("°", "°,");
+  };
+  const horiz = (kosa, zenitStr) => {
+    const z = G.parsirajUgao(zenitStr);
+    if (z === null || isNaN(kosa)) return "";
+    const h = Math.abs(Math.round(kosa * Math.sin(z * Math.PI / 180) * 1000) / 1000);
+    return fz(h, 2);
+  };
+
+  let redovi = "";
+  (ucitaneStanice || []).forEach((st) => {
+    // red stanice (naziv) + ispod visina instrumenta (u prvoj koloni)
+    redovi += `<tr class="tz-stanica">
+      <td class="c"><b>${st.stanica ?? ""}</b></td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>`;
+    redovi += `<tr class="tz-vi">
+      <td class="c">${fz(st.visinaInstr, 3)}</td>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>`;
+    // redovi mjerenja
+    (st.mjerenja || []).forEach((m) => {
+      redovi += `<tr>
+        <td></td>
+        <td class="c">${m.vizura ?? ""}</td>
+        <td class="c">${m.kod ?? ""}</td>
+        <td class="c">${ugStr(m.horiz)}</td>
+        <td class="c">${ugStr(m.zenit)}</td>
+        <td class="d">${fz(Number(m.kosa), 3)}</td>
+        <td class="d">${horiz(Number(m.kosa), m.zenit)}</td>
+        <td class="d">${fz(Number(m.visinaSignala), 3)}</td>
+        <td></td>
+      </tr>`;
+    });
+  });
+
+  // dopuni praznim redovima do npr. 4 reda
+  for (let i = 0; i < 4; i++) redovi += `<tr>${'<td>&nbsp;</td>'.repeat(9)}</tr>`;
+
+  return `
+  <table class="obrazac obrazacTZ">
+    <thead>
+      <tr><td colspan="9" class="naslov">TAHIMETRIJSKI ZAPISNIK</td></tr>
+      <tr class="podnaslov-red">
+        <td class="c" colspan="2" style="text-align:left">LOKALITET: ${lokalitet || ""}</td>
+        <td colspan="5"></td>
+        <td class="c">Strana:</td><td class="c">1</td>
+      </tr>
+      <tr class="zaglavlje-red">
+        <th>Stanica i</th>
+        <th>Vizura</th>
+        <th>Kod</th>
+        <th>Horizontalni<br>ugao</th>
+        <th>Zenitni<br>ugao</th>
+        <th>Kosa<br>dužina</th>
+        <th>Horizontalna<br>dužina</th>
+        <th>Visina<br>signala</th>
+        <th>Primjedba</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19 };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19 };
+  module.exports = { obrazac25, obrazac19, obrazacTZ };
 }
