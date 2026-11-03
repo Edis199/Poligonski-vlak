@@ -92,6 +92,10 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 
 .greska{background:#fdecec;border-left:4px solid var(--crvena);padding:10px 14px;border-radius:6px;color:var(--crvena);margin:10px 0}
 
+.ucitavanje-okvir{background:#f7fbff;border:1px dashed var(--plava);border-radius:10px;padding:16px;margin-bottom:8px}
+.uspjeh{color:var(--zelena);font-weight:600}
+.neuspjeh{color:var(--crvena);font-weight:600}
+
 /* ---------- Stil za ispis / PDF ---------- */
 @media print{
   .kartice,.akcije,.alatna,footer,.info{display:none !important}

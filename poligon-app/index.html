@@ -31,8 +31,31 @@
   <!-- ========== UNOS ========== -->
   <section id="unos" class="panel vidljiv">
     <div class="info">
-      <strong>Uputa:</strong> Unesite poznate (date) tačke, mjerene prelomne uglove i dužine.
-      Uglovi se unose u obliku <code>SSS.MMSS</code> (npr. <code>237.2509</code> = 237°25′09″).
+      <strong>Uputa:</strong> Unesite poznate (date) tačke, pa prelomne uglove i dužine —
+      <b>ručno</b> u tabelu, ili ih <b>učitajte iz tahimetrijskog zapisnika</b> (CSV).
+      Uglovi se mogu unijeti kao <code>57°25'08"</code> ili kao <code>57.2508</code>.
+    </div>
+
+    <h2>Učitavanje iz tahimetrijskog zapisnika (CSV)</h2>
+    <div class="ucitavanje-okvir">
+      <p class="napomena" style="margin-top:0">
+        1) Preuzmite predložak &nbsp;→&nbsp; 2) u Excelu kopirajte mjerenja iz totalke i spremite kao CSV
+        &nbsp;→&nbsp; 3) ovdje ga učitajte. Aplikacija sama računa sredine iz girusa,
+        prelomne uglove i horizontalne dužine.
+      </p>
+      <div class="alatna">
+        <button id="preuzmiPredlozak" class="dugme">Preuzmi predložak (CSV)</button>
+        <label class="dugme" style="position:relative;cursor:pointer">
+          Učitaj zapisnik (CSV)
+          <input id="datotekaCSV" type="file" accept=".csv,text/csv"
+                 style="position:absolute;inset:0;opacity:0;cursor:pointer" />
+        </label>
+        <span id="statusUcitavanja" class="napomena"></span>
+      </div>
+      <div class="info" style="font-size:13px">
+        <b>Girusna metoda:</b> red po stanici ide <b>zadnja → prednja → prednja (II položaj) → zadnja (II položaj)</b>.
+        Dozvoljeno 1, 2 ili 3 girusa po stanici. Stanicu i visinu instrumenta upišite samo u prvom redu stanice.
+      </div>
     </div>
 
     <h2>Date (poznate) tačke</h2>
@@ -83,7 +106,7 @@
       <thead>
         <tr>
           <th>Stanica</th>
-          <th>Prelomni ugao (SSS.MMSS)</th>
+          <th>Prelomni ugao (57°25'08" ili 57.2508)</th>
           <th>Dužina stranice (m)</th>
           <th>Naziv nove tačke</th>
         </tr>
@@ -130,6 +153,8 @@
 </footer>
 
 <script src="racun.js"></script>
+<script src="girus.js"></script>
+<script src="ucitavanje.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -36,7 +36,7 @@ function generirajTabelu(brUglova, podaci) {
 
     tr.innerHTML = `
       <td><strong>${stanica}</strong></td>
-      <td><input class="in-ugao" type="number" step="0.0001" value="${ugaoV}" placeholder="SSS.MMSS" /></td>
+      <td><input class="in-ugao" type="text" value="${ugaoV}" placeholder="57°25'08&quot; ili 57.2508" /></td>
       <td>${imaDuzina ? `<input class="in-duzina" type="number" step="0.001" value="${duzV}" placeholder="m" />` : "<span class='napomena'>—</span>"}</td>
       <td><input class="in-naziv" value="${nazV}" placeholder="${stanica}" /></td>
     `;
@@ -69,6 +69,20 @@ function ucitajPrimjer() {
   alert("Učitan je primjer s datim tačkama iz Excela.\nUglovi i dužine su ilustrativni — zamijenite ih svojim mjerenjima.");
 }
 
+// decimalni stupnjevi -> broj oblika SSS.MMSS (npr. 135.998... -> 135.5955)
+function decimalniUSmsBroj(dec){
+  let x = dec;
+  while (x < 0) x += 360;
+  while (x >= 360) x -= 360;
+  let s = Math.floor(x);
+  let mF = (x - s) * 60;
+  let m = Math.floor(mF + 1e-9);
+  let se = Math.round((mF - m) * 60);
+  if (se >= 60){ se -= 60; m++; }
+  if (m >= 60){ m -= 60; s++; }
+  return Number(`${s}.${String(m).padStart(2,"0")}${String(se).padStart(2,"0")}`);
+}
+
 function postavi(id, v){ const e=document.getElementById(id); if(e) e.value=v; }
 function broj(id){ return parseFloat(document.getElementById(id).value) || 0; }
 function tekst(id){ return document.getElementById(id).value || ""; }
@@ -87,10 +101,20 @@ document.getElementById("izracunaj").addEventListener("click", () => {
   // nazivi novih tačaka = srednji nazivi (bez prvog/zadnjeg)
   const naziviNovih = nazivi.slice(1, nazivi.length - 1);
 
+  // uglove parsiramo preko Girus.parsirajUgao (razumije i "57°25'08\"" i "57.2508")
+  // pa ih vraćamo u SSS.MMSS zapis koji jezgra očekuje
+  const uglDecimalni = uglovi.map((u) => {
+    if (u === "" || u === null) return 0;
+    const dec = window.Girus ? window.Girus.parsirajUgao(u) : Number(u);
+    return dec === null ? 0 : dec;
+  });
+  // jezgra prima SSS.MMSS; pretvorimo decimalne natrag u taj zapis
+  const prelomniSms = uglDecimalni.map(decimalniUSmsBroj);
+
   const ulaz = {
     datePocetne: { A:{Y:broj("A_Y"),X:broj("A_X")}, B:{Y:broj("B_Y"),X:broj("B_X")} },
     dateKrajnje: { C:{Y:broj("C_Y"),X:broj("C_X")}, D:{Y:broj("D_Y"),X:broj("D_X")} },
-    prelomniUglovi: uglovi.map((u)=>u===""?0:Number(u)),
+    prelomniUglovi: prelomniSms,
     duzine,
     nazivi: naziviNovih,
     nazivPocetne: tekst("B_naziv") || "B",
@@ -319,3 +343,82 @@ generirajTabelu(4, {
   duzine: ["", "", ""],
   nazivi: ["", "1", "2", ""]
 });
+
+/* =====================================================================
+   UČITAVANJE IZ TAHIMETRIJSKOG ZAPISNIKA (CSV)
+   ===================================================================== */
+
+// Predložak za preuzimanje (isti raspored koji aplikacija čita)
+const PREDLOZAK_CSV =
+`Stanica;VisinaInstrumenta;Vizura;Kod;HorizontalniUgao;ZenitniUgao;KosaDuzina;VisinaSignala
+P2586;1.658;P2585;;57°25'08";90°49'44";92.750;1.671
+;;1;;193°25'01";89°46'31";116.768;1.455
+;;1;;13°25'11";270°13'13";116.768;1.455
+;;P2585;;237°25'15";269°10'09";92.750;1.671
+;;P2585;;57°25'12";90°49'41";92.750;1.671
+;;1;;193°25'04";89°46'35";116.768;1.455
+;;1;;13°25'12";270°13'17";116.768;1.455
+;;P2585;;237°25'15";269°10'10";92.750;1.671
+`;
+
+document.getElementById("preuzmiPredlozak").addEventListener("click", () => {
+  const bom = "\uFEFF";
+  const blob = new Blob([bom + PREDLOZAK_CSV], { type: "text/csv;charset=utf-8;" });
+  preuzmi(blob, "predlozak_tahimetrijski_zapisnik.csv");
+});
+
+document.getElementById("datotekaCSV").addEventListener("change", (ev) => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  const citac = new FileReader();
+  citac.onload = () => {
+    try {
+      obradiUcitaniCSV(String(citac.result));
+    } catch (e) {
+      postaviStatus("Greška: " + e.message, false);
+    }
+  };
+  citac.readAsText(f, "UTF-8");
+  // resetiraj da se može ponovno učitati ista datoteka
+  ev.target.value = "";
+});
+
+function postaviStatus(poruka, uspjeh) {
+  const el = document.getElementById("statusUcitavanja");
+  el.textContent = poruka;
+  el.className = "napomena " + (uspjeh ? "uspjeh" : "neuspjeh");
+}
+
+function obradiUcitaniCSV(tekst) {
+  const stanice = window.Ucitavanje.ucitajCSV(tekst);
+  const { obradjene, greske } = window.Ucitavanje.pripremiIzStanica(stanice);
+
+  const validne = obradjene.filter((o) => !o.greska);
+  if (!validne.length) {
+    postaviStatus("Nijedna stanica nije ispravno obrađena. " + (greske[0] || ""), false);
+    return;
+  }
+
+  // Popuni tabelu prelomnih uglova i dužina
+  const n = validne.length;                 // broj prelomnih uglova = broj stanica
+  document.getElementById("brojUglova").value = n;
+  generirajTabelu(n);
+
+  const uglInputi = document.querySelectorAll(".in-ugao");
+  const duzInputi = document.querySelectorAll(".in-duzina");
+  const nazInputi = document.querySelectorAll(".in-naziv");
+
+  validne.forEach((o, i) => {
+    // prelomni ugao upisujemo u čitljivom zapisu SSS°MM'SS" (jezgra ga razumije preko parsiranja)
+    if (uglInputi[i]) uglInputi[i].value = window.Girus.decUStr(o.prelomniUgao);
+    // dužina (ima je svaka stanica osim zadnje)
+    if (duzInputi[i]) duzInputi[i].value = o.horizDuzina.toFixed(3);
+    // naziv prednje tačke (nova tačka)
+    if (nazInputi[i]) nazInputi[i].value = o.nazPrednja || "";
+  });
+
+  postaviStatus(`Učitano ${n} stanica. Provjerite date tačke pa kliknite „Izračunaj".`, true);
+  if (greske.length) {
+    alert("Napomena:\n" + greske.join("\n"));
+  }
+}

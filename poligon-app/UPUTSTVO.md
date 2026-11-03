@@ -16,18 +16,43 @@ ne instalira.
 ## Kako se koristi
 
 ### 1. Unos podataka
-- Unesite **date (poznate) tačke**:
+
+Date (poznate) tačke unesite ručno:
   - **A** = orijentacijska tačka pozadi, **B** = početna stanica vlaka
   - **C** = krajnja stanica vlaka, **D** = orijentacijska tačka naprijed
-- Odaberite **broj prelomnih uglova** (2–15) i kliknite **"Generiraj tabelu"**.
-- Unesite **prelomne uglove** u obliku `SSS.MMSS`
-  (npr. `237.2509` znači 237°25′09″).
-- Unesite **dužine stranica** (horizontalne dužine, u metrima).
-  Dužina ima za jedan manje nego prelomnih uglova.
-- Kliknite **"Izračunaj izravnanje"**.
 
-Dugme **"Učitaj primjer iz Excela"** popuni date tačke iz originalnog Excela
-(uglovi i dužine su ilustrativni — zamijenite ih svojim mjerenjima).
+Prelomne uglove i dužine možete unijeti na **dva načina**:
+
+**Način 1 — učitavanje iz tahimetrijskog zapisnika (CSV):**
+  1. Kliknite **"Preuzmi predložak (CSV)"**.
+  2. Otvorite predložak u Excelu, kopirajte mjerenja iz totalke i spremite
+     kao CSV (`Datoteka → Spremi kao → CSV`).
+  3. Kliknite **"Učitaj zapisnik (CSV)"** i odaberite datoteku.
+  4. Aplikacija sama računa sredine iz girusa, prelomne uglove i
+     horizontalne dužine, te popuni tabelu.
+
+**Način 2 — ručni unos:**
+  - Odaberite **broj prelomnih uglova** (2–15) → **"Generiraj tabelu"**.
+  - Uglove unesite kao `57°25'08"` **ili** kao `57.2508`.
+  - Dužine (horizontalne, u metrima) — ima ih za jedan manje od uglova.
+
+Na kraju kliknite **"Izračunaj izravnanje"**.
+
+### Format zapisnika (girusna metoda)
+
+Jedan girus = 4 reda redom:
+  1. **zadnja** (I položaj / krug lijevo)
+  2. **prednja** (I položaj)
+  3. **prednja** (II položaj / krug desno)
+  4. **zadnja** (II položaj)
+
+Dozvoljeno je 1, 2 ili 3 girusa po stanici (4, 8 ili 12 redova).
+Stanicu i visinu instrumenta upišite **samo u prvom redu** svake stanice
+(ostali redovi te stanice ostaju prazni u tim stupcima).
+
+Stupci predloška:
+`Stanica ; VisinaInstrumenta ; Vizura ; Kod ; HorizontalniUgao ;
+ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
 ### 2. Rezultati
 Prikazuje:
