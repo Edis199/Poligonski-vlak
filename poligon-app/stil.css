@@ -108,46 +108,64 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   .tabela{font-size:12px}
 }
 
-/* ---------- Geodetski obrasci ---------- */
+/* ---------- Geodetski obrasci (stil kao tablice u Rezultatima) ---------- */
 .obrazac-okvir{margin-top:16px;overflow-x:auto}
 .obrazac{
-  border-collapse:collapse;margin:0 auto;background:#fff;
-  font-size:13.5px;color:#000;
-  font-family:"Times New Roman",Times,Georgia,serif;
+  border-collapse:separate;border-spacing:0;margin:0 auto;background:#fff;
+  font-size:14px;color:var(--tekst);
+  font-family:"Segoe UI",system-ui,Arial,sans-serif;
+  border-radius:10px;overflow:hidden;
+  box-shadow:0 1px 6px rgba(0,0,0,.08);
 }
-/* horizontalne linije tanje, vertikalne blago podebljane */
 .obrazac th,.obrazac td{
-  border-top:1px solid #000;border-bottom:1px solid #000;
-  border-left:1.6px solid #000;border-right:1.6px solid #000;
-  padding:3px 7px;text-align:center;vertical-align:middle;
+  border-right:1.5px solid var(--obrub);
+  border-bottom:1px solid var(--obrub);
+  padding:7px 10px;text-align:center;vertical-align:middle;
 }
-/* vanjski okvir malo deblji za uredan izgled */
-.obrazac{border:2px solid #000}
+/* zaglavlja plava kao u rezultatima */
+.obrazac thead th{
+  background:var(--svijetla);color:var(--plava-tamna);font-weight:600;
+  border-bottom:2px solid var(--obrub);
+}
+.obrazac .naslov{
+  background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+  color:#fff;font-weight:700;font-size:15px;letter-spacing:.4px;padding:10px;
+  border-right:none;
+}
+/* zebrasti redovi */
+.obrazac tbody tr:nth-child(even) td{background:#fafcfe}
+/* ukloni desni rub na zadnjoj koloni */
+.obrazac th:last-child,.obrazac td:last-child{border-right:none}
 .obrazac .naslov{font-weight:bold;font-size:14px;letter-spacing:.5px;padding:6px}
-.obrazac .zaglavlje-red th{font-weight:bold;height:80px;background:#fff}
+.obrazac .zaglavlje-red th{font-weight:600;height:72px}
 .obrazac td.c{text-align:center}
-.obrazac td.d{text-align:right;padding-right:10px;font-variant-numeric:tabular-nums}
-.obrazac .sekcija{font-weight:bold;letter-spacing:1px}
-.obrazac .crvena,.obrazac .crveni-tekst td{color:#c00}
-.obrazac .mali{font-size:11px;color:#333}
-.obrazac .suma-red td{font-weight:bold;background:#f3f3f3}
+.obrazac td.d{text-align:right;padding-right:12px;font-variant-numeric:tabular-nums}
+.obrazac .sekcija{font-weight:700;letter-spacing:.6px;color:var(--plava-tamna);background:#eef4fb}
+.obrazac .crvena{color:#c0392b}
+.obrazac .crveni-tekst td{color:#c0392b;font-weight:600}
+.obrazac .mali{font-size:11px;color:var(--siva)}
+.obrazac .suma-red td{font-weight:700;background:#eef4fb !important;color:var(--plava-tamna)}
 .uspravno{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block}
 .obrazac25 .w-naziv{width:150px}
 .obrazac25 .w-gdje{width:60px}
 .obrazac25 th:nth-child(3),.obrazac25 th:nth-child(4),.obrazac25 th:nth-child(5){width:130px}
 .obrazac19 .uspravno-col{width:28px}
 .obrazac-naslov-linija{
-  text-align:right;font-weight:bold;margin:0 auto 6px;max-width:960px;
-  font-family:"Times New Roman",Times,serif;font-size:15px;
+  text-align:right;font-weight:700;margin:0 auto 8px;max-width:980px;
+  font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:15px;color:var(--plava-tamna);
 }
-.obrazac19 td{height:26px}
-.obrazac19 .suma-red td{background:#eef4fb}
-.obrazac25 .crveni-tekst td,.obrazac25 .crvena{font-weight:600}
+/* red s pod-zaglavljem Δy/Δx — niži i diskretniji */
+.obrazac19 .zaglavlje-red.pod th{height:auto;padding:4px 10px;font-size:13px;color:var(--siva);background:#f6f9fd}
+/* mali redovi popravke vβ — niži */
+.obrazac19 tr.tanko td{padding:2px 10px;height:auto}
+.obrazac19 tr.tanko td .mali{font-size:11px}
 
 @media print{
   .kartice,.akcije,.alatna,footer,.info,.zaglavlje{display:none !important}
   .panel{display:none !important}
   #obrasci{display:block !important;box-shadow:none;padding:0}
   #obrasci h2,#obrasci .napomena{display:none}
-  .obrazac{font-size:12px}
+  .obrazac{font-size:12px;box-shadow:none}
+  .obrazac .naslov{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .obrazac thead th,.obrazac .sekcija,.obrazac .suma-red td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
