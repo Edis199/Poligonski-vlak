@@ -11,11 +11,29 @@
    ===================================================================== */
 
 function ucitajCSV(tekst) {
-  // razdjelnik: ako ima više ; nego , koristi ;
-  const prviRed = tekst.split(/\r?\n/)[0] || "";
-  const sep = (prviRed.split(";").length >= prviRed.split(",").length) ? ";" : ",";
+  // makni eventualni BOM na početku
+  if (tekst.charCodeAt(0) === 0xFEFF) tekst = tekst.slice(1);
 
-  const redovi = tekst.split(/\r?\n/).map((r) => r.trim()).filter((r) => r !== "");
+  const prviRed = tekst.split(/\r?\n/)[0] || "";
+
+  // Automatski prepoznaj razdjelnik stupaca: tab, tačka-zarez ili zarez.
+  // Biramo onaj kojeg u zaglavlju ima najviše.
+  const kandidati = ["\t", ";", ","];
+  let sep = ";";
+  let najvise = -1;
+  for (const k of kandidati) {
+    const broj = prviRed.split(k).length - 1;
+    if (broj > najvise) { najvise = broj; sep = k; }
+  }
+  // ako ni jedan razdjelnik nije pronađen, javi jasnu grešku
+  if (najvise <= 0) {
+    throw new Error("Ne mogu prepoznati stupce. Spremite datoteku kao CSV (razdvojeno zarezom) ili Tekst (tab).");
+  }
+
+  // redove trimamo samo od CR/LF i razmaka na krajevima, NE od tabova
+  const redovi = tekst.split(/\r?\n/)
+    .map((r) => r.replace(/^[ \r\n]+|[ \r\n]+$/g, ""))
+    .filter((r) => r !== "");
   if (redovi.length < 2) throw new Error("Datoteka je prazna ili nema podataka.");
 
   // zaglavlje -> mapa naziva na indeks
@@ -53,7 +71,9 @@ function ucitajCSV(tekst) {
     if (vizura === "" && horiz === "") continue;
 
     if (!trenutna || trenutna.stanica !== stan) {
-      trenutna = { stanica: stan, visinaInstr: vis, mjerenja: [] };
+      // visinu instrumenta normaliziramo (zarez -> tačka)
+      const visBroj = parseFloat(String(vis).replace(",", ".")) || 0;
+      trenutna = { stanica: stan, visinaInstr: visBroj, mjerenja: [] };
       stanice.push(trenutna);
     }
     trenutna.mjerenja.push({
