@@ -146,6 +146,24 @@ document.getElementById("izracunaj").addEventListener("click", () => {
 });
 
 /* ---------- Prikaz rezultata ---------- */
+// Prikaz ugla iz sekundi u obliku  M'SS"  (ili samo SS" ako < 60").
+// predznak=true dodaje + ili - ispred.
+function sekMinSek(ukupnoSek, predznak) {
+  const neg = ukupnoSek < 0;
+  let s = Math.abs(ukupnoSek);
+  const min = Math.floor(s / 60);
+  const sek = s - min * 60;
+  let txt;
+  if (min > 0) {
+    txt = `${min}'${sek.toFixed(1).padStart(4, "0")}"`;
+  } else {
+    txt = `${sek.toFixed(1)}"`;
+  }
+  if (predznak) txt = (neg ? "-" : "+") + txt;
+  else if (neg) txt = "-" + txt;
+  return txt;
+}
+
 function prikaziRezultate(r, rv) {
   const D = window.Racun.decimalniUSms;
   const sek = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "\"";
@@ -157,9 +175,9 @@ function prikaziRezultate(r, rv) {
     <h2>Sažetak izravnanja</h2>
     <div class="sazetak-kartice">
       <div class="sk ${kutnoKlasa}">
-        <div class="oznaka">Kutno odstupanje f&beta;</div>
-        <div class="vrijednost">${sek(r.fBetaSek)}</div>
-        <div class="napomena">dopušteno ±${r.dopustenoFbetaSek.toFixed(1)}"</div>
+        <div class="oznaka">Uglovno odstupanje f&beta;</div>
+        <div class="vrijednost">${sekMinSek(r.fBetaSek, true)}</div>
+        <div class="napomena">dopušteno ±${sekMinSek(r.dopustenoFbetaSek, false)}</div>
       </div>
       <div class="sk ${linKlasa}">
         <div class="oznaka">Linearno odstupanje f<sub>d</sub></div>
@@ -183,12 +201,12 @@ function prikaziRezultate(r, rv) {
     </div>
   `;
 
-  // tabela direkcijskih uglova
+  // tabela direkcionih uglova
   let tblAlfe = `
-    <h2>Direkcijski uglovi i priraštaji</h2>
+    <h2>Direkcioni uglovi i priraštaji</h2>
     <table class="tabela">
       <thead><tr>
-        <th>Stranica</th><th>Direkcijski ugao &alpha;</th>
+        <th>Stranica</th><th>Direkcioni ugao &alpha;</th>
         <th>Dužina d (m)</th><th>&Delta;y</th><th>&Delta;x</th>
         <th>Popravka v<sub>y</sub></th><th>Popravka v<sub>x</sub></th>
       </tr></thead><tbody>`;
@@ -214,7 +232,7 @@ function prikaziRezultate(r, rv) {
   // tabela prelomnih uglova (mjereni i popravljeni)
   let tblBeta = `
     <h2>Prelomni uglovi</h2>
-    <p class="napomena">Popravka na svaki ugao: ${sek(r.popravakUgla*3600)}</p>
+    <p class="napomena">Popravka na svaki ugao: ${sekMinSek(r.popravakUgla*3600, true)}</p>
     <table class="tabela">
       <thead><tr><th>#</th><th>Mjereni ugao</th><th>Popravljeni ugao</th></tr></thead><tbody>`;
   for (let i = 0; i < r.n; i++) {
@@ -241,7 +259,7 @@ function prikaziRezultate(r, rv) {
   // status kontrola
   const statusHtml = `
     <h2>Kontrola dopuštenih odstupanja</h2>
-    <p>Kutno izravnanje:
+    <p>Uglovno izravnanje:
       <span class="oznaka-status ${r.kutnoOK?'status-ok':'status-ne'}">
         ${r.kutnoOK ? "U DOZVOLJENIM GRANICAMA" : "PREKORAČENO"}</span></p>
     <p>Linearno izravnanje:
@@ -379,8 +397,8 @@ document.getElementById("izvozExcel").addEventListener("click", () => {
       csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${t.tip}\n`;
     }
   });
-  csv += `\nKutno odstupanje fbeta (sek);${r.fBetaSek.toFixed(1)}\n`;
-  csv += `Dopusteno kutno (sek);${r.dopustenoFbetaSek.toFixed(1)}\n`;
+  csv += `\nUglovno odstupanje fbeta;${sekMinSek(r.fBetaSek, true)}\n`;
+  csv += `Dopusteno uglovno;${sekMinSek(r.dopustenoFbetaSek, false)}\n`;
   csv += `Linearno odstupanje fd (m);${r.fd.toFixed(3)}\n`;
   csv += `Dopusteno linearno (m);${r.dopustenoFd.toFixed(3)}\n`;
   csv += `Ukupna duzina (m);${r.sumaD.toFixed(2)}\n`;
