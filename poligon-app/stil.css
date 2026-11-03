@@ -165,6 +165,10 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:600}
 .obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:700}
 .obrazacTZ .tz-vi td{color:var(--siva)}
+/* TO 28P obrazac */
+.obrazac28p .tz-vi td{color:var(--siva)}
+.obrazac28p .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
+.obrazac28p .sitno{font-size:10px;color:var(--siva);font-weight:400}
 /* odabrani obrazac — istaknut gumb */
 .obrazac-izbor{flex-wrap:wrap}
 .dugme.odabran{background:var(--plava);color:#fff;border-color:var(--plava)}

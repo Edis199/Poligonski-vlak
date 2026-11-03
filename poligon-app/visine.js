@@ -57,7 +57,16 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
       od: sNapr.stanica, do: sNapr.nazPrednja,
       duzina: d,
       dHnaprijed, dHnazad, dHsred,
-      odstojanjeKm: round(d / 100, 1)  // Excel L kolona: d/100 (u stotinama m)
+      odstojanjeKm: round(d / 100, 1),  // Excel L kolona: d/100 (u stotinama m)
+      // --- podaci za obrazac TO 28P (prikaz) ---
+      vizuraNaprijed: sNapr.nazPrednja,   // na koju tačku gledamo naprijed
+      zenitNaprijed: sNapr.zenitPrednja,  // zenitni ugao naprijed (dec°)
+      ia,                                 // visina instrumenta na stanici "od"
+      lb,                                 // visina signala na tački "do" (naprijed)
+      vizuraNazad: sNazad.nazZadnja,      // nazad gledamo na "od" sa stanice "do"
+      zenitNazad: sNazad.zenitZadnja,     // zenitni ugao nazad (dec°)
+      ib,                                 // visina instrumenta na stanici "do"
+      la                                  // visina signala na tački "od" (nazad)
     });
   }
 

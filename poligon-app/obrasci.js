@@ -482,9 +482,93 @@ function obrazac8(date) {
   </table>`;
 }
 
+/* --------- OBRAZAC TO 28P: Trigonometrijska nivelacija (visinske razlike) ---------
+   rez = rezultat iz Visine.izravnajVisine(...):
+     rez.redovi[] = { od, do, duzina,
+                      vizuraNaprijed, zenitNaprijed, ia, lb, dHnaprijed,
+                      vizuraNazad,    zenitNazad,    ib, la, dHnazad,
+                      dHsred }
+   Prikaz vjeran Excel obrascu 28P: svaka stranica = dva reda (od/do).       */
+function obrazac28P(rez) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+  // visinske razlike se prikazuju u milimetrima (kao u Excelu)
+  const mm = (m) => (m === null || m === undefined || isNaN(m)) ? "" : String(Math.round(m * 1000));
+
+  let redovi = "";
+  (rez.redovi || []).forEach((r) => {
+    // odstupanje Δ = ΔH_naprijed − (−ΔH_nazad) = ΔH_napr + ΔH_nazad (mm)
+    const odstMM = Math.round((r.dHnaprijed + r.dHnazad) * 1000);
+    // gornji red: vizura + visina instrumenta (ia / ib)
+    // donji red: zenitni ugao + visina signala (lb / la) + ΔH u mm
+    redovi += `
+      <tr>
+        <td class="c"><b>${r.od}</b></td>
+        <td class="d" rowspan="2">${fz(r.duzina, 3)}</td>
+        <td class="c">${r.vizuraNaprijed || ""}</td>
+        <td class="d">${fz(r.ia, 3)}</td>
+        <td class="d" rowspan="2"><b>${mm(r.dHnaprijed)}</b></td>
+        <td class="c">${r.vizuraNazad || ""}</td>
+        <td class="d">${fz(r.ib, 3)}</td>
+        <td class="d" rowspan="2"><b>${mm(r.dHnazad)}</b></td>
+        <td class="d" rowspan="2"><b>${mm(r.dHsred)}</b><br><span class="sitno">&Delta;=${odstMM}</span></td>
+      </tr>
+      <tr class="tz-vi">
+        <td class="c"><b>${r.do}</b></td>
+        <td class="c">${ug(r.zenitNaprijed)}</td>
+        <td class="d">${fz(r.lb, 3)}</td>
+        <td class="c">${ug(r.zenitNazad)}</td>
+        <td class="d">${fz(r.la, 3)}</td>
+      </tr>
+      <tr class="razmak"><td colspan="9">&nbsp;</td></tr>`;
+  });
+
+  // sažetak zatvaranja
+  const fhMM = Math.round(rez.fh * 1000);
+  const dopMM = Math.round(rez.dopustenoFh * 1000);
+  const ok = rez.visinskiOK ? "zadovoljava" : "NE zadovoljava";
+  const sazetak = `
+    <tr class="razmak"><td colspan="9">&nbsp;</td></tr>
+    <tr class="tz-sum">
+      <td colspan="5" style="text-align:right">Zbroj definitivnih visinskih razlika &Sigma;&Delta;H:</td>
+      <td colspan="4" class="d"><b>${fz(rez.sumaDH, 3)} m</b></td>
+    </tr>
+    <tr class="tz-sum">
+      <td colspan="5" style="text-align:right">Visinsko odstupanje f<sub>h</sub>:</td>
+      <td colspan="4" class="d"><b>${fhMM} mm</b></td>
+    </tr>
+    <tr class="tz-sum">
+      <td colspan="5" style="text-align:right">Dozvoljeno odstupanje f<sub>h,dop</sub>:</td>
+      <td colspan="4" class="d">&plusmn;${dopMM} mm &nbsp;(${ok})</td>
+    </tr>`;
+
+  return `
+  <div class="obrazac-naslov-linija">Trigonom. obrazac br.28P — Trigonometrijska nivelacija</div>
+  <table class="obrazac obrazac28p">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th rowspan="2">od A<br>do B</th>
+        <th rowspan="2">Dužina<br>D (m)</th>
+        <th colspan="3">Mjerenje naprijed (A &ndash; B)</th>
+        <th colspan="3">Mjerenje nazad (B &ndash; A)</th>
+        <th rowspan="2">Definitivna<br>&Delta;H (mm)</th>
+      </tr>
+      <tr class="zaglavlje-red">
+        <th>Vizura /<br>zenit. ugao</th>
+        <th>i<sub>a</sub> / l<sub>b</sub></th>
+        <th>&Delta;H (mm)<br>naprijed</th>
+        <th>Vizura /<br>zenit. ugao</th>
+        <th>i<sub>b</sub> / l<sub>a</sub></th>
+        <th>&Delta;H (mm)<br>nazad</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}${sazetak}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8 };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8 };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P };
 }
