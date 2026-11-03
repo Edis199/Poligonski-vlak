@@ -123,14 +123,18 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
       while (d > 180) d -= 360; while (d < -180) d += 360;
       return Math.round(d * 3600); // sekunde
     };
+    // dvostruki visinski ugao (Excel V = K.L. - K.D. + 360); visinski ugao = V/2
+    const dvostruki = (kl, kd) => norm360(kl - kd + 360);
     girusDetalji.push({
       girus: g + 1,
       zadnja: { vizura: z1.vizura, iPolu: hz1, iiPolu: hz2, dvoC: kolim(hz1, hz2), sredina: srZad,
                 visSignala: Number(z1.visinaSignala),
-                zenitKL: zz1, zenitKD: zz2, zbrojZen: zz1 + zz2, srZenit: srZenZad },
+                zenitKL: zz1, zenitKD: zz2, zbrojZen: zz1 + zz2,
+                dvostrukiVis: dvostruki(zz1, zz2), srZenit: srZenZad },
       prednja:{ vizura: p1.vizura, iPolu: hp1, iiPolu: hp2, dvoC: kolim(hp1, hp2), sredina: srPre,
                 visSignala: Number(p1.visinaSignala),
-                zenitKL: zp1, zenitKD: zp2, zbrojZen: zp1 + zp2, srZenit: srZenPre },
+                zenitKL: zp1, zenitKD: zp2, zbrojZen: zp1 + zp2,
+                dvostrukiVis: dvostruki(zp1, zp2), srZenit: srZenPre },
     });
 
     kosaZadnja.push(prosjek([Number(z1.kosa), Number(z2.kosa)]));

@@ -320,12 +320,11 @@ function obrazac1V(obradjeneStanice) {
   const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
   const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
 
-  // jedan red para (stanica->vizura): KL, KD, zbroj, dvostruki visinski, srednji visinski ugao
+  // jedan red para (stanica->vizura): KL, KD, zbroj(2HV), dvostruki visinski, visinski ugao
   function redPara(stanNaziv, vi, p) {
-    const zbroj = p.zbrojZen;                 // ≈ 360°
-    const dvostrukiVis = Math.abs(180 - p.zbrojZen) * 0;  // (ne koristi se direktno)
-    // srednji zenit -> visinski ugao se prikazuje kao srednji zenit (kao u Excelu, kolona 10)
-    const srednjiZen = p.srZenit;
+    const zbroj = p.zbrojZen;                 // 2(H.V.) = K.L.+K.D. ≈ 360°
+    const dvostruki = p.dvostrukiVis;         // dvostruki visinski ugao (K.L.-K.D.+360)
+    const srednjiZen = p.srZenit;             // visinski ugao = dvostruki/2
     return `
       <tr>
         <td class="c"><b>${stanNaziv}</b></td>
@@ -333,12 +332,13 @@ function obrazac1V(obradjeneStanice) {
         <td class="c">${ug(p.zenitKL)}</td>
         <td class="c">${ug(p.zenitKD)}</td>
         <td class="c">${ug(zbroj)}</td>
+        <td class="c">${ug(dvostruki)}</td>
         <td class="c">${ug(srednjiZen)}</td>
       </tr>
       <tr class="tz-vi">
         <td class="c">${vi ? fz(vi,3) : ""}</td>
         <td class="c">${fz(p.visSignala,3)}</td>
-        <td colspan="3"></td>
+        <td colspan="4"></td>
         <td class="c"><b>${ug(srednjiZen)}</b></td>
       </tr>`;
   }
@@ -363,6 +363,7 @@ function obrazac1V(obradjeneStanice) {
         <th>I Krug lijevo<br>K.L.</th>
         <th>II Krug desno<br>K.D.</th>
         <th>2(H.V.)=<br>K.L.+K.D.</th>
+        <th>Dvostruki<br>visinski ugao<br>2&alpha;</th>
         <th>Visinski<br>ugao</th>
       </tr>
     </thead>
