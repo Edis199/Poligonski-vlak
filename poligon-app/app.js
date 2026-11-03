@@ -567,7 +567,7 @@ document.getElementById("stampajObrazac").addEventListener("click", () => {
 document.getElementById("stampajSve").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   // svi dostupni obrasci, redom (samo oni koji su napravljeni)
-  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "o19", "o25"]);
+  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "o25"]);
 });
 
 // Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
@@ -684,6 +684,9 @@ function generirajObrazacHTML(kod) {
   if (kod === "to18d") {
     return obradjeneStanice ? window.Obrasci.obrazac18D(obradjeneStanice) : "";
   }
+  if (kod === "to8") {
+    return zadnjiRezultat ? window.Obrasci.obrazac8(dateTackeABCD()) : "";
+  }
   if (kod === "o19") {
     return zadnjiRezultat ? window.Obrasci.obrazac19(zadnjiRezultat, { nazivA: tekst("A_naziv") }) : "";
   }
@@ -737,9 +740,11 @@ function prikaziObrazac() {
     } else {
       el.innerHTML = window.Obrasci.obrazac18D(obradjeneStanice);
     }
+  } else if (trenutniObrazac === "to8") {
+    el.innerHTML = window.Obrasci.obrazac8(dateTackeABCD());
   } else {
     // obrasci koji još nisu napravljeni
-    const nazivi = { to8:"TO 8", to28p:"TO 28P", tok:"TO K" };
+    const nazivi = { to28p:"TO 28P", tok:"TO K" };
     el.innerHTML = `<div class="info">Obrazac <b>${nazivi[trenutniObrazac] || trenutniObrazac}</b> je u pripremi — dodajemo ga uskoro.</div>`;
   }
   oznaciAktivniObrazac();
@@ -773,6 +778,16 @@ function sloziObrazac25() {
     .map((t) => ({ naziv: t.naziv, Y: t.Y, X: t.X, H: visMap[t.naziv] }));
 
   return window.Obrasci.obrazac25(dateTacke, noveTacke);
+}
+
+// Date tačke A, B, C, D iz polja na kartici 1 (za TO 8 — direkcioni uglovi)
+function dateTackeABCD() {
+  return {
+    A: { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") },
+    B: { naziv: tekst("B_naziv"), Y: broj("B_Y"), X: broj("B_X") },
+    C: { naziv: tekst("C_naziv"), Y: broj("C_Y"), X: broj("C_X") },
+    D: { naziv: tekst("D_naziv"), Y: broj("D_Y"), X: broj("D_X") },
+  };
 }
 
 function brojOpc(id) {

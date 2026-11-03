@@ -428,9 +428,63 @@ function obrazac18D(obradjeneStanice) {
   </table>`;
 }
 
+/* --------- OBRAZAC TO 8: Direkcioni uglovi i odstojanja iz koordinata ---------
+   date = { A:{naziv,Y,X}, B:{...}, C:{...}, D:{...} }
+   Računa orijentacijske smjerove: A->B (polazni) i C->D (dolazni).          */
+function obrazac8(date) {
+  const R = (typeof window !== "undefined" ? window.Racun : require("./racun.js"));
+  const ug = (dec) => R.decimalniUSms(dec);
+
+  // jedan blok: smjer od T1 prema T2
+  function blok(T1, T2) {
+    const dY = T2.Y - T1.Y;
+    const dX = T2.X - T1.X;
+    const alfa = R.direkcijskiUgao(T1.Y, T1.X, T2.Y, T2.X);
+    const d = R.odstojanje(T1.Y, T1.X, T2.Y, T2.X);
+    return `
+      <tr>
+        <td class="c"><b>${T2.naziv}</b></td>
+        <td class="d">${fz(T2.Y,3)}</td>
+        <td class="d">${fz(T2.X,3)}</td>
+        <td class="c" rowspan="2">${ug(alfa)}</td>
+        <td class="d" rowspan="2">${fz(d,2)}</td>
+      </tr>
+      <tr>
+        <td class="c"><b>${T1.naziv}</b></td>
+        <td class="d">${fz(T1.Y,3)}</td>
+        <td class="d">${fz(T1.X,3)}</td>
+      </tr>
+      <tr class="tz-vi">
+        <td class="c">&Delta;</td>
+        <td class="d">${fz(dY,3)}</td>
+        <td class="d">${fz(dX,3)}</td>
+        <td colspan="2"></td>
+      </tr>
+      <tr class="razmak"><td colspan="5">&nbsp;</td></tr>`;
+  }
+
+  // polazni smjer A->B i dolazni C->D
+  const redovi = blok(date.A, date.B) + blok(date.C, date.D);
+
+  return `
+  <div class="obrazac-naslov-linija">Trigonom. obrazac br.8 — Direkcioni uglovi i odstojanja</div>
+  <table class="obrazac obrazac8">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th>Tačke<br>Tb / Ta</th>
+        <th>Y<br>(&Delta;Y = Yb−Ya)</th>
+        <th>X<br>(&Delta;X = Xb−Xa)</th>
+        <th>Direkcioni<br>ugao</th>
+        <th>Odstojanje<br>d (m)</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8 };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8 };
 }
