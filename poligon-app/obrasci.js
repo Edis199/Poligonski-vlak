@@ -370,9 +370,67 @@ function obrazac1V(obradjeneStanice) {
   </table>`;
 }
 
+/* --------- OBRAZAC TO 18D: Redukcija dužina ---------
+   Za svaku stranicu vlaka prikazuje mjerenu kosu dužinu (naprijed/nazad),
+   sredinu, vertikalni (zenitni) ugao i redukovanu horizontalnu dužinu.     */
+function obrazac18D(obradjeneStanice) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+
+  let redovi = "";
+  const n = (obradjeneStanice || []).length;
+  // stranice: od stanice i -> prednja (i+1). Zadnja stanica nema prednju stranicu.
+  for (let i = 0; i < n - 1; i++) {
+    const st = obradjeneStanice[i];
+    if (st.greska) continue;
+    const od = st.stanica;
+    const doT = st.nazPrednja;
+    // kose dužine: naprijed (sa st) i nazad (sa sljedeće stanice prema st)
+    const sljed = obradjeneStanice[i + 1];
+    const kosaNaprijed = st.kosaPrednja;            // st -> prednja
+    const kosaNazad = sljed ? sljed.kosaZadnja : kosaNaprijed; // sljed -> zadnja (prema st)
+    const sredinaKosa = (kosaNaprijed + kosaNazad) / 2;
+    const zenit = st.zenitPrednja;
+    const horiz = st.horizDuzina;                   // redukovana horizontalna
+
+    redovi += `
+      <tr>
+        <td class="c"><b>${od}</b></td>
+        <td class="d">${fz(kosaNaprijed,3)}</td>
+        <td class="d" rowspan="2">${fz(sredinaKosa,3)}</td>
+        <td class="c" rowspan="2"></td>
+        <td class="c" rowspan="2">${ug(zenit)}</td>
+        <td class="d" rowspan="2">${fz(horiz,2)}</td>
+        <td rowspan="2"></td>
+      </tr>
+      <tr class="tz-vi">
+        <td class="c">${doT}</td>
+        <td class="d">${fz(kosaNazad,3)}</td>
+      </tr>
+      <tr class="razmak"><td colspan="7">&nbsp;</td></tr>`;
+  }
+
+  return `
+  <div class="obrazac-naslov-linija">Trigon. obrazac br. 18D — Redukcija dužina</div>
+  <table class="obrazac obrazac18d">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th>Od<br>Do</th>
+        <th>Mjerena dužina<br>(I / II mjer.)</th>
+        <th>Sredina</th>
+        <th>Temperatura</th>
+        <th>Vertikalni<br>ugao</th>
+        <th>Redukovana<br>horizontalna<br>dužina</th>
+        <th>Primjedba</th>
+      </tr>
+    </thead>
+    <tbody>${redovi}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D };
 }

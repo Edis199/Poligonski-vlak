@@ -567,7 +567,7 @@ document.getElementById("stampajObrazac").addEventListener("click", () => {
 document.getElementById("stampajSve").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   // svi dostupni obrasci, redom (samo oni koji su napravljeni)
-  ispisiObrasce(["tz", "to1i2", "to1v", "o19", "o25"]);
+  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "o19", "o25"]);
 });
 
 // Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
@@ -681,6 +681,9 @@ function generirajObrazacHTML(kod) {
   if (kod === "to1v") {
     return obradjeneStanice ? window.Obrasci.obrazac1V(obradjeneStanice) : "";
   }
+  if (kod === "to18d") {
+    return obradjeneStanice ? window.Obrasci.obrazac18D(obradjeneStanice) : "";
+  }
   if (kod === "o19") {
     return zadnjiRezultat ? window.Obrasci.obrazac19(zadnjiRezultat, { nazivA: tekst("A_naziv") }) : "";
   }
@@ -728,9 +731,15 @@ function prikaziObrazac() {
     } else {
       el.innerHTML = window.Obrasci.obrazac1V(obradjeneStanice);
     }
+  } else if (trenutniObrazac === "to18d") {
+    if (!obradjeneStanice) {
+      el.innerHTML = `<div class="info">Učitajte zapisnik (CSV/Excel) da se prikaže ovaj obrazac.</div>`;
+    } else {
+      el.innerHTML = window.Obrasci.obrazac18D(obradjeneStanice);
+    }
   } else {
     // obrasci koji još nisu napravljeni
-    const nazivi = { to18d:"TO 18D", to8:"TO 8", to28p:"TO 28P", tok:"TO K" };
+    const nazivi = { to8:"TO 8", to28p:"TO 28P", tok:"TO K" };
     el.innerHTML = `<div class="info">Obrazac <b>${nazivi[trenutniObrazac] || trenutniObrazac}</b> je u pripremi — dodajemo ga uskoro.</div>`;
   }
   oznaciAktivniObrazac();
