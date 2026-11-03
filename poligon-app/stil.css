@@ -1,0 +1,105 @@
+:root{
+  --plava:#1e5aa8;
+  --plava-tamna:#17407a;
+  --zelena:#1f9d55;
+  --crvena:#d64545;
+  --siva:#64748b;
+  --svijetla:#f1f5f9;
+  --obrub:#d7dee8;
+  --tekst:#1e293b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;
+  color:var(--tekst);background:#eef2f7;line-height:1.5;
+}
+.zaglavlje{
+  display:flex;align-items:center;gap:16px;
+  background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+  color:#fff;padding:18px 28px;box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.zaglavlje .logo{display:flex;align-items:center;justify-content:center}
+.zaglavlje h1{margin:0;font-size:24px}
+.podnaslov{margin:2px 0 0;opacity:.9;font-size:14px}
+
+.kartice{display:flex;gap:4px;background:#fff;padding:0 20px;border-bottom:2px solid var(--obrub);overflow-x:auto}
+.kartica{
+  background:none;border:none;padding:14px 20px;font-size:15px;cursor:pointer;
+  color:var(--siva);border-bottom:3px solid transparent;white-space:nowrap;
+}
+.kartica:hover{color:var(--plava)}
+.kartica.aktivna{color:var(--plava);border-bottom-color:var(--plava);font-weight:600}
+
+main{max-width:1100px;margin:0 auto;padding:24px}
+.panel{display:none;background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.panel.vidljiv{display:block}
+
+h2{color:var(--plava-tamna);border-bottom:2px solid var(--svijetla);padding-bottom:6px;margin-top:28px}
+h2:first-child{margin-top:0}
+
+.info{background:#e8f1fc;border-left:4px solid var(--plava);padding:12px 16px;border-radius:6px;margin-bottom:8px;font-size:14px}
+.info code,code{background:#dde7f3;padding:1px 6px;border-radius:4px;font-size:13px}
+
+.mreza2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.mreza2{grid-template-columns:1fr}}
+fieldset{border:1px solid var(--obrub);border-radius:8px;padding:14px}
+legend{font-weight:600;color:var(--plava);padding:0 8px}
+label{display:block;font-size:13px;color:var(--siva);margin:10px 0 4px}
+.red3{display:grid;grid-template-columns:1fr 1.3fr 1.3fr;gap:8px}
+
+input{
+  width:100%;padding:8px 10px;border:1px solid var(--obrub);border-radius:6px;
+  font-size:14px;font-family:inherit;
+}
+input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,90,168,.15)}
+
+.alatna{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}
+.alatna input{width:80px}
+.napomena{font-size:13px;color:var(--siva)}
+
+.dugme{
+  background:#fff;border:1px solid var(--plava);color:var(--plava);
+  padding:9px 18px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit;
+}
+.dugme:hover{background:var(--svijetla)}
+.dugme.primarno{background:var(--plava);color:#fff}
+.dugme.primarno:hover{background:var(--plava-tamna)}
+
+.akcije{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+
+.tabela{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.tabela th,.tabela td{border:1px solid var(--obrub);padding:8px 10px;text-align:center}
+.tabela th{background:var(--svijetla);color:var(--plava-tamna);font-weight:600}
+.tabela input{text-align:center}
+.tabela tr:nth-child(even) td{background:#fafcfe}
+
+.sazetak-kartice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 24px}
+.sk{padding:16px;border-radius:10px;border:1px solid var(--obrub);background:#fafcff}
+.sk .oznaka{font-size:13px;color:var(--siva)}
+.sk .vrijednost{font-size:20px;font-weight:700;margin-top:4px}
+.sk.ok{border-color:var(--zelena);background:#eafaf0}
+.sk.ok .vrijednost{color:var(--zelena)}
+.sk.ne{border-color:var(--crvena);background:#fdecec}
+.sk.ne .vrijednost{color:var(--crvena)}
+
+.oznaka-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.status-ok{background:#eafaf0;color:var(--zelena)}
+.status-ne{background:#fdecec;color:var(--crvena)}
+
+canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background:#fff}
+
+.podnozje{text-align:center;color:var(--siva);font-size:13px;padding:20px}
+
+.greska{background:#fdecec;border-left:4px solid var(--crvena);padding:10px 14px;border-radius:6px;color:var(--crvena);margin:10px 0}
+
+/* ---------- Stil za ispis / PDF ---------- */
+@media print{
+  .kartice,.akcije,.alatna,footer,.info{display:none !important}
+  .panel{display:none !important;box-shadow:none;padding:0}
+  #rezultati{display:block !important}
+  .zaglavlje{background:#fff !important;color:#000 !important;box-shadow:none;border-bottom:2px solid #000}
+  .zaglavlje svg{stroke:#000 !important}
+  body{background:#fff}
+  .sk{break-inside:avoid}
+  .tabela{font-size:12px}
+}

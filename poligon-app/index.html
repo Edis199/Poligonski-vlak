@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Izravnanje poligonskog vlaka</title>
+<link rel="stylesheet" href="stil.css" />
+</head>
+<body>
+<header class="zaglavlje">
+  <div class="logo" aria-hidden="true">
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 3 L3 21 L21 21 Z"/>
+      <path d="M3 14 L10 14 M3 9 L7 9"/>
+    </svg>
+  </div>
+  <div>
+    <h1>Izravnanje poligonskog vlaka</h1>
+    <p class="podnaslov">Umetnuti (priključni) poligonski vlak — geodetski proračun</p>
+  </div>
+</header>
+
+<nav class="kartice">
+  <button class="kartica aktivna" data-cilj="unos">1. Unos podataka</button>
+  <button class="kartica" data-cilj="rezultati">2. Rezultati</button>
+  <button class="kartica" data-cilj="crtez">3. Grafički prikaz</button>
+  <button class="kartica" data-cilj="izvoz">4. Ispis / Izvoz</button>
+</nav>
+
+<main>
+  <!-- ========== UNOS ========== -->
+  <section id="unos" class="panel vidljiv">
+    <div class="info">
+      <strong>Uputa:</strong> Unesite poznate (date) tačke, mjerene prelomne uglove i dužine.
+      Uglovi se unose u obliku <code>SSS.MMSS</code> (npr. <code>237.2509</code> = 237°25′09″).
+    </div>
+
+    <h2>Date (poznate) tačke</h2>
+    <div class="mreza2">
+      <fieldset>
+        <legend>Početak vlaka</legend>
+        <label>Orijentacijska tačka A (pozadi)</label>
+        <div class="red3">
+          <input id="A_naziv" placeholder="Naziv" value="P2585" />
+          <input id="A_Y" type="number" step="0.001" placeholder="Y" value="6525657.407" />
+          <input id="A_X" type="number" step="0.001" placeholder="X" value="4864001.469" />
+        </div>
+        <label>Početna stanica B</label>
+        <div class="red3">
+          <input id="B_naziv" placeholder="Naziv" value="P2586" />
+          <input id="B_Y" type="number" step="0.001" placeholder="Y" value="6525579.270" />
+          <input id="B_X" type="number" step="0.001" placeholder="X" value="4863951.535" />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kraj vlaka</legend>
+        <label>Krajnja stanica C</label>
+        <div class="red3">
+          <input id="C_naziv" placeholder="Naziv" value="P2582" />
+          <input id="C_Y" type="number" step="0.001" placeholder="Y" value="6525881.407" />
+          <input id="C_X" type="number" step="0.001" placeholder="X" value="4863893.674" />
+        </div>
+        <label>Orijentacijska tačka D (naprijed)</label>
+        <div class="red3">
+          <input id="D_naziv" placeholder="Naziv" value="P2581" />
+          <input id="D_Y" type="number" step="0.001" placeholder="Y" value="6525982.753" />
+          <input id="D_X" type="number" step="0.001" placeholder="X" value="4863728.072" />
+        </div>
+      </fieldset>
+    </div>
+
+    <h2>Prelomni uglovi i dužine</h2>
+    <div class="alatna">
+      <label>Broj prelomnih uglova:
+        <input id="brojUglova" type="number" min="2" max="15" value="4" />
+      </label>
+      <button id="generiraj" class="dugme">Generiraj tabelu</button>
+      <span class="napomena">Dužina ima za jedan manje od prelomnih uglova (stranice između tačaka).</span>
+    </div>
+
+    <table class="tabela" id="tabelaUnos">
+      <thead>
+        <tr>
+          <th>Stanica</th>
+          <th>Prelomni ugao (SSS.MMSS)</th>
+          <th>Dužina stranice (m)</th>
+          <th>Naziv nove tačke</th>
+        </tr>
+      </thead>
+      <tbody id="teloUnos"></tbody>
+    </table>
+
+    <div class="akcije">
+      <button id="izracunaj" class="dugme primarno">Izračunaj izravnanje</button>
+      <button id="primjer" class="dugme">Učitaj primjer iz Excela</button>
+    </div>
+  </section>
+
+  <!-- ========== REZULTATI ========== -->
+  <section id="rezultati" class="panel">
+    <div id="sazetak"></div>
+    <div id="rezultatiSadrzaj"></div>
+  </section>
+
+  <!-- ========== CRTEŽ ========== -->
+  <section id="crtez" class="panel">
+    <h2>Grafički prikaz vlaka</h2>
+    <p class="napomena">Date tačke su prikazane trokutom, nove tačke kružićem. Y je vodoravno, X okomito.</p>
+    <canvas id="platno" width="900" height="600"></canvas>
+  </section>
+
+  <!-- ========== IZVOZ ========== -->
+  <section id="izvoz" class="panel">
+    <h2>Ispis i izvoz</h2>
+    <p>Rezultate možete izvesti i spremiti:</p>
+    <div class="akcije">
+      <button id="izvozExcel" class="dugme">Izvoz u Excel (CSV)</button>
+      <button id="izvozPdf" class="dugme">Ispis / Spremi u PDF</button>
+    </div>
+    <p class="napomena">
+      "Izvoz u Excel" sprema tabelu koordinata koju Excel otvara direktno.<br />
+      "Ispis / PDF" otvara dijalog za štampu — odaberite "Spremi kao PDF".
+    </p>
+  </section>
+</main>
+
+<footer class="podnozje">
+  Geodetski alat za izravnanje poligonskog vlaka · radi offline u pregledniku
+</footer>
+
+<script src="racun.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
