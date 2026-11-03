@@ -492,26 +492,24 @@ function obrazac8(date) {
 function obrazac28P(rez) {
   const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
   const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
-  // visinske razlike se prikazuju u milimetrima (kao u Excelu)
-  const mm = (m) => (m === null || m === undefined || isNaN(m)) ? "" : String(Math.round(m * 1000));
 
   let redovi = "";
   (rez.redovi || []).forEach((r) => {
-    // odstupanje Δ = ΔH_naprijed − (−ΔH_nazad) = ΔH_napr + ΔH_nazad (mm)
-    const odstMM = Math.round((r.dHnaprijed + r.dHnazad) * 1000);
+    // odstupanje Δ = ΔH_naprijed + ΔH_nazad (u metrima)
+    const odst = r.dHnaprijed + r.dHnazad;
     // gornji red: vizura + visina instrumenta (ia / ib)
-    // donji red: zenitni ugao + visina signala (lb / la) + ΔH u mm
+    // donji red: zenitni ugao + visina signala (lb / la) + ΔH u metrima
     redovi += `
       <tr>
         <td class="c"><b>${r.od}</b></td>
         <td class="d" rowspan="2">${fz(r.duzina, 3)}</td>
         <td class="c">${r.vizuraNaprijed || ""}</td>
         <td class="d">${fz(r.ia, 3)}</td>
-        <td class="d" rowspan="2"><b>${mm(r.dHnaprijed)}</b></td>
+        <td class="d" rowspan="2"><b>${fz(r.dHnaprijed, 3)}</b></td>
         <td class="c">${r.vizuraNazad || ""}</td>
         <td class="d">${fz(r.ib, 3)}</td>
-        <td class="d" rowspan="2"><b>${mm(r.dHnazad)}</b></td>
-        <td class="d" rowspan="2"><b>${mm(r.dHsred)}</b><br><span class="sitno">&Delta;=${odstMM}</span></td>
+        <td class="d" rowspan="2"><b>${fz(r.dHnazad, 3)}</b></td>
+        <td class="d" rowspan="2"><b>${fz(r.dHsred, 3)}</b><br><span class="sitno">&Delta;=${fz(odst, 3)}</span></td>
       </tr>
       <tr class="tz-vi">
         <td class="c"><b>${r.do}</b></td>
@@ -551,15 +549,15 @@ function obrazac28P(rez) {
         <th rowspan="2">Dužina<br>D (m)</th>
         <th colspan="3">Mjerenje naprijed (A &ndash; B)</th>
         <th colspan="3">Mjerenje nazad (B &ndash; A)</th>
-        <th rowspan="2">Definitivna<br>&Delta;H (mm)</th>
+        <th rowspan="2">Definitivna<br>&Delta;H (m)</th>
       </tr>
       <tr class="zaglavlje-red">
         <th>Vizura /<br>zenit. ugao</th>
         <th>i<sub>a</sub> / l<sub>b</sub></th>
-        <th>&Delta;H (mm)<br>naprijed</th>
+        <th>&Delta;H (m)<br>naprijed</th>
         <th>Vizura /<br>zenit. ugao</th>
         <th>i<sub>b</sub> / l<sub>a</sub></th>
-        <th>&Delta;H (mm)<br>nazad</th>
+        <th>&Delta;H (m)<br>nazad</th>
       </tr>
     </thead>
     <tbody>${redovi}${sazetak}</tbody>
