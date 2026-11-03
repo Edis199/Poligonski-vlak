@@ -418,7 +418,11 @@ document.getElementById("izvozExcel").addEventListener("click", () => {
 document.getElementById("izvozPdf").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   idiNa("rezultati");
-  setTimeout(() => window.print(), 300);
+  document.body.classList.add("print-rezultati");
+  setTimeout(() => {
+    window.print();
+    setTimeout(() => document.body.classList.remove("print-rezultati"), 500);
+  }, 300);
 });
 
 function preuzmi(blob, ime) {
@@ -533,9 +537,50 @@ document.querySelectorAll("[data-obrazac]").forEach((btn) => {
 });
 
 document.getElementById("stampajObrazac").addEventListener("click", () => {
-  if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  window.print();
+  if (trenutniObrazac === "tz" && !ucitaneStanice) { alert("Učitajte zapisnik."); return; }
+  if (trenutniObrazac !== "tz" && !zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
+  // ispiši samo trenutni obrazac (jedan A4)
+  ispisiObrasce([trenutniObrazac]);
 });
+
+document.getElementById("stampajSve").addEventListener("click", () => {
+  if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
+  // svi dostupni obrasci, redom (samo oni koji su napravljeni)
+  ispisiObrasce(["tz", "o19", "o25"]);
+});
+
+// Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
+function ispisiObrasce(lista) {
+  const el = document.getElementById("obrazacSadrzaj");
+  const original = el.innerHTML;         // zapamti trenutni prikaz
+  let html = "";
+  lista.forEach((kod) => {
+    const sadrzaj = generirajObrazacHTML(kod);
+    if (sadrzaj) html += `<div class="obrazac-stranica">${sadrzaj}</div>`;
+  });
+  el.innerHTML = html;
+  document.body.classList.add("print-obrasci");
+  window.print();
+  // vrati prikaz nakon ispisa
+  setTimeout(() => {
+    el.innerHTML = original;
+    document.body.classList.remove("print-obrasci");
+  }, 500);
+}
+
+// Vrati HTML jednog obrasca po kodu (bez promjene prikaza).
+function generirajObrazacHTML(kod) {
+  if (kod === "tz") {
+    return ucitaneStanice ? window.Obrasci.obrazacTZ(ucitaneStanice, lokalitet) : "";
+  }
+  if (kod === "o19") {
+    return zadnjiRezultat ? window.Obrasci.obrazac19(zadnjiRezultat, { nazivA: tekst("A_naziv") }) : "";
+  }
+  if (kod === "o25") {
+    return zadnjiRezultat ? sloziObrazac25() : "";
+  }
+  return "";
+}
 
 // kad se otvori kartica Obrasci, osvježi prikaz
 function osvjeziObrasceAkoTreba(cilj) {

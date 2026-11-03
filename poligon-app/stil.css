@@ -97,15 +97,20 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .neuspjeh{color:var(--crvena);font-weight:600}
 
 /* ---------- Stil za ispis / PDF ---------- */
+/* Ispis REZULTATA (kad body ima klasu print-rezultati) */
 @media print{
-  .kartice,.akcije,.alatna,footer,.info{display:none !important}
-  .panel{display:none !important;box-shadow:none;padding:0}
-  #rezultati{display:block !important}
-  .zaglavlje{background:#fff !important;color:#000 !important;box-shadow:none;border-bottom:2px solid #000}
-  .zaglavlje svg{stroke:#000 !important}
-  body{background:#fff}
-  .sk{break-inside:avoid}
-  .tabela{font-size:12px}
+  body.print-rezultati .kartice,
+  body.print-rezultati .akcije,
+  body.print-rezultati .alatna,
+  body.print-rezultati footer,
+  body.print-rezultati .info{display:none !important}
+  body.print-rezultati .panel{display:none !important;box-shadow:none;padding:0}
+  body.print-rezultati #rezultati{display:block !important}
+  body.print-rezultati .zaglavlje{background:#fff !important;color:#000 !important;box-shadow:none;border-bottom:2px solid #000}
+  body.print-rezultati .zaglavlje svg{stroke:#000 !important}
+  body.print-rezultati{background:#fff}
+  body.print-rezultati .sk{break-inside:avoid}
+  body.print-rezultati .tabela{font-size:12px}
 }
 
 /* ---------- Geodetski obrasci (stil kao tablice u Rezultatima) ---------- */
@@ -167,12 +172,25 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac19 tr.tanko td{padding:2px 10px;height:auto}
 .obrazac19 tr.tanko td .mali{font-size:11px}
 
+/* Ispis OBRAZACA (kad body ima klasu print-obrasci) — svaki obrazac na A4 */
 @media print{
-  .kartice,.akcije,.alatna,footer,.info,.zaglavlje{display:none !important}
-  .panel{display:none !important}
-  #obrasci{display:block !important;box-shadow:none;padding:0}
-  #obrasci h2,#obrasci .napomena{display:none}
-  .obrazac{font-size:12px;box-shadow:none}
-  .obrazac .naslov{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .obrazac thead th,.obrazac .sekcija,.obrazac .suma-red td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body.print-obrasci{background:#fff}
+  body.print-obrasci .kartice,
+  body.print-obrasci .akcije,
+  body.print-obrasci .alatna,
+  body.print-obrasci footer,
+  body.print-obrasci .info,
+  body.print-obrasci .zaglavlje{display:none !important}
+  body.print-obrasci .panel{display:none !important}
+  body.print-obrasci #obrasci{display:block !important;box-shadow:none;padding:0}
+  body.print-obrasci #obrasci h2,
+  body.print-obrasci #obrasci .napomena{display:none}
+  body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
+  /* svaki obrazac na zasebnom A4 listu */
+  body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
+  body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
+  body.print-obrasci .obrazac tr{page-break-inside:avoid}
+  /* da se boje (plava zaglavlja, crvene date tačke) ispišu */
+  body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+@page{ size:A4 landscape; margin:10mm; }

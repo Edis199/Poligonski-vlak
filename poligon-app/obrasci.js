@@ -74,7 +74,7 @@ function obrazac25(dateTacke, noveTacke, minPraznih = 12) {
    Svaka tačka se pojavljuje TOČNO JEDNOM.                               */
 function obrazac19(r, ctx) {
   const D = (typeof window !== "undefined" ? window.Racun : require("./racun.js")).decimalniUSms;
-  const ug = (dec) => D(dec).replace("°", "°,");          // "74°,28'48\""
+  const ug = (dec) => D(dec);                              // "74°28'48\""
   const vbeta = (r.popravakUgla >= 0 ? "" : "-") + ug(Math.abs(r.popravakUgla));
 
   const tocke = r.tocke;          // [B, nove..., C]
@@ -159,13 +159,13 @@ function red(celije, klasa) {
   return `<tr${klasa ? ` class="${klasa}"` : ""}>${tds}</tr>`;
 }
 
-// veliki ugao (preko 360) prikaži kao SSS°,MM'SS" bez normalizacije
+// veliki ugao (preko 360) prikaži kao SSS°MM'SS" bez normalizacije
 function formatBigAngle(dec){
   const neg = dec < 0; let x = Math.abs(dec);
   let s = Math.floor(x); let mF=(x-s)*60; let m=Math.floor(mF+1e-9); let se=Math.round((mF-m)*60);
   if(se>=60){se-=60;m++;} if(m>=60){m-=60;s++;}
   const p=(k)=>String(k).padStart(2,"0");
-  return (neg?"-":"")+`${s}°,${p(m)}'${p(se)}"`;
+  return (neg?"-":"")+`${s}°${p(m)}'${p(se)}"`;
 }
 
 /* --------- OBRAZAC TZ: Tahimetrijski zapisnik ---------
@@ -178,7 +178,7 @@ function obrazacTZ(ucitaneStanice, lokalitet) {
   const ugStr = (v) => {
     const dec = G.parsirajUgao(v);
     if (dec === null) return "";
-    return G.decUStr(dec).replace("°", "°,");
+    return G.decUStr(dec);
   };
   const horiz = (kosa, zenitStr) => {
     const z = G.parsirajUgao(zenitStr);
