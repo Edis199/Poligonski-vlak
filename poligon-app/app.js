@@ -445,17 +445,20 @@ generirajTabelu(4, {
    UČITAVANJE IZ TAHIMETRIJSKOG ZAPISNIKA (CSV)
    ===================================================================== */
 
-// Predložak za preuzimanje (isti raspored koji aplikacija čita)
+// Predložak za preuzimanje — isti raspored kolona kao tahimetrijski zapisnik.
+// Stanica i visina instrumenta se upisuju SAMO u prvom redu stanice.
+// Kolona "Horizontalna dužina" se ostavlja prazna — aplikacija je sama računa.
+// Uglovi se mogu upisati kao  254°28'48"  ILI kao decimalni  254.2848
 const PREDLOZAK_CSV =
-`Stanica;VisinaInstrumenta;Vizura;Kod;HorizontalniUgao;ZenitniUgao;KosaDuzina;VisinaSignala
-P2586;1.658;P2585;;57°25'08";90°49'44";92.750;1.671
-;;1;;193°25'01";89°46'31";116.768;1.455
-;;1;;13°25'11";270°13'13";116.768;1.455
-;;P2585;;237°25'15";269°10'09";92.750;1.671
-;;P2585;;57°25'12";90°49'41";92.750;1.671
-;;1;;193°25'04";89°46'35";116.768;1.455
-;;1;;13°25'12";270°13'17";116.768;1.455
-;;P2585;;237°25'15";269°10'10";92.750;1.671
+`Stanica i;Vizura;Kod;Horizontalni ugao;Zenitni ugao;Kosa dužina;Horizontalna dužina;Visina signala;Primjedba;Visina instrumenta
+P647;P646;;254°28'48";89°19'50";76.019;;1.649;;1.694
+;83;;347°37'52";90°09'14";68.084;;1.608;;
+;83;;167°38'01";269°50'40";68.084;;1.608;;
+;P646;;74°28'46";270°40'11";76.019;;1.649;;
+;P646;;254°28'50";89°19'47";76.019;;1.649;;
+;83;;347°37'56";90°09'12";68.084;;1.608;;
+;83;;167°38'01";269°50'40";68.084;;1.608;;
+;P646;;74°28'48";270°40'11";76.019;;1.649;;
 `;
 
 document.getElementById("preuzmiPredlozak").addEventListener("click", () => {

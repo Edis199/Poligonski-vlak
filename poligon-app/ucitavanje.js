@@ -55,12 +55,13 @@ function ucitajCSV(tekst) {
 
   for (let i = 1; i < redovi.length; i++) {
     const c = redovi[i].split(sep);
-    let stan = uzmi(c, ["stanica"]);
+    let stan = uzmi(c, ["stanicai", "stanica"]);
     let vis = uzmi(c, ["visinainstrumenta", "visinainstr", "visinainstrumenta(m)", "vi"]);
     const vizura = uzmi(c, ["vizura", "vuzura", "vizurnatacka"]);
+    const kod = uzmi(c, ["kod"]);
     const horiz = uzmi(c, ["horizontalniugao", "horizontalni", "hz", "ha"]);
     const zenit = uzmi(c, ["zenitniugao", "zenitni", "vz", "z"]);
-    const kosa = uzmi(c, ["kosaduzina", "kosa", "duzina", "sd"]);
+    const kosa = uzmi(c, ["kosaduzina", "kosa", "sd"]);  // NE "duzina" (to je horizontalna, prazna)
     const visSig = uzmi(c, ["visinasignala", "vissignala", "vs"]);
 
     // ako nema stanice u retku -> nasljeđuje prethodnu
@@ -77,7 +78,7 @@ function ucitajCSV(tekst) {
       stanice.push(trenutna);
     }
     trenutna.mjerenja.push({
-      vizura, horiz, zenit, kosa: parseFloat((kosa || "0").replace(",", ".")),
+      vizura, kod, horiz, zenit, kosa: parseFloat((kosa || "0").replace(",", ".")),
       visinaSignala: parseFloat((visSig || "0").replace(",", "."))
     });
   }
