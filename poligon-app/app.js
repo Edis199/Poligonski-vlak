@@ -1,6 +1,8 @@
 /* app.js — povezuje sučelje s jezgrom izračuna (racun.js) */
 
 let zadnjiRezultat = null;
+let zadnjiRezultatVisine = null;
+let obradjeneStanice = null;   // iz učitanog zapisnika (za visinsko izravnanje)
 
 /* ---------- Navigacija kartica ---------- */
 document.querySelectorAll(".kartica").forEach((btn) => {
@@ -128,7 +130,20 @@ document.getElementById("izracunaj").addEventListener("click", () => {
   try {
     const r = window.Racun.izravnajUmetnutiVlak(ulaz);
     zadnjiRezultat = r;
-    prikaziRezultate(r);
+
+    // --- Visinsko izravnanje (ako ima podataka iz zapisnika i date visine) ---
+    zadnjiRezultatVisine = null;
+    const Hb = parseFloat(document.getElementById("B_H").value);
+    const Hc = parseFloat(document.getElementById("C_H").value);
+    if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
+      try {
+        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc);
+      } catch (ev) {
+        console.warn("Visinsko izravnanje preskočeno:", ev.message);
+      }
+    }
+
+    prikaziRezultate(r, zadnjiRezultatVisine);
     idiNa("rezultati");
   } catch (e) {
     alert("Greška u izračunu: " + e.message);
@@ -137,7 +152,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
 });
 
 /* ---------- Prikaz rezultata ---------- */
-function prikaziRezultate(r) {
+function prikaziRezultate(r, rv) {
   const D = window.Racun.decimalniUSms;
   const sek = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "\"";
 
@@ -165,6 +180,12 @@ function prikaziRezultate(r) {
         <div class="oznaka">Ukupna dužina vlaka</div>
         <div class="vrijednost">${r.sumaD.toFixed(2)} m</div>
       </div>
+      ${rv ? `
+      <div class="sk ${rv.visinskiOK ? "ok" : "ne"}">
+        <div class="oznaka">Visinsko odstupanje f<sub>h</sub></div>
+        <div class="vrijednost">${(rv.fh*1000).toFixed(0)} mm</div>
+        <div class="napomena">dopušteno ${(rv.dopustenoFh*1000).toFixed(0)} mm</div>
+      </div>` : ""}
     </div>
   `;
 
@@ -232,13 +253,51 @@ function prikaziRezultate(r) {
     <p>Linearno izravnanje:
       <span class="oznaka-status ${r.linearnoOK?'status-ok':'status-ne'}">
         ${r.linearnoOK ? "U DOZVOLJENIM GRANICAMA" : "PREKORAČENO"}</span></p>
+    ${rv ? `<p>Visinsko izravnanje:
+      <span class="oznaka-status ${rv.visinskiOK?'status-ok':'status-ne'}">
+        ${rv.visinskiOK ? "U DOZVOLJENIM GRANICAMA" : "PREKORAČENO"}</span></p>` : ""}
   `;
 
   const greskeHtml = r.greske.length
     ? `<div class="greska">⚠ ${r.greske.join("<br>")}</div>` : "";
 
+  // --- Tablica visinskog izravnanja ---
+  let tblVisine = "";
+  if (rv) {
+    tblVisine = `
+      <h2>Visinsko izravnanje</h2>
+      <p class="napomena">Zatvaranje visina f<sub>h</sub> = ${(rv.fh*1000).toFixed(0)} mm,
+        dopušteno ${(rv.dopustenoFh*1000).toFixed(0)} mm.</p>
+      <table class="tabela">
+        <thead><tr>
+          <th>Stranica</th><th>&Delta;H naprijed</th><th>&Delta;H nazad</th>
+          <th>&Delta;H sredina</th><th>Popravka</th><th>&Delta;H popravljeno</th>
+        </tr></thead><tbody>`;
+    rv.redovi.forEach((row) => {
+      tblVisine += `<tr>
+        <td>${row.od} → ${row.do}</td>
+        <td>${row.dHnaprijed.toFixed(2)}</td>
+        <td>${row.dHnazad.toFixed(2)}</td>
+        <td>${row.dHsred.toFixed(3)}</td>
+        <td>${row.popravka.toFixed(3)}</td>
+        <td>${row.dHpopr.toFixed(3)}</td>
+      </tr>`;
+    });
+    tblVisine += `</tbody></table>
+      <h2>Nadmorske visine tačaka</h2>
+      <table class="tabela"><thead><tr><th>Tačka</th><th>H (m)</th><th>Tip</th></tr></thead><tbody>`;
+    rv.tocke.forEach((t) => {
+      tblVisine += `<tr><td><strong>${t.naziv}</strong></td><td>${t.H.toFixed(3)}</td><td>${t.tip}</td></tr>`;
+    });
+    tblVisine += `</tbody></table>`;
+  } else {
+    tblVisine = `<div class="info" style="margin-top:20px">
+      <b>Visinsko izravnanje</b> nije izračunato. Za visine: učitajte zapisnik (sadrži zenitne uglove)
+      i unesite nadmorske visine H za početnu (B) i krajnju (C) stanicu.</div>`;
+  }
+
   document.getElementById("rezultatiSadrzaj").innerHTML =
-    statusHtml + greskeHtml + tblBeta + tblAlfe + tblKoord;
+    statusHtml + greskeHtml + tblBeta + tblAlfe + tblKoord + tblVisine;
 }
 
 /* ---------- Grafički prikaz (Canvas) ---------- */
@@ -310,15 +369,31 @@ function nacrtaj(r) {
 document.getElementById("izvozExcel").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   const r = zadnjiRezultat;
-  let csv = "Tacka;Y (m);X (m);Tip\n";
+  // pripremi mapu visina po nazivu tačke (ako ima visinskog izravnanja)
+  const visineMap = {};
+  if (zadnjiRezultatVisine) {
+    zadnjiRezultatVisine.tocke.forEach((t) => { visineMap[t.naziv] = t.H; });
+  }
+  const imaVisine = Object.keys(visineMap).length > 0;
+
+  let csv = imaVisine ? "Tacka;Y (m);X (m);H (m);Tip\n" : "Tacka;Y (m);X (m);Tip\n";
   r.tocke.forEach((t) => {
-    csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${t.tip}\n`;
+    if (imaVisine) {
+      const H = visineMap[t.naziv] !== undefined ? visineMap[t.naziv].toFixed(3) : "";
+      csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${H};${t.tip}\n`;
+    } else {
+      csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${t.tip}\n`;
+    }
   });
   csv += `\nKutno odstupanje fbeta (sek);${r.fBetaSek.toFixed(1)}\n`;
   csv += `Dopusteno kutno (sek);${r.dopustenoFbetaSek.toFixed(1)}\n`;
   csv += `Linearno odstupanje fd (m);${r.fd.toFixed(3)}\n`;
   csv += `Dopusteno linearno (m);${r.dopustenoFd.toFixed(3)}\n`;
   csv += `Ukupna duzina (m);${r.sumaD.toFixed(2)}\n`;
+  if (zadnjiRezultatVisine) {
+    csv += `Visinsko odstupanje fh (mm);${(zadnjiRezultatVisine.fh*1000).toFixed(0)}\n`;
+    csv += `Dopusteno visinsko (mm);${(zadnjiRezultatVisine.dopustenoFh*1000).toFixed(0)}\n`;
+  }
 
   const bom = "\uFEFF"; // da Excel prepozna UTF-8
   const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" });
@@ -402,6 +477,9 @@ function obradiUcitaniCSV(tekst) {
     postaviStatus("Nijedna stanica nije ispravno obrađena. " + (greske[0] || ""), false);
     return;
   }
+
+  // sačuvaj obrađene stanice (trebaju za visinsko izravnanje)
+  obradjeneStanice = validne;
 
   // Popuni tabelu prelomnih uglova i dužina
   const n = validne.length;                 // broj prelomnih uglova = broj stanica

@@ -137,6 +137,11 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     kosaPrednja: kosaPrednjaSr,
     horizDuzina,
     visinaSignalaPrednja: prosjek(visPrednja),
+    // podaci na ZADNJU tačku (potrebni za visinsko izravnanje — mjerenje "nazad")
+    zenitZadnja: prosjek(zenitZadnja),
+    kosaZadnja: prosjek(kosaZadnja),
+    visinaSignalaZadnja: prosjek(visZadnja),
+    horizDuzinaZadnja: Math.abs(round(prosjek(kosaZadnja) * Math.sin((prosjek(zenitZadnja) * Math.PI) / 180), 3)),
     brGirusa
   };
 }

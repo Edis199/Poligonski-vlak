@@ -38,6 +38,17 @@ Prelomne uglove i dužine možete unijeti na **dva načina**:
 
 Na kraju kliknite **"Izračunaj izravnanje"**.
 
+### Visinsko izravnanje (nadmorske visine)
+
+Aplikacija računa i **nadmorske visine** tačaka (trigonometrijsko nivelanje,
+obrasci 28P i K iz Excela). Da bi se visine izračunale:
+  - učitajte zapisnik iz CSV-a (sadrži **zenitne uglove** potrebne za visine), i
+  - unesite **nadmorsku visinu H** za početnu stanicu (B) i krajnju stanicu (C).
+
+Rezultat prikazuje visinske razlike (naprijed/nazad/sredina), popravke,
+zatvaranje visina f_h s dopuštenom vrijednošću, i konačne nadmorske visine.
+Visine se uključuju i u izvoz (CSV).
+
 ### Format zapisnika (girusna metoda)
 
 Jedan girus = 4 reda redom:
