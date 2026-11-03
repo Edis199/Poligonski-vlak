@@ -13,6 +13,7 @@ document.querySelectorAll(".kartica").forEach((btn) => {
     const cilj = document.getElementById(btn.dataset.cilj);
     cilj.classList.add("vidljiv");
     if (btn.dataset.cilj === "crtez" && zadnjiRezultat) nacrtaj(zadnjiRezultat);
+    if (btn.dataset.cilj === "obrasci") prikaziObrazac();
   });
 });
 
@@ -496,4 +497,69 @@ function obradiUcitaniCSV(tekst) {
   if (greske.length) {
     alert("Napomena:\n" + greske.join("\n"));
   }
+}
+
+/* =====================================================================
+   GEODETSKI OBRASCI (kartica 4)
+   ===================================================================== */
+let trenutniObrazac = "o25";
+
+document.querySelectorAll("[data-obrazac]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    trenutniObrazac = btn.dataset.obrazac;
+    prikaziObrazac();
+  });
+});
+
+document.getElementById("stampajObrazac").addEventListener("click", () => {
+  if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
+  window.print();
+});
+
+// kad se otvori kartica Obrasci, osvježi prikaz
+function osvjeziObrasceAkoTreba(cilj) {
+  if (cilj === "obrasci") prikaziObrazac();
+}
+
+function prikaziObrazac() {
+  const el = document.getElementById("obrazacSadrzaj");
+  if (!zadnjiRezultat) {
+    el.innerHTML = `<div class="info">Prvo unesite podatke i kliknite „Izračunaj izravnanje" na kartici 1.</div>`;
+    return;
+  }
+  if (trenutniObrazac === "o25") {
+    el.innerHTML = sloziObrazac25();
+  } else if (trenutniObrazac === "o19") {
+    el.innerHTML = window.Obrasci.obrazac19(zadnjiRezultat, {
+      nazivA: tekst("A_naziv"),
+    });
+  }
+}
+
+function sloziObrazac25() {
+  const r = zadnjiRezultat;
+  const rv = zadnjiRezultatVisine;
+  // mapa visina po nazivu
+  const visMap = {};
+  if (rv) rv.tocke.forEach((t) => { visMap[t.naziv] = t.H; });
+
+  // date tačke: A, B, C, D (s visinama iz polja)
+  const dateTacke = [
+    { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X"), H: brojOpc("A_H") },
+    { naziv: tekst("B_naziv"), Y: broj("B_Y"), X: broj("B_X"), H: brojOpc("B_H") },
+    { naziv: tekst("C_naziv"), Y: broj("C_Y"), X: broj("C_X"), H: brojOpc("C_H") },
+    { naziv: tekst("D_naziv"), Y: broj("D_Y"), X: broj("D_X"), H: brojOpc("D_H") },
+  ];
+
+  // nove tačke: iz rezultata (tip "nova")
+  const noveTacke = r.tocke
+    .filter((t) => t.tip === "nova")
+    .map((t) => ({ naziv: t.naziv, Y: t.Y, X: t.X, H: visMap[t.naziv] }));
+
+  return window.Obrasci.obrazac25(dateTacke, noveTacke);
+}
+
+function brojOpc(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
 }

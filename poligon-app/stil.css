@@ -107,3 +107,30 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   .sk{break-inside:avoid}
   .tabela{font-size:12px}
 }
+
+/* ---------- Geodetski obrasci ---------- */
+.obrazac-okvir{margin-top:16px;overflow-x:auto}
+.obrazac{border-collapse:collapse;margin:0 auto;background:#fff;font-size:13px;color:#000}
+.obrazac th,.obrazac td{border:1px solid #000;padding:3px 6px;text-align:center;vertical-align:middle}
+.obrazac .naslov{font-weight:bold;font-size:14px;letter-spacing:.5px;padding:6px}
+.obrazac .zaglavlje-red th{font-weight:bold;height:80px;background:#fff}
+.obrazac td.c{text-align:center}
+.obrazac td.d{text-align:right;padding-right:10px;font-variant-numeric:tabular-nums}
+.obrazac .sekcija{font-weight:bold;letter-spacing:1px}
+.obrazac .crvena,.obrazac .crveni-tekst td{color:#c00}
+.obrazac .mali{font-size:11px;color:#333}
+.obrazac .suma-red td{font-weight:bold;background:#f3f3f3}
+.uspravno{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block}
+.obrazac25 .w-naziv{width:150px}
+.obrazac25 .w-gdje{width:60px}
+.obrazac25 th:nth-child(3),.obrazac25 th:nth-child(4),.obrazac25 th:nth-child(5){width:130px}
+.obrazac19 .uspravno-col{width:28px}
+.obrazac-naslov-linija{text-align:right;font-weight:bold;margin:0 auto 4px;max-width:900px}
+
+@media print{
+  .kartice,.akcije,.alatna,footer,.info,.zaglavlje{display:none !important}
+  .panel{display:none !important}
+  #obrasci{display:block !important;box-shadow:none;padding:0}
+  #obrasci h2,#obrasci .napomena{display:none}
+  .obrazac{font-size:12px}
+}

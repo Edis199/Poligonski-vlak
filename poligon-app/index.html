@@ -24,7 +24,8 @@
   <button class="kartica aktivna" data-cilj="unos">1. Unos podataka</button>
   <button class="kartica" data-cilj="rezultati">2. Rezultati</button>
   <button class="kartica" data-cilj="crtez">3. Grafički prikaz</button>
-  <button class="kartica" data-cilj="izvoz">4. Ispis / Izvoz</button>
+  <button class="kartica" data-cilj="obrasci">4. Geodetski obrasci</button>
+  <button class="kartica" data-cilj="izvoz">5. Ispis / Izvoz</button>
 </nav>
 
 <main>
@@ -68,6 +69,8 @@
           <input id="A_Y" type="number" step="0.001" placeholder="Y" value="6534004.099" />
           <input id="A_X" type="number" step="0.001" placeholder="X" value="4856781.708" />
         </div>
+        <label>Nadmorska visina H orijentacijske tačke A</label>
+        <input id="A_H" type="number" step="0.001" placeholder="H (m)" value="540.177" />
         <label>Početna stanica B</label>
         <div class="red3">
           <input id="B_naziv" placeholder="Naziv" value="P647" />
@@ -94,6 +97,8 @@
           <input id="D_Y" type="number" step="0.001" placeholder="Y" value="6534197.270" />
           <input id="D_X" type="number" step="0.001" placeholder="X" value="4856958.416" />
         </div>
+        <label>Nadmorska visina H orijentacijske tačke D</label>
+        <input id="D_H" type="number" step="0.001" placeholder="H (m)" value="540.969" />
       </fieldset>
     </div>
 
@@ -137,6 +142,18 @@
     <canvas id="platno" width="900" height="600"></canvas>
   </section>
 
+  <!-- ========== OBRASCI ========== -->
+  <section id="obrasci" class="panel">
+    <h2>Geodetski obrasci</h2>
+    <p class="napomena">Službeni obrasci popunjeni rezultatima izravnanja. Svaki se može ispisati ili spremiti u PDF.</p>
+    <div class="alatna">
+      <button class="dugme" data-obrazac="o25">Obrazac 25 — Spisak koordinata</button>
+      <button class="dugme" data-obrazac="o19">Obrazac 19 — Izravnanje vlaka</button>
+      <button id="stampajObrazac" class="dugme primarno">Ispis / PDF ovog obrasca</button>
+    </div>
+    <div id="obrazacSadrzaj" class="obrazac-okvir"></div>
+  </section>
+
   <!-- ========== IZVOZ ========== -->
   <section id="izvoz" class="panel">
     <h2>Ispis i izvoz</h2>
@@ -160,6 +177,7 @@
 <script src="girus.js"></script>
 <script src="visine.js"></script>
 <script src="ucitavanje.js"></script>
+<script src="obrasci.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
