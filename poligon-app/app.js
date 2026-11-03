@@ -462,24 +462,38 @@ P647;P646;;254°28'48";89°19'50";76.019;;1.649;;1.694
 `;
 
 document.getElementById("preuzmiPredlozak").addEventListener("click", () => {
-  const bom = "\uFEFF";
-  const blob = new Blob([bom + PREDLOZAK_CSV], { type: "text/csv;charset=utf-8;" });
-  preuzmi(blob, "predlozak_tahimetrijski_zapisnik.csv");
+  try {
+    // Excel predložak (uredna tablica s okvirima i zaglavljem)
+    const bytes = window.XlsxGen.predlozakZapisnikXlsx();
+    const blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    preuzmi(blob, "predlozak_tahimetrijski_zapisnik.xlsx");
+  } catch (e) {
+    // rezerva: CSV ako generiranje Excela ne uspije
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + PREDLOZAK_CSV], { type: "text/csv;charset=utf-8;" });
+    preuzmi(blob, "predlozak_tahimetrijski_zapisnik.csv");
+  }
 });
 
 document.getElementById("datotekaCSV").addEventListener("change", (ev) => {
   const f = ev.target.files && ev.target.files[0];
   if (!f) return;
+  const jeXlsx = /\.xlsx$/i.test(f.name);
   const citac = new FileReader();
-  citac.onload = () => {
+  citac.onload = async () => {
     try {
-      obradiUcitaniCSV(String(citac.result));
+      if (jeXlsx) {
+        const stanice = await window.Ucitavanje.ucitajXlsxStanice(citac.result);
+        obradiUcitaneStanice(stanice);
+      } else {
+        obradiUcitaniCSV(String(citac.result));
+      }
     } catch (e) {
       postaviStatus("Greška: " + e.message, false);
     }
   };
-  citac.readAsText(f, "UTF-8");
-  // resetiraj da se može ponovno učitati ista datoteka
+  if (jeXlsx) citac.readAsArrayBuffer(f);
+  else citac.readAsText(f, "UTF-8");
   ev.target.value = "";
 });
 
@@ -491,6 +505,10 @@ function postaviStatus(poruka, uspjeh) {
 
 function obradiUcitaniCSV(tekst) {
   const stanice = window.Ucitavanje.ucitajCSV(tekst);
+  obradiUcitaneStanice(stanice);
+}
+
+function obradiUcitaneStanice(stanice) {
   ucitaneStanice = stanice;   // sačuvaj sirova mjerenja za obrazac TZ
   const { obradjene, greske } = window.Ucitavanje.pripremiIzStanica(stanice);
 

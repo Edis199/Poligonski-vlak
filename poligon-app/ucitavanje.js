@@ -17,7 +17,6 @@ function ucitajCSV(tekst) {
   const prviRed = tekst.split(/\r?\n/)[0] || "";
 
   // Automatski prepoznaj razdjelnik stupaca: tab, tačka-zarez ili zarez.
-  // Biramo onaj kojeg u zaglavlju ima najviše.
   const kandidati = ["\t", ";", ","];
   let sep = ";";
   let najvise = -1;
@@ -25,19 +24,31 @@ function ucitajCSV(tekst) {
     const broj = prviRed.split(k).length - 1;
     if (broj > najvise) { najvise = broj; sep = k; }
   }
-  // ako ni jedan razdjelnik nije pronađen, javi jasnu grešku
   if (najvise <= 0) {
     throw new Error("Ne mogu prepoznati stupce. Spremite datoteku kao CSV (razdvojeno zarezom) ili Tekst (tab).");
   }
 
-  // redove trimamo samo od CR/LF i razmaka na krajevima, NE od tabova
-  const redovi = tekst.split(/\r?\n/)
+  // razbij u 2D niz redova
+  const redovi2D = tekst.split(/\r?\n/)
     .map((r) => r.replace(/^[ \r\n]+|[ \r\n]+$/g, ""))
-    .filter((r) => r !== "");
-  if (redovi.length < 2) throw new Error("Datoteka je prazna ili nema podataka.");
+    .filter((r) => r !== "")
+    .map((r) => r.split(sep));
+  return ucitajRedove(redovi2D);
+}
 
-  // zaglavlje -> mapa naziva na indeks
-  const zagl = redovi[0].split(sep).map((x) => normZaglavlje(x));
+/* Učitaj iz 2D niza redova (koristi se i za CSV i za .xlsx). */
+function ucitajRedove(redovi) {
+  if (!redovi || redovi.length < 2) throw new Error("Datoteka je prazna ili nema podataka.");
+
+  // preskoči eventualni naslovni red (npr. "TAHIMETRIJSKI ZAPISNIK" spojen u A1)
+  // zaglavlje je prvi red koji sadrži "vizura" ili "stanica"
+  let zaglRed = 0;
+  for (let i = 0; i < Math.min(redovi.length, 3); i++) {
+    const spoj = redovi[i].map((x) => normZaglavlje(x || "")).join("|");
+    if (spoj.includes("vizura") || spoj.includes("stanica")) { zaglRed = i; break; }
+  }
+
+  const zagl = redovi[zaglRed].map((x) => normZaglavlje(x));
   const idx = {};
   zagl.forEach((naziv, i) => { idx[naziv] = i; });
 
@@ -53,8 +64,8 @@ function ucitajCSV(tekst) {
   let zadnjaStanica = "";
   let zadnjaVisina = "";
 
-  for (let i = 1; i < redovi.length; i++) {
-    const c = redovi[i].split(sep);
+  for (let i = zaglRed + 1; i < redovi.length; i++) {
+    const c = redovi[i];
     let stan = uzmi(c, ["stanicai", "stanica"]);
     let vis = uzmi(c, ["visinainstrumenta", "visinainstr", "visinainstrumenta(m)", "vi"]);
     const vizura = uzmi(c, ["vizura", "vuzura", "vizurnatacka"]);
@@ -108,9 +119,15 @@ function pripremiIzStanica(stanice) {
   return { obradjene, greske };
 }
 
+/* Učitavanje iz .xlsx (ArrayBuffer) — koristi XlsxGen.citajXlsx pa ucitajRedove */
+async function ucitajXlsxStanice(arrayBuffer) {
+  const redovi = await window.XlsxGen.citajXlsx(arrayBuffer);
+  return ucitajRedove(redovi);
+}
+
 if (typeof window !== "undefined") {
-  window.Ucitavanje = { ucitajCSV, pripremiIzStanica };
+  window.Ucitavanje = { ucitajCSV, ucitajRedove, ucitajXlsxStanice, pripremiIzStanica };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { ucitajCSV, pripremiIzStanica };
+  module.exports = { ucitajCSV, ucitajRedove, pripremiIzStanica };
 }

@@ -45,10 +45,10 @@
         prelomne uglove i horizontalne dužine.
       </p>
       <div class="alatna">
-        <button id="preuzmiPredlozak" class="dugme">Preuzmi predložak (CSV)</button>
+        <button id="preuzmiPredlozak" class="dugme">Preuzmi predložak (Excel)</button>
         <label class="dugme" style="position:relative;cursor:pointer">
-          Učitaj zapisnik (CSV)
-          <input id="datotekaCSV" type="file" accept=".csv,text/csv"
+          Učitaj zapisnik (Excel ili CSV)
+          <input id="datotekaCSV" type="file" accept=".xlsx,.csv,text/csv"
                  style="position:absolute;inset:0;opacity:0;cursor:pointer" />
         </label>
         <span id="statusUcitavanja" class="napomena"></span>
@@ -190,6 +190,7 @@
 <script src="visine.js"></script>
 <script src="ucitavanje.js"></script>
 <script src="obrasci.js"></script>
+<script src="xlsx.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
