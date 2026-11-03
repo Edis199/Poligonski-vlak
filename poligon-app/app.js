@@ -56,19 +56,12 @@ document.getElementById("generiraj").addEventListener("click", () => {
 document.getElementById("primjer").addEventListener("click", ucitajPrimjer);
 
 function ucitajPrimjer() {
-  // Date tačke (iz Excela)
-  postavi("A_naziv","P2585"); postavi("A_Y","6525657.407"); postavi("A_X","4864001.469");
-  postavi("B_naziv","P2586"); postavi("B_Y","6525579.270"); postavi("B_X","4863951.535");
-  postavi("C_naziv","P2582"); postavi("C_Y","6525881.407"); postavi("C_X","4863893.674");
-  postavi("D_naziv","P2581"); postavi("D_Y","6525982.753"); postavi("D_X","4863728.072");
-  document.getElementById("brojUglova").value = 4;
-  // Primjer vrijednosti (ilustrativne — korisnik unosi svoje stvarne)
-  generirajTabelu(4, {
-    uglovi: [135.5955, 209.3627, 91.2024, 148.3206],
-    duzine: [116.767, 46.673, 72.058],
-    nazivi: ["", "1", "2", ""]
-  });
-  alert("Učitan je primjer s datim tačkama iz Excela.\nUglovi i dužine su ilustrativni — zamijenite ih svojim mjerenjima.");
+  // Date tačke (vlak P647 -> P568, primjer o kojem smo diskutovali)
+  postavi("A_naziv","P646"); postavi("A_Y","6534004.099"); postavi("A_X","4856781.708");
+  postavi("B_naziv","P647"); postavi("B_Y","6534077.333"); postavi("B_X","4856802.045"); postavi("B_H","539.234");
+  postavi("C_naziv","P568"); postavi("C_Y","6534219.852"); postavi("C_X","4856903.011"); postavi("C_H","540.370");
+  postavi("D_naziv","G48"); postavi("D_Y","6534197.270"); postavi("D_X","4856958.416");
+  alert("Učitane su date tačke i visine iz primjera (vlak P647 → P568).\nUčitajte zapisnik (CSV) za uglove, dužine i zenitne uglove.");
 }
 
 // decimalni stupnjevi -> broj oblika SSS.MMSS (npr. 135.998... -> 135.5955)
