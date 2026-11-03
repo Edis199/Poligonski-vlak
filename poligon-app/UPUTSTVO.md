@@ -10,8 +10,9 @@ ne instalira.
 2. Dvoklik na **`index.html`** — otvorit će se u vašem pregledniku (Chrome, Edge, Firefox).
 3. To je sve — aplikacija radi bez interneta.
 
-> Važno: držite sve 4 datoteke (`index.html`, `stil.css`, `racun.js`, `app.js`)
-> zajedno u istoj mapi.
+> Važno: držite **sve datoteke** zajedno u istoj mapi
+> (`index.html`, `stil.css`, `racun.js`, `girus.js`, `visine.js`,
+> `ucitavanje.js`, `obrasci.js`, `xlsx.js`, `app.js`).
 
 ## Kako se koristi
 
@@ -76,16 +77,35 @@ Prikazuje:
 ### 3. Grafički prikaz
 Crtež vlaka: date tačke (crveni trokut), nove tačke (zeleni kružić).
 
-### 4. Ispis / Izvoz
+### 4. Geodetski obrasci
+
+Službeni obrasci, popunjeni rezultatima izravnanja, vjerno originalnim Excel
+shetovima. Dostupni su svi obrasci:
+
+- **TZ** — Tahimetrijski zapisnik (učitana mjerenja)
+- **TO 1 i 2** — Girusno mjerenje horizontalnih pravaca
+- **TO 1V** — Vertikalni (zenitni) uglovi
+- **TO 18D** — Redukcija dužina
+- **TO 8** — Direkcioni uglovi i odstojanja iz koordinata
+- **TO 19** — Izravnanje (koordinate)
+- **TO 28P** — Trigonometrijska nivelacija (visinske razlike)
+- **TO K** — Izravnanje visina (nadmorske visine)
+- **TO 25** — Spisak koordinata i nadmorskih visina
+
+Svaki se obrazac može ispisati pojedinačno, ili svi odjednom
+(**„Ispiši SVE obrasce"**) — svaki ide na zaseban A4 list, s automatskom
+numeracijom strana (npr. „Strana 2 / 3") kad obrazac prelazi na sljedeću stranu.
+
+### 5. Ispis / Izvoz
 - **Izvoz u Excel (CSV)** — sprema tabelu koordinata (Excel je otvara direktno).
-- **Ispis / Spremi u PDF** — otvara dijalog štampe; odaberite "Spremi kao PDF".
+- **Ispis / Spremi u PDF** — otvara dijalog štampe; odaberite „Spremi kao PDF".
 
 ## Formule (iz originalnog Excela)
 
 - Pretvorba ugla `SSS.MMSS` → decimalni stupnjevi
 - Direkcijski ugao iz koordinata (kvadrantna `ATAN` formula)
 - Kutno zatvaranje: `fβ = "treba" − "ima"`, popravak = `fβ / n`
-- Dopušteno kutno odstupanje: `4.5″ · √n`
+- Dopušteno uglovno odstupanje: `45″ · √n` (n = broj prelomnih i veznih uglova)
 - Priraštaji: `Δy = d·sin(α)`, `Δx = d·cos(α)`
 - Linearno zatvaranje: `f_d = √(f_y² + f_x²)`
 - Dopušteno linearno: `0.0045·√Σd + 0.0003·Σd + 0.05`
