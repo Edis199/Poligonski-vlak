@@ -338,8 +338,7 @@ function obrazac1V(obradjeneStanice) {
       <tr class="tz-vi">
         <td class="c">${vi ? fz(vi,3) : ""}</td>
         <td class="c">${fz(p.visSignala,3)}</td>
-        <td colspan="4"></td>
-        <td class="c"><b>${ug(srednjiZen)}</b></td>
+        <td colspan="5"></td>
       </tr>`;
   }
 
