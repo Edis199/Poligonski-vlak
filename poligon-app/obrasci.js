@@ -69,101 +69,61 @@ function obrazac25(dateTacke, noveTacke, minPraznih = 12) {
 
 /* --------- OBRAZAC 19: Izravnanje poligonskog vlaka ---------
    r  = rezultat položajnog izravnanja (iz racun.js)
-   ctx = { nazivA, alfaPocetniStr, nazivD }                              */
+   ctx = { nazivA }
+   Struktura (kao u originalu): naizmjenično red "ugao" i red "tačka".
+   Svaka tačka se pojavljuje TOČNO JEDNOM.                               */
 function obrazac19(r, ctx) {
   const D = (typeof window !== "undefined" ? window.Racun : require("./racun.js")).decimalniUSms;
-  // oznaka ugla u obliku SSS°MM'SS" sa zarezom-stilom kao PDF: "74°,28'48""
-  const ug = (dec) => D(dec).replace("°", "°,");
-
-  const popravkaStr = ug(Math.abs(r.popravakUgla)).replace("°,", "0°,").length ? "" : "";
-  // popravka vβ po uglu (string, s predznakom)
+  const ug = (dec) => D(dec).replace("°", "°,");          // "74°,28'48\""
   const vbeta = (r.popravakUgla >= 0 ? "" : "-") + ug(Math.abs(r.popravakUgla));
+
+  const tocke = r.tocke;          // [B, nove..., C]
+  const PRAZNO = 10;              // broj kolona
 
   let redovi = "";
 
-  // Prvi red: orijentacija A -> direkcioni alfaPocetni
-  redovi += `<tr>
-    <td></td><td class="c">${ctx.nazivA}</td>
-    <td></td>
-    <td class="c">${ug(r.alfaPocetni)}</td>
-    <td></td><td></td><td></td>
-    <td></td><td></td><td></td>
-  </tr>`;
+  // --- Red orijentacije: naziv A + direkcioni ugao A->B (alfaPocetni) ---
+  redovi += red([
+    "", ctx.nazivA, "", ug(r.alfaPocetni), "", "", "", "", "", ""
+  ]);
 
-  // Za svaku stanicu/tačku
-  const tocke = r.tocke; // B, nove..., C
+  // --- Za svaku tačku vlaka (B, T1..Tn-1, C) ---
+  // n = broj prelomnih uglova = broj tačaka vlaka
   for (let i = 0; i < r.n; i++) {
-    const nazTacke = tocke[i] ? tocke[i].naziv : "";
-    const prelomni = ug(r.beta[i]);
-    const vred = vbeta; // ista popravka na svaki ugao
-    // red s popravkom (iznad prelomnog) — kao u PDF-u: mali red vβ
-    redovi += `<tr class="tanko">
-      <td></td><td></td>
-      <td class="c mali">${vred}</td>
-      <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-    </tr>`;
-    // glavni red tačke
-    const imaStr = (i < r.brStranica);
-    const dir = (i < r.alfe.length) ? ug(r.alfe[i]) : "";
-    const duz = imaStr ? fz(r.d[i], 2) : "";
-    const dy = imaStr ? fz(r.dy[i], 3) : "";
-    const dx = imaStr ? fz(r.dx[i], 3) : "";
     const tk = tocke[i];
+    const naz = tk ? tk.naziv : "";
+    // mali red popravke vβ (iznad prelomnog ugla)
+    redovi += red(["", "", `<span class="mali">${vbeta}</span>`, "", "", "", "", "", "", ""], "tanko");
+
+    // glavni red tačke
+    const imaStr = (i < r.brStranica);               // stranica postoji (osim zadnje tačke)
+    const dir = (i < r.alfe.length && imaStr) ? ug(r.alfe[i]) : "";
+    const duz = imaStr ? fz(r.d[i], 2) : "";
+    const dy  = imaStr ? fz(r.dy[i], 3) : "";
+    const dx  = imaStr ? fz(r.dx[i], 3) : "";
     const Y = tk ? fz(tk.Y, 3) : "";
     const X = tk ? fz(tk.X, 3) : "";
-    redovi += `<tr>
-      <td></td>
-      <td class="c">${nazTacke}</td>
-      <td class="c">${prelomni}</td>
-      <td class="c">${dir}</td>
-      <td class="d">${duz}</td>
-      <td class="d">${dy}</td>
-      <td class="d">${dx}</td>
-      <td class="d">${Y}</td>
-      <td class="d">${X}</td>
-      <td class="c">${nazTacke}</td>
-    </tr>`;
+    redovi += red([
+      "", naz, ug(r.beta[i]), dir, duz, dy, dx, Y, X, naz
+    ]);
   }
-  // zadnja tačka C (krajnja) — koordinate
-  const C = tocke[tocke.length - 1];
-  redovi += `<tr>
-    <td></td><td class="c">${C.naziv}</td>
-    <td class="c mali">${vbeta}</td>
-    <td></td>
-    <td class="d">${fz(r.sumaD,3)}</td>
-    <td class="d">${fz(r.sumaDy,3)}</td>
-    <td class="d">${fz(r.sumaDx,3)}</td>
-    <td class="d">${fz(C.Y,3)}</td>
-    <td class="d">${fz(C.X,3)}</td>
-    <td class="c">${C.naziv}</td>
-  </tr>`;
 
-  // sumarni red (Σ priraštaji / kontrola koordinata)
-  const kontrolaY = fz(r.sumaDy, 3), kontrolaX = fz(r.sumaDx, 3);
-  redovi += `<tr class="suma-red">
-    <td></td><td></td><td></td><td></td><td></td>
-    <td class="d"></td><td class="d"></td>
-    <td class="d">${fz(C.Y - B_od(r), 3)}</td>
-    <td class="d">${fz(C.X - B_od(r), 3)}</td>
-    <td></td></tr>`;
+  // --- Σ red (sume dužina i priraštaja) ---
+  redovi += red([
+    "", "<b>Σ</b>", "", "", `<b>${fz(r.sumaD,3)}</b>`,
+    `<b>${fz(r.sumaDy,3)}</b>`, `<b>${fz(r.sumaDx,3)}</b>`, "", "", ""
+  ], "suma-red");
 
-  // donji blok: treba / ima / fβ / vβ / fd / Δd
-  const trebaStr = ug(r.treba % 360 === r.treba ? r.treba : r.treba); // prikaz kao u Excelu
+  // --- Donji blok: treba / ima / fβ / vβ / Δβ / fd / Δd ---
   const fbetaStr = (r.fBeta < 0 ? "-" : "") + ug(Math.abs(r.fBeta));
   const dBetaStr = ug(r.dopustenoFbetaSek / 3600);
-  redovi += `
-    <tr><td></td><td class="c">treba</td><td class="c">${formatBigAngle(r.treba)}</td><td></td><td></td>
-        <td class="d">${fz(r.fy,3)}</td><td class="d">${fz(r.fx,3)}</td><td></td><td></td><td></td></tr>
-    <tr><td></td><td class="c">ima</td><td class="c">${formatBigAngle(r.ima)}</td><td></td><td class="c">fd=</td>
-        <td class="d">${fz(r.fd,3)}</td><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td class="c">f<sub>β</sub>=</td><td class="c">${fbetaStr}</td>
-        <td class="c">Δβ= ${dBetaStr}</td><td class="c">Δd=</td>
-        <td class="d">${fz(r.dopustenoFd,3)}</td><td></td><td></td><td></td><td></td></tr>
-    <tr><td></td><td class="c">v<sub>β</sub>=</td><td class="c">${vbeta}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-  `;
+  redovi += red(["", "treba", formatBigAngle(r.treba), "", "", `fy=${fz(r.fy,3)}`, `fx=${fz(r.fx,3)}`, "", "", ""]);
+  redovi += red(["", "ima", formatBigAngle(r.ima), "", "fd=", fz(r.fd,3), "", "", "", ""]);
+  redovi += red(["", "f<sub>β</sub>=", fbetaStr, "Δβ= "+dBetaStr, "Δd=", fz(r.dopustenoFd,3), "", "", "", ""]);
+  redovi += red(["", "v<sub>β</sub>=", vbeta, "", "", "", "", "", "", ""]);
 
-  // prazni redovi
-  for (let i = 0; i < 6; i++) redovi += `<tr>${'<td>&nbsp;</td>'.repeat(10)}</tr>`;
+  // nekoliko praznih redova
+  for (let i = 0; i < 4; i++) redovi += `<tr>${'<td>&nbsp;</td>'.repeat(PRAZNO)}</tr>`;
 
   return `
   <div class="obrazac-naslov-linija">Trigonom. obrazac br.19 &nbsp;&nbsp;&nbsp; Str……..</div>
@@ -188,8 +148,16 @@ function obrazac19(r, ctx) {
   </table>`;
 }
 
-// početna koordinata B (za kontrolni red) — čuvamo preko r.tocke[0]
-function B_od(r){ return 0; } // placeholder (koristi se gore samo za prikaz Σ)
+// pomoćno: sastavi <tr> iz niza ćelija; prva, 2. i 10. su centrirane, 5-9 desno
+function red(celije, klasa) {
+  const poravnanje = (i) => {
+    if (i === 1 || i === 2 || i === 3 || i === 9) return "c";
+    if (i >= 4 && i <= 8) return "d";
+    return "";
+  };
+  const tds = celije.map((v, i) => `<td class="${poravnanje(i)}">${v === "" ? "&nbsp;" : v}</td>`).join("");
+  return `<tr${klasa ? ` class="${klasa}"` : ""}>${tds}</tr>`;
+}
 
 // veliki ugao (preko 360) prikaži kao SSS°,MM'SS" bez normalizacije
 function formatBigAngle(dec){

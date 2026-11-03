@@ -110,8 +110,19 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 
 /* ---------- Geodetski obrasci ---------- */
 .obrazac-okvir{margin-top:16px;overflow-x:auto}
-.obrazac{border-collapse:collapse;margin:0 auto;background:#fff;font-size:13px;color:#000}
-.obrazac th,.obrazac td{border:1px solid #000;padding:3px 6px;text-align:center;vertical-align:middle}
+.obrazac{
+  border-collapse:collapse;margin:0 auto;background:#fff;
+  font-size:13.5px;color:#000;
+  font-family:"Times New Roman",Times,Georgia,serif;
+}
+/* horizontalne linije tanje, vertikalne blago podebljane */
+.obrazac th,.obrazac td{
+  border-top:1px solid #000;border-bottom:1px solid #000;
+  border-left:1.6px solid #000;border-right:1.6px solid #000;
+  padding:3px 7px;text-align:center;vertical-align:middle;
+}
+/* vanjski okvir malo deblji za uredan izgled */
+.obrazac{border:2px solid #000}
 .obrazac .naslov{font-weight:bold;font-size:14px;letter-spacing:.5px;padding:6px}
 .obrazac .zaglavlje-red th{font-weight:bold;height:80px;background:#fff}
 .obrazac td.c{text-align:center}
@@ -125,7 +136,13 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac25 .w-gdje{width:60px}
 .obrazac25 th:nth-child(3),.obrazac25 th:nth-child(4),.obrazac25 th:nth-child(5){width:130px}
 .obrazac19 .uspravno-col{width:28px}
-.obrazac-naslov-linija{text-align:right;font-weight:bold;margin:0 auto 4px;max-width:900px}
+.obrazac-naslov-linija{
+  text-align:right;font-weight:bold;margin:0 auto 6px;max-width:960px;
+  font-family:"Times New Roman",Times,serif;font-size:15px;
+}
+.obrazac19 td{height:26px}
+.obrazac19 .suma-red td{background:#eef4fb}
+.obrazac25 .crveni-tekst td,.obrazac25 .crvena{font-weight:600}
 
 @media print{
   .kartice,.akcije,.alatna,footer,.info,.zaglavlje{display:none !important}
