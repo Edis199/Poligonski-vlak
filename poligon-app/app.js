@@ -42,7 +42,7 @@ function generirajTabelu(brUglova, podaci) {
     tr.innerHTML = `
       <td><strong>${stanica}</strong></td>
       <td><input class="in-ugao" type="text" value="${ugaoV}" placeholder="57°25'08&quot; ili 57.2508" /></td>
-      <td>${imaDuzina ? `<input class="in-duzina" type="number" step="0.001" value="${duzV}" placeholder="m" />` : "<span class='napomena'>—</span>"}</td>
+      <td>${imaDuzina ? `<input class="in-duzina" type="text" inputmode="decimal" value="${duzV}" placeholder="m" />` : "<span class='napomena'>—</span>"}</td>
       <td><input class="in-naziv" value="${nazV}" placeholder="${stanica}" /></td>
     `;
     telo.appendChild(tr);
@@ -82,13 +82,15 @@ function decimalniUSmsBroj(dec){
 }
 
 function postavi(id, v){ const e=document.getElementById(id); if(e) e.value=v; }
-function broj(id){ return parseFloat(document.getElementById(id).value) || 0; }
+// decimalni broj: prihvata i zarez i tačku (npr. 6534004,099 ili 6534004.099)
+function parseDec(s){ return parseFloat(String(s ?? "").trim().replace(/\s/g,"").replace(",", ".")); }
+function broj(id){ return parseDec(document.getElementById(id).value) || 0; }
 function tekst(id){ return document.getElementById(id).value || ""; }
 
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
   const uglovi = [...document.querySelectorAll(".in-ugao")].map((e) => e.value);
-  const duzine = [...document.querySelectorAll(".in-duzina")].map((e) => parseFloat(e.value) || 0);
+  const duzine = [...document.querySelectorAll(".in-duzina")].map((e) => parseDec(e.value) || 0);
   const nazivi = [...document.querySelectorAll(".in-naziv")].map((e) => e.value);
 
   if (uglovi.length < 2) { alert("Prvo generirajte tabelu i unesite uglove."); return; }
@@ -129,8 +131,8 @@ document.getElementById("izracunaj").addEventListener("click", () => {
 
     // --- Visinsko izravnanje (ako ima podataka iz zapisnika i date visine) ---
     zadnjiRezultatVisine = null;
-    const Hb = parseFloat(document.getElementById("B_H").value);
-    const Hc = parseFloat(document.getElementById("C_H").value);
+    const Hb = parseDec(document.getElementById("B_H").value);
+    const Hc = parseDec(document.getElementById("C_H").value);
     if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
       try {
         zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc);
@@ -809,6 +811,6 @@ function dateTackeABCD() {
 }
 
 function brojOpc(id) {
-  const v = parseFloat(document.getElementById(id).value);
+  const v = parseDec(document.getElementById(id).value);
   return isNaN(v) ? null : v;
 }
