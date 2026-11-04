@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- pozadina -->
+  <rect width="512" height="512" rx="96" fill="#1e5aa8"/>
+  <rect width="512" height="512" rx="96" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d6fc4"/>
+      <stop offset="1" stop-color="#17407a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Totalna stanica (teodolit) -->
+  <g fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <!-- tronožac (stativ) -->
+    <path d="M256 300 L176 452"/>
+    <path d="M256 300 L336 452"/>
+    <path d="M256 300 L256 440"/>
+    <!-- baza instrumenta -->
+    <path d="M196 300 H316"/>
+    <!-- alhidada / tijelo -->
+    <rect x="206" y="212" width="100" height="78" rx="12" fill="#ffffff" stroke="none"/>
+    <!-- otvor durbina (objektiv) -->
+    <circle cx="256" cy="251" r="20" fill="#17407a"/>
+    <!-- durbin (teleskop) -->
+    <rect x="168" y="150" width="176" height="40" rx="20" fill="#ffffff" stroke="none"/>
+    <!-- okular -->
+    <rect x="150" y="158" width="20" height="24" rx="6" fill="#ffffff" stroke="none"/>
+    <!-- nosači durbina -->
+    <path d="M222 212 L222 176" stroke-width="12"/>
+    <path d="M290 212 L290 176" stroke-width="12"/>
+    <!-- ciljna linija / vizura -->
+    <path d="M344 170 L432 110" stroke-width="10" stroke-dasharray="4 18"/>
+  </g>
+
+  <!-- meta / tačka vizure -->
+  <g>
+    <circle cx="440" cy="104" r="22" fill="#1f9d55" stroke="#ffffff" stroke-width="8"/>
+  </g>
+</svg>

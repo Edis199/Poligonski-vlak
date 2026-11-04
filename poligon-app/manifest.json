@@ -1,0 +1,20 @@
+{
+  "name": "Poligonska mreža",
+  "short_name": "Poligon",
+  "description": "Izravnanje poligonskog vlaka, računanje detaljnih tačaka i geodetski obrasci. Izradio: Malanović Edis.",
+  "lang": "bs",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#eef2f7",
+  "theme_color": "#1e5aa8",
+  "icons": [
+    {
+      "src": "ikona-totalka.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
