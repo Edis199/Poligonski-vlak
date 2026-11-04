@@ -105,7 +105,7 @@ tačaka (po jedno mjerenje u I položaju). Aplikacija ih sama prepoznaje.
 - Izravnanje vlaka računa se **kao i prije** — detalji ne utiču na njega.
 - Nakon izračuna detalji se računaju iz izravnatih koordinata i visina stanica
   (orijentacija na zadnju tačku, polarna metoda; visina uz korekciju zakrivljenosti i refrakcije).
-- Rezultat je u obrascu **„Detaljne tačke"** (kartica Geodetski obrasci; ispisuje se na A4 landscape), a može se izvesti i kao
+- Rezultat je u obrascu **„Detaljne tačke"** (kartica Geodetski obrasci; broj tačke, Y, X, H, kod), a može se izvesti i kao
   TXT preko dugmadi „Tačke vlaka (TXT)" i „Detaljne tačke (TXT)" na kartici Ispis / Izvoz.
   To su dva odvojena fajla (`tacke_vlaka.txt`, `detaljne_tacke.txt`), red po tački: `broj,Y,X,H,kod`
   (razdvojeno zarezom, decimalna tačka; kod je iz kolone Kod u zapisniku).
@@ -134,17 +134,12 @@ shetovima. Dostupni su svi obrasci:
 - **TO 19** — Izravnanje (koordinate)
 - **TO 28P** — Trigonometrijska nivelacija (visinske razlike)
 - **TO K** — Izravnanje visina (nadmorske visine)
-- **Detaljne tačke** — pravac, zenit, dužine, Δy, Δx, Y, X, H, kod (ispis na A4 **landscape**; svi ostali obrasci su uspravni)
+- **Detaljne tačke** — kratki obrazac: broj tačke, Y, X, H i kod (A4 uspravno)
 - **TO 25** — Spisak koordinata i nadmorskih visina
 
 Svaki se obrazac može ispisati pojedinačno, ili svi odjednom
 (**„Ispiši SVE obrasce"**) — svaki ide na zaseban A4 list, s automatskom
 numeracijom strana (npr. „Strana 2 / 3") kad obrazac prelazi na sljedeću stranu.
-
-**Napomena o ispisu svih obrazaca:** Chrome i Edge ne mogu u jednom ispisu miješati uspravne i landscape
-strane (veličina prve strane vrijedi za sve). Zato „Ispiši SVE obrasce" ispisuje **dva dokumenta**:
-prvo svi uspravni obrasci (A4 portrait), pa zasebno „Detaljne tačke" (A4 landscape). Aplikacija te pita
-prije svakog dokumenta. U dijalogu ispisa ostavi margine „Bez" i ne mijenjaj orijentaciju.
 
 ### 5. Ispis / Izvoz
 - **Izvoz u Excel (CSV)** — sprema tabelu koordinata (Excel je otvara direktno).

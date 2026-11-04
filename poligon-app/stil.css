@@ -182,7 +182,7 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac28p .tz-vi td{color:var(--siva)}
 .obrazac28p .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
 .obrazac28p .sitno{font-size:10px;color:var(--siva);font-weight:400}
-.obrazacDetalji td.kod{white-space:nowrap}
+.obrazacDetalji{min-width:60%}
 /* Obrazac K */
 .obrazacK .tz-vi td{color:var(--tekst)}
 .obrazacK .tz-stanica2 td,.obrazacK .tz-stanica2{background:#eef4fb;font-weight:400}

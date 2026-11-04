@@ -772,7 +772,7 @@ document.getElementById("stampajSve").addEventListener("click", () => {
 });
 
 // Obrasci koji se ispisuju na A4 LANDSCAPE (ostali su uspravni).
-const LANDSCAPE_OBRASCI = ["det"];
+const LANDSCAPE_OBRASCI = [];   // trenutno nijedan (svi obrasci su uspravni; "det" je kratki obrazac)
 
 /* Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
    Preglednici (Chrome/Edge) ne podržavaju uspravne i landscape strane u JEDNOM ispisu
