@@ -495,10 +495,12 @@ function obrazac28P(rez) {
 
   let redovi = "";
   (rez.redovi || []).forEach((r) => {
-    // odstupanje Δ = ΔH_naprijed + ΔH_nazad (u metrima)
-    const odst = r.dHnaprijed + r.dHnazad;
-    // gornji red: vizura + visina instrumenta (ia / ib)
-    // donji red: zenitni ugao + visina signala (lb / la) + ΔH u metrima
+    // odstupanje između mjerenja naprijed i nazad (u metrima)
+    const odst = Math.abs(r.dHnaprijed + r.dHnazad);
+    // dozvoljeno odstupanje po stranici (u metrima)
+    const dozv = (r.maxDozMM || 0) / 1000;
+    // gornji red: vizura + ia/ib + odstupanje i dozvoljeno odstupanje
+    // donji red: zenitni ugao + lb/la + definitivna visinska razlika
     redovi += `
       <tr>
         <td class="c"><b>${r.od}</b></td>
@@ -509,7 +511,8 @@ function obrazac28P(rez) {
         <td class="c">${r.vizuraNazad || ""}</td>
         <td class="d">${fz(r.ib, 3)}</td>
         <td class="d" rowspan="2"><b>${fz(r.dHnazad, 3)}</b></td>
-        <td class="d" rowspan="2"><b>${fz(r.dHsred, 3)}</b><br><span class="sitno">&Delta;=${fz(odst, 3)}</span></td>
+        <td class="d">${fz(odst, 3)}</td>
+        <td class="d">${fz(dozv, 3)}</td>
       </tr>
       <tr class="tz-vi">
         <td class="c"><b>${r.do}</b></td>
@@ -517,28 +520,10 @@ function obrazac28P(rez) {
         <td class="d">${fz(r.lb, 3)}</td>
         <td class="c">${ug(r.zenitNazad)}</td>
         <td class="d">${fz(r.la, 3)}</td>
+        <td class="d" colspan="2"><b>${fz(r.dHsred, 3)}</b></td>
       </tr>
-      <tr class="razmak"><td colspan="9">&nbsp;</td></tr>`;
+      <tr class="razmak"><td colspan="10">&nbsp;</td></tr>`;
   });
-
-  // sažetak zatvaranja
-  const fhMM = Math.round(rez.fh * 1000);
-  const dopMM = Math.round(rez.dopustenoFh * 1000);
-  const ok = rez.visinskiOK ? "zadovoljava" : "NE zadovoljava";
-  const sazetak = `
-    <tr class="razmak"><td colspan="9">&nbsp;</td></tr>
-    <tr class="tz-sum">
-      <td colspan="5" style="text-align:right">Zbroj definitivnih visinskih razlika &Sigma;&Delta;H:</td>
-      <td colspan="4" class="d"><b>${fz(rez.sumaDH, 3)} m</b></td>
-    </tr>
-    <tr class="tz-sum">
-      <td colspan="5" style="text-align:right">Visinsko odstupanje f<sub>h</sub>:</td>
-      <td colspan="4" class="d"><b>${fhMM} mm</b></td>
-    </tr>
-    <tr class="tz-sum">
-      <td colspan="5" style="text-align:right">Dozvoljeno odstupanje f<sub>h,dop</sub>:</td>
-      <td colspan="4" class="d">&plusmn;${dopMM} mm &nbsp;(${ok})</td>
-    </tr>`;
 
   return `
   <div class="obrazac-naslov-linija">Trigonom. obrazac br.28P — Trigonometrijska nivelacija</div>
@@ -549,7 +534,7 @@ function obrazac28P(rez) {
         <th rowspan="2">Dužina<br>D (m)</th>
         <th colspan="3">Mjerenje naprijed (A &ndash; B)</th>
         <th colspan="3">Mjerenje nazad (B &ndash; A)</th>
-        <th rowspan="2">Definitivna<br>&Delta;H (m)</th>
+        <th colspan="2">Odstupanje / dozvoljeno<br>Definitivna visinska razlika (m)</th>
       </tr>
       <tr class="zaglavlje-red">
         <th>Vizura /<br>zenit. ugao</th>
@@ -558,9 +543,11 @@ function obrazac28P(rez) {
         <th>Vizura /<br>zenit. ugao</th>
         <th>i<sub>b</sub> / l<sub>a</sub></th>
         <th>&Delta;H (m)<br>nazad</th>
+        <th>Odstupanje<br>(m)</th>
+        <th>Dozvoljeno<br>(m)</th>
       </tr>
     </thead>
-    <tbody>${redovi}${sazetak}</tbody>
+    <tbody>${redovi}</tbody>
   </table>`;
 }
 
