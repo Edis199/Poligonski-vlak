@@ -678,7 +678,7 @@ function obrazacDetalji(rez) {
     // red stanice: naziv + koordinate stanice
     redovi += `
       <tr class="tz-stanica">
-        <td class="c">${s.stanica}</td><td></td>${prazno(6)}
+        <td class="c">${s.stanica}</td><td></td><td></td>${prazno(6)}
         <td class="d">${fz(s.Y, 3)}</td><td class="d">${fz(s.X, 3)}</td>
         <td class="d">${fz(s.H, 3)}</td><td></td>
       </tr>`;
@@ -687,6 +687,7 @@ function obrazacDetalji(rez) {
       <tr class="tz-vi">
         <td class="c">${fz(s.visinaInstr, 3)}</td>
         <td class="c">${o.naziv || ""}</td>
+        <td></td>
         <td class="c">${ug(o.pravac)}</td>
         <td class="c">${ug(o.zenit)}</td>
         <td class="d">${o.kosa > 0 ? fz(o.kosa, 3) : ""}</td>
@@ -702,6 +703,7 @@ function obrazacDetalji(rez) {
       <tr>
         <td></td>
         <td class="c">${t.naziv}</td>
+        <td class="c kod">${t.kod || ""}</td>
         <td class="c">${ug(t.pravac)}</td>
         <td class="c">${ug(t.zenit)}</td>
         <td class="d">${fz(t.kosa, 2)}</td>
@@ -714,7 +716,7 @@ function obrazacDetalji(rez) {
         <td class="d">${fz(t.visinaSignala, 2)}</td>
       </tr>`;
     });
-    redovi += `<tr class="razmak"><td colspan="12">&nbsp;</td></tr>`;
+    redovi += `<tr class="razmak"><td colspan="13">&nbsp;</td></tr>`;
   });
 
   return `
@@ -724,6 +726,7 @@ function obrazacDetalji(rez) {
       <tr class="zaglavlje-red">
         <th rowspan="2">Stanica<br>(vis. instr.)</th>
         <th rowspan="2">Vizura</th>
+        <th rowspan="2">Kod</th>
         <th rowspan="2">Pravac na<br>tačku</th>
         <th rowspan="2">Zenitni<br>ugao</th>
         <th rowspan="2">Kosa<br>dužina<br>(m)</th>

@@ -86,7 +86,7 @@ function izracunajDetalje(stanice, tocke, A, visine) {
     (st.detalji || []).forEach((m) => {
       const r = racunajDetalj(stan, m);
       if (!r) { preskoceno++; return; }
-      tacke.push({ naziv: m.vizura, ...r });
+      tacke.push({ naziv: m.vizura, kod: m.kod || "", ...r });
       ukupno++;
     });
 
