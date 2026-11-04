@@ -129,10 +129,10 @@ function obrazac19(r, ctx) {
   // oznaka i vrijednost su u ISTOJ ćeliji
   const fbetaStr = (r.fBeta < 0 ? "-" : "") + ug(Math.abs(r.fBeta));
   const dBetaStr = ug(r.dopustenoFbetaSek / 3600);
-  redovi += red(["", `T=${formatBigAngle(r.treba)}`, "", "", "", `fy=${fz(r.fy,3)}`, `fx=${fz(r.fx,3)}`, "", "", ""]);
-  redovi += red(["", `I=${formatBigAngle(r.ima)}`, "", "", "", `fd=${fz(r.fd,3)}`, "", "", "", ""]);
-  redovi += red(["", `f<sub>β</sub>=${fbetaStr}`, `Δβ=${dBetaStr}`, "", "", `Δd=${fz(r.dopustenoFd,3)}`, "", "", "", ""]);
-  redovi += red(["", `v<sub>β</sub>=${vbeta}`, "", "", "", "", "", "", "", ""]);
+  redovi += red(["", "", `T=${formatBigAngle(r.treba)}`, "", "", `fy=${fz(r.fy,3)}`, `fx=${fz(r.fx,3)}`, "", "", ""]);
+  redovi += red(["", "", `I=${formatBigAngle(r.ima)}`, "", "", `fd=${fz(r.fd,3)}`, "", "", "", ""]);
+  redovi += red(["", "", `f<sub>β</sub>=${fbetaStr}`, `Δβ=${dBetaStr}`, "", `Δd=${fz(r.dopustenoFd,3)}`, "", "", "", ""]);
+  redovi += red(["", "", `v<sub>β</sub>=${vbeta}`, "", "", "", "", "", "", ""]);
   }
 
   // nekoliko praznih redova
