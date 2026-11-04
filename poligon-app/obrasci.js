@@ -110,8 +110,8 @@ function obrazac19(r, ctx) {
 
   // --- Σ red (sume dužina i priraštaja) ---
   redovi += red([
-    "", "<b>Σ</b>", "", "", `<b>${fz(r.sumaD,3)}</b>`,
-    `<b>${fz(r.sumaDy,3)}</b>`, `<b>${fz(r.sumaDx,3)}</b>`, "", "", ""
+    "", "Σ", "", "", fz(r.sumaD,3),
+    fz(r.sumaDy,3), fz(r.sumaDx,3), "", "", ""
   ], "suma-red");
 
   // --- Donji blok: treba / ima / fβ / vβ / Δβ / fd / Δd ---
@@ -191,7 +191,7 @@ function obrazacTZ(ucitaneStanice, lokalitet) {
   (ucitaneStanice || []).forEach((st) => {
     // red stanice (naziv) + ispod visina instrumenta (u prvoj koloni)
     redovi += `<tr class="tz-stanica">
-      <td class="c"><b>${st.stanica ?? ""}</b></td>
+      <td class="c">${st.stanica ?? ""}</td>
       <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
     </tr>`;
     redovi += `<tr class="tz-vi">
@@ -261,7 +261,7 @@ function obrazac1i2(obradjeneStanice) {
       // red ZADNJA
       const srZadRed = (gi === 0) ? ug(0) : "";  // redukovana zadnja uvijek 0 (orijentacija)
       redovi += `<tr>
-        <td class="c"><b>${gi === 0 ? st.stanica : oznaka}</b></td>
+        <td class="c">${gi === 0 ? st.stanica : oznaka}</td>
         <td class="c">${gd.zadnja.vizura}</td>
         <td class="c">${ug(gd.zadnja.iPolu)}</td>
         <td class="c">${ug(gd.zadnja.iiPolu)}</td>
@@ -327,7 +327,7 @@ function obrazac1V(obradjeneStanice) {
     const srednjiZen = p.srZenit;             // visinski ugao = dvostruki/2
     return `
       <tr>
-        <td class="c"><b>${stanNaziv}</b></td>
+        <td class="c">${stanNaziv}</td>
         <td class="c">${p.vizura}</td>
         <td class="c">${ug(p.zenitKL)}</td>
         <td class="c">${ug(p.zenitKD)}</td>
@@ -395,7 +395,7 @@ function obrazac18D(obradjeneStanice) {
 
     redovi += `
       <tr>
-        <td class="c"><b>${od}</b></td>
+        <td class="c">${od}</td>
         <td class="d">${fz(kosaNaprijed,3)}</td>
         <td class="d" rowspan="2">${fz(sredinaKosa,3)}</td>
         <td class="c" rowspan="2"></td>
@@ -443,14 +443,14 @@ function obrazac8(date) {
     const d = R.odstojanje(T1.Y, T1.X, T2.Y, T2.X);
     return `
       <tr>
-        <td class="c"><b>${T2.naziv}</b></td>
+        <td class="c">${T2.naziv}</td>
         <td class="d">${fz(T2.Y,3)}</td>
         <td class="d">${fz(T2.X,3)}</td>
         <td class="c" rowspan="2">${ug(alfa)}</td>
         <td class="d" rowspan="2">${fz(d,2)}</td>
       </tr>
       <tr>
-        <td class="c"><b>${T1.naziv}</b></td>
+        <td class="c">${T1.naziv}</td>
         <td class="d">${fz(T1.Y,3)}</td>
         <td class="d">${fz(T1.X,3)}</td>
       </tr>
@@ -503,24 +503,24 @@ function obrazac28P(rez) {
     // donji red: zenitni ugao + lb/la + definitivna visinska razlika
     redovi += `
       <tr>
-        <td class="c"><b>${r.od}</b></td>
+        <td class="c">${r.od}</td>
         <td class="d" rowspan="2">${fz(r.duzina, 3)}</td>
         <td class="c">${r.vizuraNaprijed || ""}</td>
         <td class="d">${fz(r.ia, 3)}</td>
-        <td class="d" rowspan="2"><b>${fz(r.dHnaprijed, 3)}</b></td>
+        <td class="d" rowspan="2">${fz(r.dHnaprijed, 3)}</td>
         <td class="c">${r.vizuraNazad || ""}</td>
         <td class="d">${fz(r.ib, 3)}</td>
-        <td class="d" rowspan="2"><b>${fz(r.dHnazad, 3)}</b></td>
+        <td class="d" rowspan="2">${fz(r.dHnazad, 3)}</td>
         <td class="d">${fz(odst, 3)}</td>
         <td class="d">${fz(dozv, 3)}</td>
       </tr>
       <tr class="tz-vi">
-        <td class="c"><b>${r.do}</b></td>
+        <td class="c">${r.do}</td>
         <td class="c">${ug(r.zenitNaprijed)}</td>
         <td class="d">${fz(r.lb, 3)}</td>
         <td class="c">${ug(r.zenitNazad)}</td>
         <td class="d">${fz(r.la, 3)}</td>
-        <td class="d" colspan="2"><b>${fz(r.dHsred, 3)}</b></td>
+        <td class="c" colspan="2">${fz(r.dHsred, 3)}</td>
       </tr>
       <tr class="razmak"><td colspan="10">&nbsp;</td></tr>`;
   });
@@ -568,11 +568,11 @@ function obrazacK(rez) {
     const Hod = Hmap[r.od];
     redovi += `
       <tr>
-        <td class="c tz-stanica2"><b>${r.od}</b></td>
+        <td class="c tz-stanica2">${r.od}</td>
         <td class="c"></td>
         <td class="d"></td><td class="d"></td><td class="d"></td>
         <td class="d"></td><td class="d"></td><td class="d"></td><td class="d"></td>
-        <td class="d"><b>${fz(Hod, 3)}</b></td>
+        <td class="d">${fz(Hod, 3)}</td>
       </tr>
       <tr class="tz-vi">
         <td class="c"></td>
@@ -592,11 +592,11 @@ function obrazacK(rez) {
   if (zadnja) {
     redovi += `
       <tr>
-        <td class="c tz-stanica2"><b>${zadnja}</b></td>
+        <td class="c tz-stanica2">${zadnja}</td>
         <td class="c"></td>
         <td class="d"></td><td class="d"></td><td class="d"></td>
         <td class="d"></td><td class="d"></td><td class="d"></td><td class="d"></td>
-        <td class="d"><b>${fz(Hmap[zadnja], 3)}</b></td>
+        <td class="d">${fz(Hmap[zadnja], 3)}</td>
       </tr>`;
   }
 
@@ -612,20 +612,20 @@ function obrazacK(rez) {
 
   const suma = `
     <tr class="tz-sum">
-      <td class="c" colspan="2" style="text-align:right"><b>&Sigma;</b></td>
-      <td class="d"><b>${fz(sPrvo, 3)}</b></td>
-      <td class="d"><b>${fz(sDrugo, 3)}</b></td>
-      <td class="d"><b>${fz(sSred, 3)}</b></td>
+      <td class="c" colspan="2" style="text-align:right">&Sigma;</td>
+      <td class="d">${fz(sPrvo, 3)}</td>
+      <td class="d">${fz(sDrugo, 3)}</td>
+      <td class="d">${fz(sSred, 3)}</td>
       <td class="d"></td>
       <td class="d"></td>
-      <td class="d"><b>${fz(sPopr, 3)}</b></td>
-      <td class="d"><b>${fz(sDHpopr, 3)}</b></td>
+      <td class="d">${fz(sPopr, 3)}</td>
+      <td class="d">${fz(sDHpopr, 3)}</td>
       <td class="d"></td>
     </tr>
     <tr class="tz-sum">
       <td colspan="10" style="text-align:center">
-        f<sub>h</sub> = <b>${fhMM} mm</b> &nbsp;&nbsp;|&nbsp;&nbsp;
-        dozvoljeno &Delta;h = <b>&plusmn;${dopMM} mm</b> &nbsp;(${ok})
+        f<sub>h</sub> = ${fhMM} mm &nbsp;&nbsp;|&nbsp;&nbsp;
+        dozvoljeno &Delta;h = &plusmn;${dopMM} mm &nbsp;(${ok})
       </td>
     </tr>`;
 

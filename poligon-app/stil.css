@@ -6,6 +6,8 @@
   --siva:#64748b;
   --svijetla:#f1f5f9;
   --obrub:#d7dee8;
+  --obrub-obr:#7b8aa0;   /* tamnije linije unutar obrazaca */
+  --okvir-obr:#4a5a72;   /* okvir obrasca */
   --tekst:#1e293b;
 }
 *{box-sizing:border-box}
@@ -119,18 +121,19 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   border-collapse:separate;border-spacing:0;margin:0 auto;background:#fff;
   font-size:14px;color:var(--tekst);
   font-family:"Segoe UI",system-ui,Arial,sans-serif;
+  border:2px solid var(--okvir-obr);
   border-radius:10px;overflow:hidden;
   box-shadow:0 1px 6px rgba(0,0,0,.08);
 }
 .obrazac th,.obrazac td{
-  border-right:1.5px solid var(--obrub);
-  border-bottom:1px solid var(--obrub);
+  border-right:1.5px solid var(--obrub-obr);
+  border-bottom:1px solid var(--obrub-obr);
   padding:7px 10px;text-align:center;vertical-align:middle;
 }
 /* zaglavlja plava kao u rezultatima */
 .obrazac thead th{
   background:var(--svijetla);color:var(--plava-tamna);font-weight:600;
-  border-bottom:2px solid var(--obrub);
+  border-bottom:2px solid var(--okvir-obr);
 }
 .obrazac .naslov{
   background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
@@ -145,11 +148,11 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac .zaglavlje-red th{font-weight:600;height:72px}
 .obrazac td.c{text-align:center}
 .obrazac td.d{text-align:right;padding-right:12px;font-variant-numeric:tabular-nums}
-.obrazac .sekcija{font-weight:700;letter-spacing:.6px;color:var(--plava-tamna);background:#eef4fb}
+.obrazac .sekcija{font-weight:400;letter-spacing:.6px;color:var(--plava-tamna);background:#eef4fb}
 .obrazac .crvena{color:#c0392b}
-.obrazac .crveni-tekst td{color:#c0392b;font-weight:600}
+.obrazac .crveni-tekst td{color:#c0392b;font-weight:400}
 .obrazac .mali{font-size:11px;color:var(--siva)}
-.obrazac .suma-red td{font-weight:700;background:#eef4fb !important;color:var(--plava-tamna)}
+.obrazac .suma-red td{font-weight:400;background:#eef4fb !important;color:var(--plava-tamna)}
 .uspravno{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block}
 .obrazac25 .w-naziv{width:150px}
 .obrazac25 .w-gdje{width:60px}
@@ -162,8 +165,8 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 /* red s pod-zaglavljem Δy/Δx — niži i diskretniji */
 .obrazac19 .zaglavlje-red.pod th{height:auto;padding:4px 10px;font-size:13px;color:var(--siva);background:#f6f9fd}
 /* TZ obrazac */
-.obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:600}
-.obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:700}
+.obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:400}
+.obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:400}
 .obrazacTZ .tz-vi td{color:var(--siva)}
 /* TO 28P obrazac */
 .obrazac28p .tz-vi td{color:var(--siva)}
@@ -171,7 +174,7 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac28p .sitno{font-size:10px;color:var(--siva);font-weight:400}
 /* Obrazac K */
 .obrazacK .tz-vi td{color:var(--tekst)}
-.obrazacK .tz-stanica2 td,.obrazacK .tz-stanica2{background:#eef4fb;font-weight:700}
+.obrazacK .tz-stanica2 td,.obrazacK .tz-stanica2{background:#eef4fb;font-weight:400}
 .obrazacK .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
 /* odabrani obrazac — istaknut gumb */
 .obrazac-izbor{flex-wrap:wrap}
