@@ -12,7 +12,7 @@ ne instalira.
 
 > Važno: držite **sve datoteke** zajedno u istoj mapi
 > (`index.html`, `stil.css`, `racun.js`, `girus.js`, `visine.js`,
-> `ucitavanje.js`, `obrasci.js`, `xlsx.js`, `app.js`).
+> `detalj.js`, `ucitavanje.js`, `obrasci.js`, `xlsx.js`, `app.js`).
 
 ## Kako se koristi
 
@@ -66,6 +66,18 @@ Stupci predloška:
 `Stanica ; VisinaInstrumenta ; Vizura ; Kod ; HorizontalniUgao ;
 ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
+### Detaljne tačke (u istom zapisniku)
+
+U isti tahimetrijski zapisnik možete upisati i detaljne tačke (npr. 1, 2, 3…). Na svakoj
+stanici prvo idu girusna mjerenja vlaka (4 vizure po girusu), a **iza njih** redovi detaljnih
+tačaka (po jedno mjerenje u I položaju). Aplikacija ih sama prepoznaje.
+
+- Izravnanje vlaka računa se **kao i prije** — detalji ne utiču na njega.
+- Nakon izračuna detalji se računaju iz izravnatih koordinata i visina stanica
+  (orijentacija na zadnju tačku, polarna metoda; visina uz korekciju zakrivljenosti i refrakcije).
+- Rezultat je u obrascu **„Računanje detalja"** (kartica Geodetski obrasci), a može se izvesti i kao
+  TXT (`Y;X;H;broj;H`) preko **„Detaljne tačke (TXT)"** na kartici Ispis / Izvoz.
+
 ### 2. Rezultati
 Prikazuje:
 - **Kutno odstupanje fβ** i dopuštenu vrijednost (zeleno/crveno)
@@ -90,6 +102,7 @@ shetovima. Dostupni su svi obrasci:
 - **TO 19** — Izravnanje (koordinate)
 - **TO 28P** — Trigonometrijska nivelacija (visinske razlike)
 - **TO K** — Izravnanje visina (nadmorske visine)
+- **Računanje detalja** — koordinate i visine detaljnih tačaka
 - **TO 25** — Spisak koordinata i nadmorskih visina
 
 Svaki se obrazac može ispisati pojedinačno, ili svi odjednom

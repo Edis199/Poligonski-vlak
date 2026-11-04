@@ -120,7 +120,29 @@ function ucitajRedove(redovi) {
   }
 
   if (!stanice.length) throw new Error("Nije pronađeno nijedno mjerenje. Provjerite zaglavlje stupaca.");
+
+  // Na svakoj stanici odvoji girusna mjerenja (vlak) od detaljnih tačaka.
+  stanice.forEach((s) => {
+    const { girus, detalji } = razdvojiGirusIDetalje(s.mjerenja);
+    s.sviRedovi = s.mjerenja;   // sva mjerenja, originalnim redoslijedom (za obrazac TZ)
+    s.mjerenja = girus;         // samo girus (4 vizure po girusu)
+    s.detalji = detalji;        // detaljne tačke (po jedno mjerenje, I položaj)
+  });
   return stanice;
+}
+
+/* Girus = 4 reda: ZADNJA, PREDNJA, PREDNJA, ZADNJA (isti nazivi tačaka u svakom girusu).
+   Redovi iza zadnjeg potpunog girusa su detaljne tačke.                             */
+function razdvojiGirusIDetalje(m) {
+  const naz = (r) => String(r.vizura || "").trim();
+  if (m.length < 4) return { girus: m, detalji: [] };
+  const Z = naz(m[0]), P = naz(m[1]);
+  let k = 0;
+  while (k + 4 <= m.length &&
+         naz(m[k]) === Z && naz(m[k + 1]) === P &&
+         naz(m[k + 2]) === P && naz(m[k + 3]) === Z) k += 4;
+  if (k === 0) return { girus: m, detalji: [] };   // ne liči na girus — neka obrada javi grešku
+  return { girus: m.slice(0, k), detalji: m.slice(k) };
 }
 
 function normZaglavlje(s) {
@@ -139,6 +161,7 @@ function pripremiIzStanica(stanice) {
   for (const s of stanice) {
     const r = G.obradiStanicu(s.stanica, s.visinaInstr, s.mjerenja);
     if (r.greska) greske.push(r.greska);
+    r.detalji = s.detalji || [];          // detaljne tačke ove stanice
     obradjene.push(r);
   }
   return { obradjene, greske };

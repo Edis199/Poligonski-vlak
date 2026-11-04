@@ -156,6 +156,7 @@
       <button class="dugme" data-obrazac="o19">TO 19 — Izravnanje</button>
       <button class="dugme" data-obrazac="to28p">TO 28P</button>
       <button class="dugme" data-obrazac="tok">TO K</button>
+      <button class="dugme" data-obrazac="det">Računanje detalja</button>
       <button class="dugme" data-obrazac="o25">TO 25 — Spisak koordinata</button>
     </div>
     <div class="akcije" style="margin-top:8px">
@@ -171,10 +172,12 @@
     <p>Rezultate možete izvesti i spremiti:</p>
     <div class="akcije">
       <button id="izvozExcel" class="dugme">Izvoz u Excel (CSV)</button>
+      <button id="izvozDetaljiTxt" class="dugme">Detaljne tačke (TXT)</button>
       <button id="izvozPdf" class="dugme">Ispis / Spremi u PDF</button>
     </div>
     <p class="napomena">
       "Izvoz u Excel" sprema tabelu koordinata koju Excel otvara direktno.<br />
+      "Detaljne tačke (TXT)" sprema Y;X;H;broj;H za svaku detaljnu tačku.<br />
       "Ispis / PDF" otvara dijalog za štampu — odaberite "Spremi kao PDF".
     </p>
   </section>
@@ -187,6 +190,7 @@
 <script src="racun.js"></script>
 <script src="girus.js"></script>
 <script src="visine.js"></script>
+<script src="detalj.js"></script>
 <script src="ucitavanje.js"></script>
 <script src="obrasci.js"></script>
 <script src="xlsx.js"></script>

@@ -2,6 +2,7 @@
 
 let zadnjiRezultat = null;
 let zadnjiRezultatVisine = null;
+let zadnjiDetalji = null;       // koordinate detaljnih tačaka (računaju se nakon izravnanja vlaka)
 let obradjeneStanice = null;   // iz učitanog zapisnika (za visinsko izravnanje)
 let ucitaneStanice = null;     // sirova mjerenja iz zapisnika (za obrazac TZ)
 let lokalitet = "";            // naziv lokaliteta (opcionalno)
@@ -138,6 +139,18 @@ document.getElementById("izracunaj").addEventListener("click", () => {
         zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc);
       } catch (ev) {
         console.warn("Visinsko izravnanje preskočeno:", ev.message);
+      }
+    }
+
+    // --- Detaljne tačke (nakon izravnanja vlaka; izravnanje se ne mijenja) ---
+    zadnjiDetalji = null;
+    if (obradjeneStanice && obradjeneStanice.some((s) => s.detalji && s.detalji.length)) {
+      try {
+        const visine = zadnjiRezultatVisine ? zadnjiRezultatVisine.tocke.map((t) => t.H) : null;
+        const A = { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") };
+        zadnjiDetalji = window.Detalj.izracunajDetalje(obradjeneStanice, r.tocke, A, visine);
+      } catch (ed) {
+        console.warn("Računanje detalja preskočeno:", ed.message);
       }
     }
 
@@ -599,10 +612,16 @@ document.getElementById("stampajObrazac").addEventListener("click", () => {
   ispisiObrasce([trenutniObrazac]);
 });
 
+document.getElementById("izvozDetaljiTxt").addEventListener("click", () => {
+  if (!zadnjiDetalji || !zadnjiDetalji.ukupno) { alert("Nema izračunatih detaljnih tačaka. Učitajte zapisnik s detaljem i kliknite Izračunaj izravnanje."); return; }
+  const blob = new Blob([window.Detalj.detaljiUTxt(zadnjiDetalji)], { type: "text/plain;charset=utf-8" });
+  preuzmi(blob, "detaljne_tacke.txt");
+});
+
 document.getElementById("stampajSve").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   // svi dostupni obrasci, redom (samo oni koji su napravljeni)
-  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "tok", "o25"]);
+  ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "tok", "det", "o25"]);
 });
 
 // Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
@@ -726,6 +745,9 @@ function generirajObrazacHTML(kod) {
     return zadnjiRezultatVisine && !zadnjiRezultatVisine.greska
       ? window.Obrasci.obrazac28P(zadnjiRezultatVisine) : "";
   }
+  if (kod === "det") {
+    return zadnjiDetalji ? window.Obrasci.obrazacDetalji(zadnjiDetalji) : "";
+  }
   if (kod === "tok") {
     return zadnjiRezultatVisine && !zadnjiRezultatVisine.greska
       ? window.Obrasci.obrazacK(zadnjiRezultatVisine) : "";
@@ -790,6 +812,12 @@ function prikaziObrazac() {
       el.innerHTML = `<div class="info">Za ovaj obrazac učitajte tahimetrijski zapisnik (mjerenja) i unesite nadmorske visine H za tačke B i C, pa kliknite „Izračunaj izravnanje".</div>`;
     } else {
       el.innerHTML = window.Obrasci.obrazac28P(zadnjiRezultatVisine);
+    }
+  } else if (trenutniObrazac === "det") {
+    if (!zadnjiDetalji) {
+      el.innerHTML = `<div class="info">Za ovaj obrazac učitajte tahimetrijski zapisnik koji sadrži i detaljne tačke (npr. 1, 2, 3…), pa kliknite „Izračunaj izravnanje".</div>`;
+    } else {
+      el.innerHTML = window.Obrasci.obrazacDetalji(zadnjiDetalji);
     }
   } else if (trenutniObrazac === "tok") {
     if (!zadnjiRezultatVisine || zadnjiRezultatVisine.greska) {
