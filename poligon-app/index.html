@@ -110,13 +110,14 @@
     </div>
 
     <div class="zatvoreni-vlak">
-      <label for="vrstaVlaka"><b>Vrsta vlaka:</b></label>
-      <select id="vrstaVlaka">
-        <option value="umetnuti" selected>Umetnuti (počinje i završava na poznatim tačkama)</option>
-        <option value="zatvoreni">Zatvoreni (C = B, D = A)</option>
-        <option value="slijepi">Slijepi (počinje na poznatoj tački, ne završava na poznatoj)</option>
+      <b>Vrsta vlaka:</b> <span id="vrstaTekst">prepoznaje se automatski iz učitanog zapisnika</span>
+      <select id="vrstaVlaka" style="display:none" aria-hidden="true">
+        <option value="umetnuti" selected>Umetnuti</option>
+        <option value="zatvoreni">Zatvoreni</option>
+        <option value="slijepi">Slijepi</option>
       </select>
       <div class="napomena" id="napomenaVrste"></div>
+    </div>
     </div>
 
     <div class="redukcija-blok">

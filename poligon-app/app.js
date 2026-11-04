@@ -124,9 +124,12 @@ function primijeniVrstu() {
     const tr = document.getElementById(k + "_naziv").closest("tr");
     if (tr) tr.style.display = v === "slijepi" ? "none" : "";
   });
+  document.getElementById("vrstaTekst").textContent = ucitaneStanice
+    ? { umetnuti: "UMETNUTI (prepoznat iz zapisnika)", zatvoreni: "ZATVORENI (prepoznat iz zapisnika)", slijepi: "SLIJEPI (prepoznat iz zapisnika)" }[v]
+    : "prepoznaje se automatski iz učitanog zapisnika";
   document.getElementById("napomenaVrste").textContent = v === "slijepi"
-    ? "Slijepi vlak: unesite koordinate i visinu za A (orijentacija) i B (početna stanica). Nema uglovnog ni linearnog odstupanja ni popravki."
-    : "";
+    ? "Unesite koordinate i visinu za A (orijentacija) i B (početna stanica). Nema uglovnog ni linearnog odstupanja ni popravki."
+    : v === "zatvoreni" ? "Unesite koordinate i visinu za A i B (C = B, D = A)." : "";
   if (v === "slijepi") {
     document.getElementById("redukcijaNacin").value = "nema";
     osvjeziPoljaRedukcije();
