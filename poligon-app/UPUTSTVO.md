@@ -105,7 +105,7 @@ tačaka (po jedno mjerenje u I položaju). Aplikacija ih sama prepoznaje.
 - Izravnanje vlaka računa se **kao i prije** — detalji ne utiču na njega.
 - Nakon izračuna detalji se računaju iz izravnatih koordinata i visina stanica
   (orijentacija na zadnju tačku, polarna metoda; visina uz korekciju zakrivljenosti i refrakcije).
-- Rezultat je u obrascu **„Računanje detalja"** (kartica Geodetski obrasci), a može se izvesti i kao
+- Rezultat je u obrascu **„Detaljne tačke"** (kartica Geodetski obrasci; broj tačke, Y, X, H, kod), a može se izvesti i kao
   TXT preko dugmadi „Tačke vlaka (TXT)" i „Detaljne tačke (TXT)" na kartici Ispis / Izvoz.
   To su dva odvojena fajla (`tacke_vlaka.txt`, `detaljne_tacke.txt`), red po tački: `broj,Y,X,H,kod`
   (razdvojeno zarezom, decimalna tačka; kod je iz kolone Kod u zapisniku).
@@ -134,7 +134,7 @@ shetovima. Dostupni su svi obrasci:
 - **TO 19** — Izravnanje (koordinate)
 - **TO 28P** — Trigonometrijska nivelacija (visinske razlike)
 - **TO K** — Izravnanje visina (nadmorske visine)
-- **Računanje detalja** — koordinate i visine detaljnih tačaka
+- **Detaljne tačke** — broj tačke, Y, X, H i kod (staje na A4 uspravno)
 - **TO 25** — Spisak koordinata i nadmorskih visina
 
 Svaki se obrazac može ispisati pojedinačno, ili svi odjednom
