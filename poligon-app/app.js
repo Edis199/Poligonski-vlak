@@ -771,6 +771,9 @@ document.getElementById("stampajSve").addEventListener("click", () => {
   ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "tok", "det", "o25"]);
 });
 
+// Obrasci koji se ispisuju na A4 LANDSCAPE (ostali su uspravni).
+const LANDSCAPE_OBRASCI = ["det"];
+
 // Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
 function ispisiObrasce(lista) {
   const el = document.getElementById("obrazacSadrzaj");
@@ -780,7 +783,7 @@ function ispisiObrasce(lista) {
   let html = "";
   lista.forEach((kod) => {
     const sadrzaj = generirajObrazacHTML(kod);
-    if (sadrzaj) html += `<div class="obrazac-stranica" data-kod="${kod}">${sadrzaj}</div>`;
+    if (sadrzaj) html += `<div class="obrazac-stranica${LANDSCAPE_OBRASCI.includes(kod) ? " ls" : ""}" data-kod="${kod}">${sadrzaj}</div>`;
   });
   el.innerHTML = html;
   document.body.classList.add("print-obrasci");
@@ -813,15 +816,19 @@ function paginirajObrasce(kontejner) {
 
     const redovi = [...tbody.children];
     // procijeni koliko redova stane po stranici
-    const visinaNaslov = naslov ? naslov.offsetHeight + 8 : 0;
-    const visinaThead = thead ? thead.offsetHeight : 0;
-    const raspoloziva = A4_VISINA_PX - visinaNaslov - visinaThead - 30;
+    const jeLs = obr.classList.contains("ls");
+    // landscape: niža stranica (210mm); mjerenje je na ekranu (font 14px), a ispis je 11px → ×0,88
+    const faktor = jeLs ? 0.88 : 1;
+    const visStranice = jeLs ? Math.round(((210 - 20) / 25.4) * 96) - 40 : A4_VISINA_PX;
+    const visinaNaslov = (naslov ? naslov.offsetHeight + 8 : 0) * faktor;
+    const visinaThead = (thead ? thead.offsetHeight : 0) * faktor;
+    const raspoloziva = visStranice - visinaNaslov - visinaThead - 30;
 
     // izmjeri kumulativnu visinu redova i podijeli u grupe (stranice)
     const grupe = [[]];
     let h = 0;
     redovi.forEach((tr) => {
-      const vh = tr.offsetHeight || 24;
+      const vh = (tr.offsetHeight || 24) * faktor;
       if (h + vh > raspoloziva && grupe[grupe.length - 1].length > 0) {
         grupe.push([]);
         h = 0;
@@ -846,7 +853,7 @@ function paginirajObrasce(kontejner) {
 
     grupe.forEach((grupa, gi) => {
       const div = document.createElement("div");
-      div.className = "obrazac-stranica";
+      div.className = obr.className;   // zadrži i klasu "ls" (landscape)
       const telo = grupa.map((tr) => tr.outerHTML).join("");
       div.innerHTML = naslovHTML +
         `<table class="${tabelaKlase}">${theadHTML}<tbody>${telo}</tbody></table>`;

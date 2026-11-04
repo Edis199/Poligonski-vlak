@@ -662,34 +662,82 @@ function obrazacK(rez) {
   </table>`;
 }
 
-/* --------- OBRAZAC: Koordinate detaljnih tačaka ---------
+/* --------- OBRAZAC: Računanje koordinata detaljnih tačaka ---------
    rez = rezultat iz Detalj.izracunajDetalje(...)
-   Kratki obrazac (staje na A4 uspravno): broj tačke, Y, X, H i kod tačke.        */
+   Raspored kao u Excelu "Računanje detalja": za svaku stanicu red sa stanicom
+   i njenim koordinatama, red orijentacije (zadnja tačka), pa detaljne tačke.   */
 function obrazacDetalji(rez) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+  const prazno = (n) => "<td></td>".repeat(n);
+
   let redovi = "";
   (rez.stanice || []).forEach((s) => {
+    if (!s.tacke.length) return;          // stanice bez detalja se ne prikazuju
+    const o = s.orijentacija;
+    // red stanice: naziv + koordinate stanice
+    redovi += `
+      <tr class="tz-stanica">
+        <td class="c">${s.stanica}</td><td></td><td></td>${prazno(6)}
+        <td class="d">${fz(s.Y, 3)}</td><td class="d">${fz(s.X, 3)}</td>
+        <td class="d">${fz(s.H, 3)}</td><td></td>
+      </tr>`;
+    // red orijentacije: visina instrumenta, zadnja tačka, pravac, zenit, kosa, horiz.
+    redovi += `
+      <tr class="tz-vi">
+        <td class="c">${fz(s.visinaInstr, 3)}</td>
+        <td class="c">${o.naziv || ""}</td>
+        <td></td>
+        <td class="c">${ug(o.pravac)}</td>
+        <td class="c">${ug(o.zenit)}</td>
+        <td class="d">${o.kosa > 0 ? fz(o.kosa, 3) : ""}</td>
+        <td class="d">${o.horizDuzina > 0 ? fz(o.horizDuzina, 3) : ""}</td>
+        <td></td><td></td>
+        <td class="d">${fz(o.Y, 3)}</td><td class="d">${fz(o.X, 3)}</td>
+        <td></td>
+        <td class="d">${o.visinaSignala > 0 ? fz(o.visinaSignala, 2) : ""}</td>
+      </tr>`;
+    // detaljne tačke
     s.tacke.forEach((t) => {
       redovi += `
       <tr>
+        <td></td>
         <td class="c">${t.naziv}</td>
+        <td class="c kod">${t.kod || ""}</td>
+        <td class="c">${ug(t.pravac)}</td>
+        <td class="c">${ug(t.zenit)}</td>
+        <td class="d">${fz(t.kosa, 2)}</td>
+        <td class="d">${fz(t.horizDuzina, 3)}</td>
+        <td class="d">${fz(t.dy, 3)}</td>
+        <td class="d">${fz(t.dx, 3)}</td>
         <td class="d">${fz(t.Y, 3)}</td>
         <td class="d">${fz(t.X, 3)}</td>
         <td class="d">${fz(t.H, 3)}</td>
-        <td class="c">${t.kod || ""}</td>
+        <td class="d">${fz(t.visinaSignala, 2)}</td>
       </tr>`;
     });
+    redovi += `<tr class="razmak"><td colspan="13">&nbsp;</td></tr>`;
   });
 
   return `
-  <div class="obrazac-naslov-linija">Koordinate detaljnih tačaka</div>
+  <div class="obrazac-naslov-linija">Računanje koordinata detaljnih tačaka</div>
   <table class="obrazac obrazacDetalji">
     <thead>
       <tr class="zaglavlje-red">
-        <th>Broj<br>tačke</th>
-        <th>Y</th>
-        <th>X</th>
-        <th>H</th>
-        <th>Kod</th>
+        <th rowspan="2">Stanica<br>(vis. instr.)</th>
+        <th rowspan="2">Vizura</th>
+        <th rowspan="2">Kod</th>
+        <th rowspan="2">Pravac na<br>tačku</th>
+        <th rowspan="2">Zenitni<br>ugao</th>
+        <th rowspan="2">Kosa<br>dužina<br>(m)</th>
+        <th rowspan="2">Horiz.<br>dužina<br>(m)</th>
+        <th colspan="2">Koordinatne razlike</th>
+        <th colspan="3">Koordinate tačaka</th>
+        <th rowspan="2">Visina<br>signala<br>(m)</th>
+      </tr>
+      <tr class="zaglavlje-red">
+        <th>&Delta;y</th><th>&Delta;x</th>
+        <th>Y</th><th>X</th><th>H</th>
       </tr>
     </thead>
     <tbody>${redovi}</tbody>

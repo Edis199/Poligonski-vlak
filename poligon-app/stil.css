@@ -182,7 +182,7 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac28p .tz-vi td{color:var(--siva)}
 .obrazac28p .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
 .obrazac28p .sitno{font-size:10px;color:var(--siva);font-weight:400}
-.obrazacDetalji{min-width:60%}
+.obrazacDetalji td.kod{white-space:nowrap}
 /* Obrazac K */
 .obrazacK .tz-vi td{color:var(--tekst)}
 .obrazacK .tz-stanica2 td,.obrazacK .tz-stanica2{background:#eef4fb;font-weight:400}
@@ -201,6 +201,9 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 @media print{
   /* margina 0 = preglednik ne ispisuje zaglavlje/podnožje (naslov, adresa, datum) */
   @page { size:A4 portrait; margin:0; }
+  /* obrazac s mnogo kolona (detaljne tačke) ide na A4 LANDSCAPE */
+  @page ls { size:A4 landscape; margin:0; }
+  body.print-obrasci .obrazac-stranica.ls{page:ls}
   body.print-obrasci{margin:0;padding:0}
   body.print-obrasci .obrazac-stranica{padding:10mm}
   body.print-rezultati{padding:10mm}
