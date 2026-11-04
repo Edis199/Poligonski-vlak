@@ -526,43 +526,6 @@ function nacrtaj(r) {
   ctx.fillStyle = "#1e293b"; ctx.fillText("nove tačke", pad + 132, 35);
 }
 
-/* ---------- Izvoz u Excel (CSV) ---------- */
-document.getElementById("izvozExcel").addEventListener("click", () => {
-  if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  const r = zadnjiRezultat;
-  // pripremi mapu visina po nazivu tačke (ako ima visinskog izravnanja)
-  const visineMap = {};
-  if (zadnjiRezultatVisine) {
-    zadnjiRezultatVisine.tocke.forEach((t) => { visineMap[t.naziv] = t.H; });
-  }
-  const imaVisine = Object.keys(visineMap).length > 0;
-
-  let csv = imaVisine ? "Tacka;Y (m);X (m);H (m);Tip\n" : "Tacka;Y (m);X (m);Tip\n";
-  r.tocke.forEach((t) => {
-    if (imaVisine) {
-      const H = visineMap[t.naziv] !== undefined ? visineMap[t.naziv].toFixed(3) : "";
-      csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${H};${t.tip}\n`;
-    } else {
-      csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${t.tip}\n`;
-    }
-  });
-  if (!r.slijepi) {
-    csv += `\nUglovno odstupanje fbeta;${sekMinSek(r.fBetaSek, true)}\n`;
-    csv += `Dopusteno uglovno;${sekMinSek(r.dopustenoFbetaSek, false)}\n`;
-    csv += `Linearno odstupanje fd (m);${r.fd.toFixed(3)}\n`;
-    csv += `Dopusteno linearno (m);${r.dopustenoFd.toFixed(3)}\n`;
-  }
-  csv += `Ukupna duzina (m);${r.sumaD.toFixed(2)}\n`;
-  if (zadnjiRezultatVisine && !r.slijepi) {
-    csv += `Visinsko odstupanje fh (mm);${(zadnjiRezultatVisine.fh*1000).toFixed(0)}\n`;
-    csv += `Dopusteno visinsko (mm);${(zadnjiRezultatVisine.dopustenoFh*1000).toFixed(0)}\n`;
-  }
-
-  const bom = "\uFEFF"; // da Excel prepozna UTF-8
-  const blob = new Blob([bom + csv], { type: "text/csv;charset=utf-8;" });
-  preuzmi(blob, "koordinate_poligonski_vlak.csv");
-});
-
 /* ---------- Izvoz u PDF (preko ispisa) ---------- */
 document.getElementById("izvozPdf").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
