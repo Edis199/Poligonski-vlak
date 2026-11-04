@@ -32,16 +32,16 @@
   <!-- ========== UNOS ========== -->
   <section id="unos" class="panel vidljiv">
     <div class="info">
-      <strong>Uputa:</strong> Unesite poznate (date) tačke, pa prelomne uglove i dužine —
-      <b>ručno</b> u tabelu, ili ih <b>učitajte iz tahimetrijskog zapisnika</b> (CSV).
-      Uglovi se mogu unijeti kao <code>57°25'08"</code> ili kao <code>57.2508</code>.
+      <strong>Uputa:</strong> 1) Preuzmite predložak zapisnika i u njega prebacite mjerenja (TZ). 2) Učitajte zapisnik.
+      3) Upišite koordinate i visine datih tačaka. 4) Kliknite „Izračunaj izravnanje".
+      Uglovi i dužine se računaju iz zapisnika — ne unose se ručno.
     </div>
 
-    <h2>Učitavanje iz tahimetrijskog zapisnika (CSV)</h2>
+    <h2>Učitavanje tahimetrijskog zapisnika</h2>
     <div class="ucitavanje-okvir">
       <p class="napomena" style="margin-top:0">
-        1) Preuzmite predložak &nbsp;→&nbsp; 2) u Excelu kopirajte mjerenja iz totalke i spremite kao CSV
-        &nbsp;→&nbsp; 3) ovdje ga učitajte. Aplikacija sama računa sredine iz girusa,
+        1) Preuzmite predložak &nbsp;→&nbsp; 2) u Excelu prebacite mjerenja iz totalke i spremite
+        &nbsp;→&nbsp; 3) ovdje ga učitajte (Excel .xlsx ili CSV). Aplikacija sama računa sredine iz girusa,
         prelomne uglove i horizontalne dužine.
       </p>
       <div class="alatna">
@@ -113,26 +113,11 @@
       <b>Zatvoren vlak</b> — krajnja stanica C je ista tačka kao početna B, a orijentacija D ista kao A
       (C i D se tada popunjavaju automatski)</label>
 
-    <h2>Prelomni uglovi i dužine</h2>
-    <div class="alatna">
-      <label>Broj prelomnih uglova:
-        <input id="brojUglova" type="number" min="2" max="15" value="4" />
-      </label>
-      <button id="generiraj" class="dugme">Generiraj tabelu</button>
-      <span class="napomena">Dužina ima za jedan manje od prelomnih uglova (stranice između tačaka).</span>
-    </div>
-
     <div class="redukcija-blok">
-      <label for="tolerancijeNacin"><b>Dozvoljena odstupanja:</b></label>
-      <select id="tolerancijeNacin">
-        <option value="nove" selected>Prema obrascima 2019 (20″√n; 0,03+0,001√Σd+0,00012Σd)</option>
-        <option value="stare">Raniji Excel (45″√n; 0,05+0,0045√Σd+0,0003Σd)</option>
-      </select>
-      <br />
       <label for="redukcijaNacin"><b>Redukcija dužina na nultu plohu:</b></label>
       <select id="redukcijaNacin">
-        <option value="auto">Automatski (iz visina H tačaka B i C i koordinate Y)</option>
-        <option value="nema" selected>Bez redukcije (dužine kako su izmjerene)</option>
+        <option value="auto" selected>Automatski (iz visina H tačaka B i C i koordinate Y)</option>
+        <option value="nema">Bez redukcije (dužine kako su izmjerene)</option>
         <option value="rucno">Ručno unesen faktor</option>
       </select>
       <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none;width:130px" />
@@ -140,7 +125,17 @@
         <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" style="width:90px" />
       </label>
       <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
-        Dužine u tabeli ispod su horizontalne dužine <b>prije</b> redukcije; množe se faktorom pri izračunu.</div>
+        Horizontalne dužine iz zapisnika množe se ovim faktorom pri izračunu.</div>
+    </div>
+
+    <div id="rucniUnos" style="display:none" aria-hidden="true">
+    <h2>Prelomni uglovi i dužine</h2>
+    <div class="alatna">
+      <label>Broj prelomnih uglova:
+        <input id="brojUglova" type="number" min="2" max="15" value="4" />
+      </label>
+      <button id="generiraj" class="dugme">Generiraj tabelu</button>
+      <span class="napomena">Dužina ima za jedan manje od prelomnih uglova (stranice između tačaka).</span>
     </div>
 
     <table class="tabela" id="tabelaUnos">
@@ -154,10 +149,11 @@
       </thead>
       <tbody id="teloUnos"></tbody>
     </table>
+    </div>
 
     <div class="akcije">
       <button id="izracunaj" class="dugme primarno">Izračunaj izravnanje</button>
-      <button id="primjer" class="dugme">Učitaj primjer iz Excela</button>
+      <button id="primjer" class="dugme" style="display:none">Učitaj primjer iz Excela</button>
     </div>
   </section>
 

@@ -90,7 +90,7 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
   const n = redovi.length;
   // Dozvoljeno (Excel G20): (4 * (L16/n) * √n + 2) / 100   [m]
   //   "nove" (obrasci 2019): n' = broj stranica − 1, Σ bez zaokruživanja: (4·Σ/√n' + 2)/100
-  const novaTol = tolerancije === "nove";
+  const novaTol = tolerancije !== "stare";   // zadano: obrasci 2019
   let dopustenoFh;
   if (novaTol) {
     const sumaT = redovi.reduce((s, r) => s + d100(r), 0);

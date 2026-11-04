@@ -90,6 +90,22 @@ function parseDec(s){ return parseFloat(String(s ?? "").trim().replace(/\s/g,"")
 function broj(id){ return parseDec(document.getElementById(id).value) || 0; }
 function tekst(id){ return document.getElementById(id).value || ""; }
 
+/* Početne (tvornički upisane) vrijednosti datih tačaka — da se ne zaborave stari brojevi
+   kad se učita zapisnik s drugim tačkama. */
+const POCETNE_DATE = {};
+["A", "B", "C", "D"].forEach((k) => {
+  POCETNE_DATE[k] = ["naziv", "Y", "X", "H"].map((f) => document.getElementById(k + "_" + f).value);
+});
+function obrisiStareDateTacke(noviNazivi) {
+  ["A", "B", "C", "D"].forEach((k) => {
+    const tren = ["naziv", "Y", "X", "H"].map((f) => document.getElementById(k + "_" + f).value);
+    const jeTvornicko = tren.slice(1).every((v, i) => v === POCETNE_DATE[k][i + 1]);
+    if (jeTvornicko && noviNazivi[k] && noviNazivi[k] !== POCETNE_DATE[k][0]) {
+      ["Y", "X", "H"].forEach((f) => { document.getElementById(k + "_" + f).value = ""; });
+    }
+  });
+}
+
 /* ---------- Redukcija dužina: prikaz polja za ručni faktor ---------- */
 function osvjeziPoljaRedukcije() {
   const nacin = document.getElementById("redukcijaNacin").value;
@@ -119,6 +135,10 @@ document.getElementById("zatvoreniVlak").addEventListener("change", sinkronizira
 
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
+  if (!obradjeneStanice || !obradjeneStanice.length) {
+    alert("Prvo učitajte tahimetrijski zapisnik (mjerenja) — uglovi i dužine se računaju iz njega.");
+    return;
+  }
   if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
   const uglovi = [...document.querySelectorAll(".in-ugao")].map((e) => e.value);
   const duzine = [...document.querySelectorAll(".in-duzina")].map((e) => parseDec(e.value) || 0);
@@ -170,7 +190,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     nazivi: naziviNovih,
     nazivPocetne: tekst("B_naziv") || "B",
     nazivKrajnje: tekst("C_naziv") || "C",
-    tolerancije: document.getElementById("tolerancijeNacin").value,
+    tolerancije: "nove",   // dozvoljena odstupanja prema obrascima 2019
   };
 
   try {
@@ -183,7 +203,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     const Hc = parseDec(document.getElementById("C_H").value);
     if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
       try {
-        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije, document.getElementById("tolerancijeNacin").value);
+        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije, "nove");
       } catch (ev) {
         console.warn("Visinsko izravnanje preskočeno:", ev.message);
       }
@@ -692,6 +712,9 @@ function obradiUcitaneStanice(stanice, ponovo) {
   // zatvoren vlak: prva i zadnja stanica su ista tačka (npr. T809 … T809)
   const zatvoren = n >= 3 && String(validne[0].stanica).trim() === String(validne[n - 1].stanica).trim();
   document.getElementById("zatvoreniVlak").checked = zatvoren;
+  obrisiStareDateTacke(zatvoren
+    ? { A: validne[0].nazZadnja, B: validne[0].stanica, C: validne[0].stanica, D: validne[0].nazZadnja }
+    : { A: validne[0].nazZadnja, B: validne[0].stanica, C: validne[n - 1].stanica, D: validne[n - 1].nazPrednja });
   if (zatvoren) {
     document.getElementById("B_naziv").value = validne[0].stanica;
     document.getElementById("A_naziv").value = validne[0].nazZadnja || document.getElementById("A_naziv").value;

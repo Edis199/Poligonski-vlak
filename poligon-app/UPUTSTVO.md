@@ -18,32 +18,22 @@ ne instalira.
 
 ### 1. Unos podataka
 
-Date (poznate) tačke unesite ručno:
-  - **A** = orijentacijska tačka pozadi, **B** = početna stanica vlaka
-  - **C** = krajnja stanica vlaka, **D** = orijentacijska tačka naprijed
+Prelomni uglovi i dužine se **ne unose ručno** — računaju se iz tahimetrijskog zapisnika (TZ):
 
-Prelomne uglove i dužine možete unijeti na **dva načina**:
-
-**Način 1 — učitavanje iz tahimetrijskog zapisnika (CSV):**
-  1. Kliknite **"Preuzmi predložak (CSV)"**.
-  2. Otvorite predložak u Excelu, kopirajte mjerenja iz totalke i spremite
-     kao CSV (`Datoteka → Spremi kao → CSV`).
-  3. Kliknite **"Učitaj zapisnik (CSV)"** i odaberite datoteku.
-  4. Aplikacija sama računa sredine iz girusa, prelomne uglove i
-     horizontalne dužine, te popuni tabelu.
-
-**Način 2 — ručni unos:**
-  - Odaberite **broj prelomnih uglova** (2–15) → **"Generiraj tabelu"**.
-  - Uglove unesite kao `57°25'08"` **ili** kao `57.2508`.
-  - Dužine (horizontalne, u metrima) — ima ih za jedan manje od uglova.
-
-Na kraju kliknite **"Izračunaj izravnanje"**.
+  1. Kliknite **„Preuzmi predložak (Excel)"** i u njega prebacite mjerenja (isti raspored kolona kao TZ).
+  2. Kliknite **„Učitaj zapisnik"** i odaberite datoteku (.xlsx ili CSV).
+  3. Aplikacija sama računa sredine iz girusa, prelomne uglove i horizontalne dužine, i upisuje
+     nazive datih tačaka A, B, C, D.
+  4. Upišite **koordinate (Y, X) i visine (H)** datih tačaka (ili ih zalijepite iz Excela u tablicu):
+     - **A** = orijentacijska tačka pozadi, **B** = početna stanica vlaka
+     - **C** = krajnja stanica vlaka, **D** = orijentacijska tačka naprijed
+  5. Kliknite **„Izračunaj izravnanje"**. Bez učitanog zapisnika izračun nije moguć.
 
 ### Visinsko izravnanje (nadmorske visine)
 
 Aplikacija računa i **nadmorske visine** tačaka (trigonometrijsko nivelanje,
 obrasci 28P i K iz Excela). Da bi se visine izračunale:
-  - učitajte zapisnik iz CSV-a (sadrži **zenitne uglove** potrebne za visine), i
+  - učitajte zapisnik (sadrži **zenitne uglove** potrebne za visine), i
   - unesite **nadmorsku visinu H** za početnu stanicu (B) i krajnju stanicu (C).
 
 Rezultat prikazuje visinske razlike (naprijed/nazad/sredina), popravke,
@@ -68,12 +58,9 @@ ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
 ### Dozvoljena odstupanja i kontrola girusa
 
-Iznad tabele uglova bira se **Dozvoljena odstupanja**:
-
-- **Prema obrascima 2019** (zadano): uglovno `20″·√(broj stranica)`, linearno
-  `0,03 + 0,001·√Σd + 0,00012·Σd`, visinsko `(4·Σ(d/100)/√n′ + 2)/100` uz `n′ = broj stranica − 1`,
-  po stranici (TO 28P) `0,02 + 0,0004·d` [m].
-- **Raniji Excel**: uglovno `45″·√n`, linearno `0,05 + 0,0045·√Σd + 0,0003·Σd`.
+**Dozvoljena odstupanja** računaju se prema obrascima 2019: uglovno `20″·√(broj stranica)`, linearno
+`0,03 + 0,001·√Σd + 0,00012·Σd`, visinsko `(4·Σ(d/100)/√n′ + 2)/100` uz `n′ = broj stranica − 1`,
+a po stranici (TO 28P) `0,02 + 0,0004·d` [m].
 
 **Kontrola girusa** (kartica 1, ispod učitavanja zapisnika) prikazuje redukovani ugao svakog girusa i
 rasipanje. Girus koji ne želite koristiti isključite kvačicom; sredina uglova, dužina i vertikalnih uglova

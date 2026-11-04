@@ -158,7 +158,7 @@ function izravnajUmetnutiVlak(ulaz) {
   // Dozvoljeno uglovno odstupanje:
   //   "stare"  (raniji Excel):  45″·√n,  n = broj prelomnih uglova
   //   "nove"   (obrasci 2019):  20″·√(n−1) = 20″·√(broj stranica)
-  const novaTol = ulaz.tolerancije === "nove";
+  const novaTol = ulaz.tolerancije !== "stare";   // zadano: obrasci 2019
   const dopustenoFbetaSek = novaTol ? 20 * Math.sqrt(Math.max(1, n - 1)) : 45 * Math.sqrt(n); // u sekundama
   const fBetaSek = fBeta * 3600;               // fβ u sekundama
 
