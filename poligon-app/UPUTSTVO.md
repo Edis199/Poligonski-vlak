@@ -66,6 +66,23 @@ Stupci predloška:
 `Stanica ; VisinaInstrumenta ; Vizura ; Kod ; HorizontalniUgao ;
 ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
+### Redukcija dužina na nultu plohu (TO 18D)
+
+Iznad tabele prelomnih uglova bira se **redukcija dužina**:
+
+- **Automatski** (zadano nakon učitavanja zapisnika): horizontalna dužina se množi faktorom
+  `k = (1 − Hm/R) · (1 + ym²/2R²)`, gdje je `Hm` srednja visina tačaka B i C, `ym` udaljenost od
+  srednjeg meridijana (iz Y koordinate), `R = 6377397 m` (Bessel). Potrebne su visine H tačaka B i C.
+- **Bez redukcije**: dužine kako su izmjerene (kao u ranijem primjeru).
+- **Ručno unesen faktor**: npr. `0,99992279`.
+
+Za dužinu stranice uzima se **sredina naprijed–nazad**. Ista redukovana dužina koristi se i u
+visinskom izravnanju (TO 28P, TO K), koje se tada računa bez međuzaokruživanja. Korišteni faktor
+piše u sažetku rezultata i u obrascu TO 18D.
+
+**Preporuka:** u zapisniku upisujte kose dužine i visine signala na **3 decimale** (192,232, a ne 192,23).
+Zaokruživanje na cm daje razlike do nekoliko milimetara u koordinatama i visinama.
+
 ### Detaljne tačke (u istom zapisniku)
 
 U isti tahimetrijski zapisnik možete upisati i detaljne tačke (npr. 1, 2, 3…). Na svakoj

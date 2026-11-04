@@ -147,8 +147,11 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
   const srZadnja = zaokruziNaSekundu(prosjekKruzni(pravciZadnja));
   const srPrednja = zaokruziNaSekundu(prosjekKruzni(pravciPrednja));
 
-  // prelomni (lijevi) ugao = (pravac prednja) - (pravac zadnja), sveden u [0,360)
-  const prelomni = razlika360(srPrednja, srZadnja);
+  // prelomni (lijevi) ugao: redukovani ugao se računa za SVAKI girus (prednja − zadnja),
+  // zatim se uzima sredina iz svih girusa i tek na kraju zaokružuje na sekundu
+  // (isti redoslijed kao u Excelu: "Redukov. sredina" po girusu → "sredina iz svih girusa").
+  const redukPoGirusu = pravciPrednja.map((p, g) => razlika360(p, pravciZadnja[g]));
+  const prelomni = zaokruziNaSekundu(prosjekKruzni(redukPoGirusu));
 
   // zenitni (srednji)
   const zenPrednjaSr = prosjek(zenitPrednja);

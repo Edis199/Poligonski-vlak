@@ -86,6 +86,20 @@ function horizontalnaDuzina(kosa, zenitniDec) {
   return Math.abs(round(kosa * Math.sin(uRad(zenitniDec)), 3));
 }
 
+/* ---------- Redukcija dužina na nultu plohu ----------
+   Horizontalna dužina se množi faktorom
+       k = (1 − Hm/R) · (1 + ym²/(2R²))
+   Hm = srednja nadmorska visina (B i C), ym = udaljenost od srednjeg meridijana
+   (iz Y koordinate: Y = zona·10⁶ + 500000 + y), R = poluosa Bessel elipsoida.
+   Ovim faktorom se dobiju dužine iz Excel obrasca TO 18D (kolona "redukovana na nultu plohu"). */
+const R_BESSEL = 6377397.155;
+function faktorRedukcijeDuzina(Hb, Hc, Yb, Yc) {
+  if ([Hb, Hc, Yb, Yc].some((v) => v === null || v === undefined || isNaN(v))) return null;
+  const Hm = (Hb + Hc) / 2;
+  const ym = (((Yb + Yc) / 2) % 1000000) - 500000;
+  return (1 - Hm / R_BESSEL) * (1 + (ym * ym) / (2 * R_BESSEL * R_BESSEL));
+}
+
 function round(x, n) {
   const f = Math.pow(10, n);
   return Math.round((x + Number.EPSILON) * f) / f;
@@ -238,13 +252,13 @@ function izravnajUmetnutiVlak(ulaz) {
 if (typeof window !== "undefined") {
   window.Racun = {
     smsUDecimalni, decimalniUSms, direkcijskiUgao, odstojanje,
-    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round
+    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round, faktorRedukcijeDuzina
   };
 }
 // Export za Node (test)
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     smsUDecimalni, decimalniUSms, direkcijskiUgao, odstojanje,
-    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round
+    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round, faktorRedukcijeDuzina
   };
 }

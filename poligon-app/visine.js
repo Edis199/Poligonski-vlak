@@ -26,38 +26,48 @@ function round(x, n) { const f = Math.pow(10, n); return Math.round((x + Number.
    visinaPocetna, visinaKrajnja = date nadmorske visine (B i C)
    Vraća rezultat s nizom tačaka i njihovim visinama.
    --------------------------------------------------------------------- */
-function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
+function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije) {
   const greske = [];
   // broj stranica vlaka = broj stanica - 1 (zadnja stanica je krajnja data)
   const brSt = stranice.length - 1;
   if (brSt < 1) { return { greska: "Premalo stanica za visinsko izravnanje." }; }
+
+  // Način računa: s redukcijom dužina (novi Excel) → bez međuzaokruživanja (6 decimala);
+  // bez redukcije → kao stari Excel (visinske razlike na cm, dužine u stotinama metara).
+  const tacno = !!(faktorRedukcije && faktorRedukcije > 0);
+  const pDH = tacno ? 6 : 2;   // preciznost visinskih razlika
+  const pM = tacno ? 6 : 3;    // preciznost popravki, visina i ostalog
 
   const redovi = []; // po stranici
   for (let i = 0; i < brSt; i++) {
     const sNapr = stranice[i];       // stanica s koje gledamo NAPRIJED na i+1
     const sNazad = stranice[i + 1];  // sljedeća stanica gleda NAZAD na i
 
-    const d = sNapr.horizDuzina;                 // dužina stranice (naprijed)
+    // Dužina stranice: ako je uključena redukcija na nultu plohu, koristi se REDUKOVANA SREDINA
+    // dužine naprijed i nazad (TO 18D), ista za oba smjera; inače dužina mjerena naprijed.
+    const reduk = faktorRedukcije && faktorRedukcije > 0;
+    const dSred = reduk ? ((sNapr.horizDuzina + sNazad.horizDuzinaZadnja) / 2) * faktorRedukcije : null;
+    const d = reduk ? dSred : sNapr.horizDuzina; // dužina stranice (naprijed)
     // NAPRIJED: ΔH = d·cot(z_naprijed) + i_a − l_b
     const ia = sNapr.visinaInstr;
     const lb = sNapr.visinaSignalaPrednja;
-    const dHnaprijed = round(d * cot(sNapr.zenitPrednja) + ia - lb, 2);
+    const dHnaprijed = round(d * cot(sNapr.zenitPrednja) + ia - lb, pDH);
 
     // NAZAD: sa sljedeće stanice, zenit/dužina/signal prema PRETHODNOJ (zadnja)
     const ib = sNazad.visinaInstr;
     const la = sNazad.visinaSignalaZadnja;
-    const dNazad = sNazad.horizDuzinaZadnja || d;
-    const dHnazad = round(dNazad * cot(sNazad.zenitZadnja) + ib - la, 2);
+    const dNazad = reduk ? dSred : (sNazad.horizDuzinaZadnja || d);
+    const dHnazad = round(dNazad * cot(sNazad.zenitZadnja) + ib - la, pDH);
 
     // definitivna (sredina apsolutnih, predznak od naprijed)
     const predznak = dHnaprijed >= 0 ? 1 : -1;
-    const dHsred = round(predznak * (Math.abs(dHnaprijed) + Math.abs(dHnazad)) / 2, 3);
+    const dHsred = round(predznak * (Math.abs(dHnaprijed) + Math.abs(dHnazad)) / 2, pM);
 
     redovi.push({
       od: sNapr.stanica, do: sNapr.nazPrednja,
       duzina: d,
       dHnaprijed, dHnazad, dHsred,
-      odstojanjeKm: round(d / 100, 1),  // Excel L kolona: d/100 (u stotinama m)
+      odstojanjeKm: tacno ? d / 100 : round(d / 100, 1),  // Excel L kolona: d/100 (u stotinama m)
       // --- podaci za obrazac TO 28P (prikaz) ---
       vizuraNaprijed: sNapr.nazPrednja,   // na koju tačku gledamo naprijed
       zenitNaprijed: sNapr.zenitPrednja,  // zenitni ugao naprijed (dec°)
@@ -71,11 +81,11 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
   }
 
   // Zatvaranje
-  const sumaDH = round(redovi.reduce((s, r) => s + r.dHsred, 0), 3);
-  const fh = round((visinaKrajnja - visinaPocetna) - sumaDH, 3);  // m
+  const sumaDH = round(redovi.reduce((s, r) => s + r.dHsred, 0), pM);
+  const fh = round((visinaKrajnja - visinaPocetna) - sumaDH, pM);  // m
 
   // Σ odstojanja (Excel L16) i broj razlika n
-  const sumaOdst = round(redovi.reduce((s, r) => s + r.odstojanjeKm, 0), 1);
+  const sumaOdst = tacno ? redovi.reduce((s, r) => s + r.odstojanjeKm, 0) : round(redovi.reduce((s, r) => s + r.odstojanjeKm, 0), 1);
   const n = redovi.length;
   // Dozvoljeno (Excel G20): (4 * (L16/n) * √n + 2) / 100   [m]
   const srOdst = sumaOdst / n;
@@ -83,14 +93,14 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
 
   // Popravke proporcionalno odstojanju: Vi = (fh/Σodst)·odst(i)
   redovi.forEach((r) => {
-    r.popravka = round((fh / sumaOdst) * r.odstojanjeKm, 3);
-    r.dHpopr = round(r.dHsred + r.popravka, 3);
+    r.popravka = round((fh / sumaOdst) * r.odstojanjeKm, pM);
+    r.dHpopr = round(r.dHsred + r.popravka, pM);
 
     // --- dodatni podaci za Obrazac "K" (izravnanje visina) ---
     // Prvo mjerenje = ΔH naprijed; Drugo mjerenje = ΔH nazad sa predznakom prvog
-    r.prvoMjerenje = round(r.dHnaprijed, 3);
+    r.prvoMjerenje = round(r.dHnaprijed, pM);
     const predznak = r.dHnaprijed < 0 ? -1 : 1;
-    r.drugoMjerenje = round(predznak * Math.abs(r.dHnazad), 3);
+    r.drugoMjerenje = round(predznak * Math.abs(r.dHnazad), pM);
     // Razlike dvostrukog mjerenja (Excel: (Drugo − Prvo)·100, u mm)
     r.razlikaDvostruko = round((r.drugoMjerenje - r.prvoMjerenje) * 100, 0);
     // Maksimalno dozvoljeno po stranici: 0.00075·(1+cot²(z))·D  [m] -> ·100 [mm]
@@ -101,18 +111,18 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja) {
   // Nadmorske visine
   const tocke = [];
   let H = visinaPocetna;
-  tocke.push({ naziv: stranice[0].stanica, H: round(H, 3), tip: "data" });
+  tocke.push({ naziv: stranice[0].stanica, H: round(H, pM), tip: "data" });
   redovi.forEach((r, i) => {
-    H = round(H + r.dHpopr, 3);
+    H = round(H + r.dHpopr, pM);
     const zadnja = (i === redovi.length - 1);
     tocke.push({
       naziv: r.do,
-      H: zadnja ? round(visinaKrajnja, 3) : round(H, 3),
+      H: zadnja ? round(visinaKrajnja, pM) : round(H, pM),
       tip: zadnja ? "data" : "nova"
     });
   });
 
-  const kontrola = round(H - visinaKrajnja, 3);
+  const kontrola = round(H - visinaKrajnja, pM);
 
   return {
     redovi, sumaDH, fh, dopustenoFh,

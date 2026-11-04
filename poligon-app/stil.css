@@ -173,6 +173,7 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:400}
 .obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:400}
 .obrazacTZ .tz-vi td{color:var(--siva)}
+.obrazac-podnaslov{text-align:center;font-size:13px;color:var(--siva);margin:0 auto 6px}
 /* TO 28P obrazac */
 .obrazac28p .tz-vi td{color:var(--siva)}
 .obrazac28p .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}

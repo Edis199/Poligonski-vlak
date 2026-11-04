@@ -371,56 +371,65 @@ function obrazac1V(obradjeneStanice) {
 }
 
 /* --------- OBRAZAC TO 18D: Redukcija dužina ---------
-   Za svaku stranicu vlaka prikazuje mjerenu kosu dužinu (naprijed/nazad),
-   sredinu, vertikalni (zenitni) ugao i redukovanu horizontalnu dužinu.     */
-function obrazac18D(obradjeneStanice) {
+   Za svaku stranicu vlaka, u dva reda (naprijed / nazad): mjerena kosa dužina,
+   zenitni ugao i dužina redukovana na horizont i nultu plohu (faktor k).
+   Zadnja kolona je redukovana sredina mjerenja naprijed–nazad (ona ulazi u izravnanje).
+   faktor = k (npr. 0,99992279) ili null/undefined = bez redukcije.            */
+function obrazac18D(obradjeneStanice, faktor) {
   const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
   const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+  const k = (faktor && faktor > 0) ? faktor : 1;
+  const imaRed = k !== 1;
+  const horiz = (kosa, zenitDec) => kosa * Math.sin((zenitDec * Math.PI) / 180);
 
   let redovi = "";
   const n = (obradjeneStanice || []).length;
   // stranice: od stanice i -> prednja (i+1). Zadnja stanica nema prednju stranicu.
   for (let i = 0; i < n - 1; i++) {
     const st = obradjeneStanice[i];
-    if (st.greska) continue;
-    const od = st.stanica;
-    const doT = st.nazPrednja;
-    // kose dužine: naprijed (sa st) i nazad (sa sljedeće stanice prema st)
     const sljed = obradjeneStanice[i + 1];
-    const kosaNaprijed = st.kosaPrednja;            // st -> prednja
-    const kosaNazad = sljed ? sljed.kosaZadnja : kosaNaprijed; // sljed -> zadnja (prema st)
-    const sredinaKosa = (kosaNaprijed + kosaNazad) / 2;
-    const zenit = st.zenitPrednja;
-    const horiz = st.horizDuzina;                   // redukovana horizontalna
+    if (st.greska || !sljed || sljed.greska) continue;
+    const kosaNap = st.kosaPrednja;          // st -> prednja tačka
+    const kosaNaz = sljed.kosaZadnja;        // sljedeća stanica -> st
+    const fNap = horiz(kosaNap, st.zenitPrednja) * k;
+    const fNaz = horiz(kosaNaz, sljed.zenitZadnja) * k;
+    const sredina = (fNap + fNaz) / 2;
 
     redovi += `
       <tr>
-        <td class="c">${od}</td>
-        <td class="d">${fz(kosaNaprijed,3)}</td>
-        <td class="d" rowspan="2">${fz(sredinaKosa,3)}</td>
+        <td class="c">${st.stanica}</td>
+        <td class="d">${fz(kosaNap, 3)}</td>
         <td class="c" rowspan="2"></td>
-        <td class="c" rowspan="2">${ug(zenit)}</td>
-        <td class="d" rowspan="2">${fz(horiz,2)}</td>
+        <td class="c">${ug(st.zenitPrednja)}</td>
+        <td class="d">${fz(fNap, 3)}</td>
+        <td class="d" rowspan="2">${fz(sredina, 3)}</td>
         <td rowspan="2"></td>
       </tr>
       <tr class="tz-vi">
-        <td class="c">${doT}</td>
-        <td class="d">${fz(kosaNazad,3)}</td>
+        <td class="c">${st.nazPrednja}</td>
+        <td class="d">${fz(kosaNaz, 3)}</td>
+        <td class="c">${ug(sljed.zenitZadnja)}</td>
+        <td class="d">${fz(fNaz, 3)}</td>
       </tr>
       <tr class="razmak"><td colspan="7">&nbsp;</td></tr>`;
   }
 
+  const napomena = imaRed
+    ? `<div class="obrazac-podnaslov">Faktor redukcije na nultu plohu: k = ${String(k.toFixed(8)).replace(".", ",")}</div>`
+    : "";
+
   return `
   <div class="obrazac-naslov-linija">Trigon. obrazac br. 18D — Redukcija dužina</div>
+  ${napomena}
   <table class="obrazac obrazac18d">
     <thead>
       <tr class="zaglavlje-red">
         <th>Od<br>Do</th>
-        <th>Mjerena dužina<br>(I / II mjer.)</th>
-        <th>Sredina</th>
+        <th>Mjerena dužina<br>(sredina)</th>
         <th>Temperatura</th>
         <th>Vertikalni<br>ugao</th>
-        <th>Redukovana<br>horizontalna<br>dužina</th>
+        <th>${imaRed ? "Dužina redukovana<br>na nultu plohu" : "Horizontalna<br>dužina"}</th>
+        <th>Redukovana sredina<br>mjerenja naprijed–nazad</th>
         <th>Primjedba</th>
       </tr>
     </thead>

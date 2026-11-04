@@ -112,6 +112,18 @@
       <span class="napomena">Dužina ima za jedan manje od prelomnih uglova (stranice između tačaka).</span>
     </div>
 
+    <div class="redukcija-blok">
+      <label for="redukcijaNacin"><b>Redukcija dužina na nultu plohu:</b></label>
+      <select id="redukcijaNacin">
+        <option value="auto">Automatski (iz visina H tačaka B i C i koordinate Y)</option>
+        <option value="nema" selected>Bez redukcije (dužine kako su izmjerene)</option>
+        <option value="rucno">Ručno unesen faktor</option>
+      </select>
+      <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none;width:130px" />
+      <div class="napomena">Faktor k = (1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
+        Dužine u tabeli ispod su horizontalne dužine <b>prije</b> redukcije; množe se faktorom pri izračunu.</div>
+    </div>
+
     <table class="tabela" id="tabelaUnos">
       <thead>
         <tr>

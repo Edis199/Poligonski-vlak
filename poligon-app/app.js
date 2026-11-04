@@ -2,7 +2,8 @@
 
 let zadnjiRezultat = null;
 let zadnjiRezultatVisine = null;
-let zadnjiDetalji = null;       // koordinate detaljnih tačaka (računaju se nakon izravnanja vlaka)
+let zadnjiDetalji = null;
+let zadnjiFaktorRedukcije = null; // faktor redukcije dužina korišten u zadnjem izračunu (null = bez redukcije)       // koordinate detaljnih tačaka (računaju se nakon izravnanja vlaka)
 let obradjeneStanice = null;   // iz učitanog zapisnika (za visinsko izravnanje)
 let ucitaneStanice = null;     // sirova mjerenja iz zapisnika (za obrazac TZ)
 let lokalitet = "";            // naziv lokaliteta (opcionalno)
@@ -88,6 +89,11 @@ function parseDec(s){ return parseFloat(String(s ?? "").trim().replace(/\s/g,"")
 function broj(id){ return parseDec(document.getElementById(id).value) || 0; }
 function tekst(id){ return document.getElementById(id).value || ""; }
 
+/* ---------- Redukcija dužina: prikaz polja za ručni faktor ---------- */
+document.getElementById("redukcijaNacin").addEventListener("change", (e) => {
+  document.getElementById("redukcijaFaktor").style.display = e.target.value === "rucno" ? "inline-block" : "none";
+});
+
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
   const uglovi = [...document.querySelectorAll(".in-ugao")].map((e) => e.value);
@@ -116,11 +122,26 @@ document.getElementById("izracunaj").addEventListener("click", () => {
   // jezgra prima SSS.MMSS; pretvorimo decimalne natrag u taj zapis
   const prelomniSms = uglDecimalni.map(decimalniUSmsBroj);
 
+  // --- Redukcija dužina na nultu plohu ---
+  const nacinRed = document.getElementById("redukcijaNacin").value;
+  let faktorRed = null;
+  if (nacinRed === "auto") {
+    faktorRed = window.Racun.faktorRedukcijeDuzina(
+      parseDec(document.getElementById("B_H").value), parseDec(document.getElementById("C_H").value),
+      broj("B_Y"), broj("C_Y"));
+    if (faktorRed === null) alert("Redukcija dužina: unesite nadmorske visine H za tačke B i C (ili odaberite „Bez redukcije\"). Računam bez redukcije.");
+  } else if (nacinRed === "rucno") {
+    const f = parseDec(document.getElementById("redukcijaFaktor").value);
+    faktorRed = isNaN(f) ? null : f;
+  }
+  zadnjiFaktorRedukcije = faktorRed;
+  const duzineRed = faktorRed ? duzine.map((d) => d * faktorRed) : duzine;
+
   const ulaz = {
     datePocetne: { A:{Y:broj("A_Y"),X:broj("A_X")}, B:{Y:broj("B_Y"),X:broj("B_X")} },
     dateKrajnje: { C:{Y:broj("C_Y"),X:broj("C_X")}, D:{Y:broj("D_Y"),X:broj("D_X")} },
     prelomniUglovi: prelomniSms,
-    duzine,
+    duzine: duzineRed,
     nazivi: naziviNovih,
     nazivPocetne: tekst("B_naziv") || "B",
     nazivKrajnje: tekst("C_naziv") || "C",
@@ -136,7 +157,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     const Hc = parseDec(document.getElementById("C_H").value);
     if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
       try {
-        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc);
+        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije);
       } catch (ev) {
         console.warn("Visinsko izravnanje preskočeno:", ev.message);
       }
@@ -208,6 +229,7 @@ function prikaziRezultate(r, rv) {
       <div class="sk">
         <div class="oznaka">Ukupna dužina vlaka</div>
         <div class="vrijednost">${r.sumaD.toFixed(2)} m</div>
+        <div class="napomena">${zadnjiFaktorRedukcije ? "redukovana na nultu plohu, k = " + zadnjiFaktorRedukcije.toFixed(8).replace(".", ",") : "bez redukcije"}</div>
       </div>
       ${rv ? `
       <div class="sk ${rv.visinskiOK ? "ok" : "ne"}">
@@ -581,11 +603,19 @@ function obradiUcitaneStanice(stanice) {
   validne.forEach((o, i) => {
     // prelomni ugao upisujemo u čitljivom zapisu SSS°MM'SS" (jezgra ga razumije preko parsiranja)
     if (uglInputi[i]) uglInputi[i].value = window.Girus.decUStr(o.prelomniUgao);
-    // dužina (ima je svaka stanica osim zadnje)
-    if (duzInputi[i]) duzInputi[i].value = o.horizDuzina.toFixed(3);
+    // dužina (ima je svaka stanica osim zadnje): sredina horizontalne dužine naprijed i nazad
+    if (duzInputi[i]) {
+      const sljed = validne[i + 1];
+      const d = sljed ? (o.horizDuzina + sljed.horizDuzinaZadnja) / 2 : o.horizDuzina;
+      duzInputi[i].value = d.toFixed(4);
+    }
     // naziv prednje tačke (nova tačka)
     if (nazInputi[i]) nazInputi[i].value = o.nazPrednja || "";
   });
+
+  // zapisnik s mjerenjima: dužine se redukuju na nultu plohu (kao u Excel obrascu TO 18D)
+  document.getElementById("redukcijaNacin").value = "auto";
+  document.getElementById("redukcijaFaktor").style.display = "none";
 
   postaviStatus(`Učitano ${n} stanica. Provjerite date tačke pa kliknite „Izračunaj".`, true);
   if (greske.length) {
@@ -736,7 +766,7 @@ function generirajObrazacHTML(kod) {
     return obradjeneStanice ? window.Obrasci.obrazac1V(obradjeneStanice) : "";
   }
   if (kod === "to18d") {
-    return obradjeneStanice ? window.Obrasci.obrazac18D(obradjeneStanice) : "";
+    return obradjeneStanice ? window.Obrasci.obrazac18D(obradjeneStanice, zadnjiFaktorRedukcije) : "";
   }
   if (kod === "to8") {
     return zadnjiRezultat ? window.Obrasci.obrazac8(dateTackeABCD()) : "";
@@ -803,7 +833,7 @@ function prikaziObrazac() {
     if (!obradjeneStanice) {
       el.innerHTML = `<div class="info">Učitajte zapisnik (CSV/Excel) da se prikaže ovaj obrazac.</div>`;
     } else {
-      el.innerHTML = window.Obrasci.obrazac18D(obradjeneStanice);
+      el.innerHTML = window.Obrasci.obrazac18D(obradjeneStanice, zadnjiFaktorRedukcije);
     }
   } else if (trenutniObrazac === "to8") {
     el.innerHTML = window.Obrasci.obrazac8(dateTackeABCD());
