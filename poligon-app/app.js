@@ -695,10 +695,16 @@ function obradiUcitaneStanice(stanice, ponovo) {
   if (zatvoren) {
     document.getElementById("B_naziv").value = validne[0].stanica;
     document.getElementById("A_naziv").value = validne[0].nazZadnja || document.getElementById("A_naziv").value;
+  } else {
+    // umetnuti vlak: nazivi date tačaka iz zapisnika (koordinate upisuje korisnik)
+    document.getElementById("A_naziv").value = validne[0].nazZadnja || document.getElementById("A_naziv").value;
+    document.getElementById("B_naziv").value = validne[0].stanica;
+    document.getElementById("C_naziv").value = validne[n - 1].stanica;
+    document.getElementById("D_naziv").value = validne[n - 1].nazPrednja || document.getElementById("D_naziv").value;
   }
   sinkronizirajZatvoreni();
 
-  postaviStatus(`Učitano ${n} stanica${zatvoren ? " — prepoznat ZATVOREN vlak (C = B, D = A)" : ""}. Provjerite date tačke pa kliknite „Izračunaj".`, true);
+  postaviStatus(`Učitano ${n} stanica${zatvoren ? " — prepoznat ZATVOREN vlak (C = B, D = A)" : ""}. ${zatvoren ? "Upišite koordinate i visinu za " + document.getElementById("A_naziv").value + " i " + document.getElementById("B_naziv").value : "Upišite koordinate (Y, X) i visine (H) za date tačke " + ["A","B","C","D"].map((k) => document.getElementById(k + "_naziv").value).join(", ")}, zatim kliknite Izračunaj.`, true);
   if (greske.length) {
     alert("Napomena:\n" + greske.join("\n"));
   }
