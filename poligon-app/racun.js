@@ -88,16 +88,17 @@ function horizontalnaDuzina(kosa, zenitniDec) {
 
 /* ---------- Redukcija dužina na nultu plohu ----------
    Horizontalna dužina se množi faktorom
-       k = (1 − Hm/R) · (1 + ym²/(2R²))
+       k = m0 · (1 − Hm/R) · (1 + ym²/(2R²))
    Hm = srednja nadmorska visina (B i C), ym = udaljenost od srednjeg meridijana
    (iz Y koordinate: Y = zona·10⁶ + 500000 + y), R = poluosa Bessel elipsoida.
    Ovim faktorom se dobiju dužine iz Excel obrasca TO 18D (kolona "redukovana na nultu plohu"). */
 const R_BESSEL = 6377397.155;
-function faktorRedukcijeDuzina(Hb, Hc, Yb, Yc) {
+function faktorRedukcijeDuzina(Hb, Hc, Yb, Yc, m0) {
   if ([Hb, Hc, Yb, Yc].some((v) => v === null || v === undefined || isNaN(v))) return null;
   const Hm = (Hb + Hc) / 2;
   const ym = (((Yb + Yc) / 2) % 1000000) - 500000;
-  return (1 - Hm / R_BESSEL) * (1 + (ym * ym) / (2 * R_BESSEL * R_BESSEL));
+  const mjerilo = (m0 && m0 > 0) ? m0 : 1;   // m0 = mjerilo na srednjem meridijanu (npr. 0,9999)
+  return mjerilo * (1 - Hm / R_BESSEL) * (1 + (ym * ym) / (2 * R_BESSEL * R_BESSEL));
 }
 
 function round(x, n) {

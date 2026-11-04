@@ -78,6 +78,10 @@ input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,
 .tabela-date td.uloga{text-align:left;color:var(--plava-tamna);font-weight:600;white-space:nowrap}
 .tabela-date td{padding:4px 6px}
 .tabela-date input{width:100%;min-width:90px;box-sizing:border-box;margin:0}
+.tabela-date input[readonly]{background:#eef2f7;color:#64748b}
+.zatvoreni-vlak{display:block;margin:10px 0 4px;font-size:14px}
+.redukcija-blok{margin:10px 0}
+.redukcija-blok label{margin-right:8px}
 .tabela tr:nth-child(even) td{background:#fafcfe}
 
 .sazetak-kartice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 24px}

@@ -345,7 +345,7 @@ function obrazac1V(obradjeneStanice) {
   let redovi = "";
   (obradjeneStanice || []).forEach((st) => {
     if (st.greska || !st.girusDetalji || !st.girusDetalji.length) return;
-    const gd = st.girusDetalji[0]; // vertikalni uglovi — iz prvog girusa
+    const gd = st.girusDetalji[st.girusDetalji.length - 1]; // vertikalni uglovi — iz zadnjeg girusa (kao u Excelu)
     // red na zadnju i na prednju
     redovi += redPara(st.stanica, st.visinaInstr, gd.zadnja);
     redovi += redPara(st.stanica, st.visinaInstr, gd.prednja);

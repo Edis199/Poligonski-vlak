@@ -103,6 +103,10 @@
     </table>
     </div>
 
+    <label class="zatvoreni-vlak"><input type="checkbox" id="zatvoreniVlak" />
+      <b>Zatvoren vlak</b> — krajnja stanica C je ista tačka kao početna B, a orijentacija D ista kao A
+      (C i D se tada popunjavaju automatski)</label>
+
     <h2>Prelomni uglovi i dužine</h2>
     <div class="alatna">
       <label>Broj prelomnih uglova:
@@ -120,7 +124,10 @@
         <option value="rucno">Ručno unesen faktor</option>
       </select>
       <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none;width:130px" />
-      <div class="napomena">Faktor k = (1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
+      <label id="m0Blok" for="redukcijaM0">m<sub>0</sub> (mjerilo na srednjem meridijanu):
+        <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" style="width:90px" />
+      </label>
+      <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
         Dužine u tabeli ispod su horizontalne dužine <b>prije</b> redukcije; množe se faktorom pri izračunu.</div>
     </div>
 

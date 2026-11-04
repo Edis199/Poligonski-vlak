@@ -154,7 +154,11 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
   const prelomni = zaokruziNaSekundu(prosjekKruzni(redukPoGirusu));
 
   // zenitni (srednji)
-  const zenPrednjaSr = prosjek(zenitPrednja);
+  // Zenitni (vertikalni) ugao uzima se iz ZADNJEG girusa (kao u Excel obrascu TO 1V);
+  // kose dužine su sredina iz svih girusa (kao u TO 18D).
+  // ... i zaokružuje se na cijelu sekundu (kao "Visinski ugao α" u Excelu); polusekunda → parna sekunda.
+  const zadnjiG = (a) => zaokruziSekParno(a[a.length - 1]);
+  const zenPrednjaSr = zadnjiG(zenitPrednja);
   const kosaPrednjaSr = prosjek(kosaPrednja);
   const horizDuzina = Math.abs(round(kosaPrednjaSr * Math.sin((zenPrednjaSr * Math.PI) / 180), 3));
 
@@ -168,10 +172,10 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     horizDuzina,
     visinaSignalaPrednja: prosjek(visPrednja),
     // podaci na ZADNJU tačku (potrebni za visinsko izravnanje — mjerenje "nazad")
-    zenitZadnja: prosjek(zenitZadnja),
+    zenitZadnja: zadnjiG(zenitZadnja),
     kosaZadnja: prosjek(kosaZadnja),
     visinaSignalaZadnja: prosjek(visZadnja),
-    horizDuzinaZadnja: Math.abs(round(prosjek(kosaZadnja) * Math.sin((prosjek(zenitZadnja) * Math.PI) / 180), 3)),
+    horizDuzinaZadnja: Math.abs(round(prosjek(kosaZadnja) * Math.sin((zadnjiG(zenitZadnja) * Math.PI) / 180), 3)),
     brGirusa,
     girusDetalji,
     // redukovana sredina prednje (sredina iz svih girusa prednje - zadnje), = prelomni
@@ -211,6 +215,17 @@ function prosjekKruzni(uglovi) {
 function round(x, n) {
   const f = Math.pow(10, n);
   return Math.round((x + Number.EPSILON) * f) / f;
+}
+
+// zaokruži ugao na cijelu sekundu; kad je tačno pola sekunde, ide na PARNU sekundu (kao u Excelu)
+function zaokruziSekParno(dec) {
+  const s = dec * 3600;
+  const f = Math.floor(s + 1e-9);
+  const ostatak = s - f;
+  let r;
+  if (Math.abs(ostatak - 0.5) < 1e-6) r = (f % 2 === 0) ? f : f + 1;
+  else r = Math.round(s);
+  return r / 3600;
 }
 
 // zaokruži ugao (u decimalnim stupnjevima) na cijelu sekundu

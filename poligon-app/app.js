@@ -90,12 +90,35 @@ function broj(id){ return parseDec(document.getElementById(id).value) || 0; }
 function tekst(id){ return document.getElementById(id).value || ""; }
 
 /* ---------- Redukcija dužina: prikaz polja za ručni faktor ---------- */
-document.getElementById("redukcijaNacin").addEventListener("change", (e) => {
-  document.getElementById("redukcijaFaktor").style.display = e.target.value === "rucno" ? "inline-block" : "none";
-});
+function osvjeziPoljaRedukcije() {
+  const nacin = document.getElementById("redukcijaNacin").value;
+  document.getElementById("redukcijaFaktor").style.display = nacin === "rucno" ? "inline-block" : "none";
+  document.getElementById("m0Blok").style.display = nacin === "auto" ? "inline-block" : "none";
+}
+document.getElementById("redukcijaNacin").addEventListener("change", osvjeziPoljaRedukcije);
+osvjeziPoljaRedukcije();
+
+/* ---------- Zatvoren vlak: C = B, D = A ---------- */
+function sinkronizirajZatvoreni() {
+  const zat = document.getElementById("zatvoreniVlak").checked;
+  [["C", "B"], ["D", "A"]].forEach(([cilj, izvor]) => {
+    ["naziv", "Y", "X", "H"].forEach((k) => {
+      const cp = document.getElementById(cilj + "_" + k), sp = document.getElementById(izvor + "_" + k);
+      cp.readOnly = zat;
+      if (zat) cp.value = sp.value;
+    });
+  });
+}
+document.getElementById("zatvoreniVlak").addEventListener("change", sinkronizirajZatvoreni);
+["A", "B"].forEach((p) => ["naziv", "Y", "X", "H"].forEach((k) => {
+  document.getElementById(p + "_" + k).addEventListener("input", () => {
+    if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
+  });
+}));
 
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
+  if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
   const uglovi = [...document.querySelectorAll(".in-ugao")].map((e) => e.value);
   const duzine = [...document.querySelectorAll(".in-duzina")].map((e) => parseDec(e.value) || 0);
   const nazivi = [...document.querySelectorAll(".in-naziv")].map((e) => e.value);
@@ -126,9 +149,10 @@ document.getElementById("izracunaj").addEventListener("click", () => {
   const nacinRed = document.getElementById("redukcijaNacin").value;
   let faktorRed = null;
   if (nacinRed === "auto") {
+    const m0 = parseDec(document.getElementById("redukcijaM0").value);
     faktorRed = window.Racun.faktorRedukcijeDuzina(
       parseDec(document.getElementById("B_H").value), parseDec(document.getElementById("C_H").value),
-      broj("B_Y"), broj("C_Y"));
+      broj("B_Y"), broj("C_Y"), isNaN(m0) ? 1 : m0);
     if (faktorRed === null) alert("Redukcija dužina: unesite nadmorske visine H za tačke B i C (ili odaberite „Bez redukcije\"). Računam bez redukcije.");
   } else if (nacinRed === "rucno") {
     const f = parseDec(document.getElementById("redukcijaFaktor").value);
@@ -498,9 +522,10 @@ function preuzmi(blob, ime) {
         const r = r0 + ri, k = k0 + ci;
         if (r >= REDOVI.length || k >= KOLONE.length) return;
         const polje = document.getElementById(REDOVI[r] + "_" + KOLONE[k]);
-        if (polje) polje.value = v.trim();
+        if (polje && !polje.readOnly) polje.value = v.trim();
       });
     });
+    if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
   });
 })();
 
@@ -615,9 +640,18 @@ function obradiUcitaneStanice(stanice) {
 
   // zapisnik s mjerenjima: dužine se redukuju na nultu plohu (kao u Excel obrascu TO 18D)
   document.getElementById("redukcijaNacin").value = "auto";
-  document.getElementById("redukcijaFaktor").style.display = "none";
+  osvjeziPoljaRedukcije();
 
-  postaviStatus(`Učitano ${n} stanica. Provjerite date tačke pa kliknite „Izračunaj".`, true);
+  // zatvoren vlak: prva i zadnja stanica su ista tačka (npr. T809 … T809)
+  const zatvoren = n >= 3 && String(validne[0].stanica).trim() === String(validne[n - 1].stanica).trim();
+  document.getElementById("zatvoreniVlak").checked = zatvoren;
+  if (zatvoren) {
+    document.getElementById("B_naziv").value = validne[0].stanica;
+    document.getElementById("A_naziv").value = validne[0].nazZadnja || document.getElementById("A_naziv").value;
+  }
+  sinkronizirajZatvoreni();
+
+  postaviStatus(`Učitano ${n} stanica${zatvoren ? " — prepoznat ZATVOREN vlak (C = B, D = A)" : ""}. Provjerite date tačke pa kliknite „Izračunaj".`, true);
   if (greske.length) {
     alert("Napomena:\n" + greske.join("\n"));
   }

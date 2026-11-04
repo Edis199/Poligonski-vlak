@@ -66,13 +66,25 @@ Stupci predloška:
 `Stanica ; VisinaInstrumenta ; Vizura ; Kod ; HorizontalniUgao ;
 ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
+### Zatvoren vlak
+
+Ako vlak počinje i završava na istoj tački (npr. T809 → 69 → 70 → 71 → T809, s orijentacijom na
+istu tačku na početku i na kraju), uključite **„Zatvoren vlak"** ispod tabele date tačke: tada su
+C = B i D = A i popunjavaju se same, pa unosite samo A i B. Pri učitavanju zapisnika aplikacija
+zatvoren vlak prepozna sama (prva i zadnja stanica imaju isti naziv). Izravnanje, visine i detalji
+računaju se isto kao kod umetnutog vlaka.
+
+**Vertikalni ugao** (TO 1V, 18D, 28P) uzima se iz **zadnjeg girusa**, zaokružen na cijelu sekundu,
+kao u Excel obrascima; kose dužine su sredina iz svih girusa.
+
 ### Redukcija dužina na nultu plohu (TO 18D)
 
 Iznad tabele prelomnih uglova bira se **redukcija dužina**:
 
 - **Automatski** (zadano nakon učitavanja zapisnika): horizontalna dužina se množi faktorom
-  `k = (1 − Hm/R) · (1 + ym²/2R²)`, gdje je `Hm` srednja visina tačaka B i C, `ym` udaljenost od
-  srednjeg meridijana (iz Y koordinate), `R = 6377397 m` (Bessel). Potrebne su visine H tačaka B i C.
+  `k = m₀ · (1 − Hm/R) · (1 + ym²/2R²)`, gdje je `m₀` mjerilo na srednjem meridijanu (zadano 0,9999;
+  upišite 1 ako ga ne želite), `Hm` srednja visina tačaka B i C, `ym` udaljenost od srednjeg
+  meridijana (iz Y koordinate), `R = 6377397 m` (Bessel). Potrebne su visine H tačaka B i C.
 - **Bez redukcije**: dužine kako su izmjerene (kao u ranijem primjeru).
 - **Ručno unesen faktor**: npr. `0,99992279`.
 
