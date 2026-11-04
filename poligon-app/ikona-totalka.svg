@@ -1,53 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3a7fd0"/><stop offset="1" stop-color="#143c72"/>
-    </linearGradient>
-    <linearGradient id="yel" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffd84a"/><stop offset="1" stop-color="#f3a50c"/>
-    </linearGradient>
-    <linearGradient id="scope" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e0e8"/>
-    </linearGradient>
-  </defs>
-
-  <!-- podloga -->
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="6" y="6" width="500" height="500" rx="108" fill="none" stroke="#ffffff" stroke-width="4" opacity="0.18"/>
-
-  <!-- ===== STATIV (tronožac) ===== -->
-  <g stroke="#0d2444" stroke-width="18" stroke-linecap="round">
-    <path d="M256 372 L182 460"/>
-    <path d="M256 372 L330 460"/>
-    <path d="M256 372 L256 452"/>
+  <rect width="512" height="512" rx="96" fill="#ffffff"/>
+  <g fill="none" stroke="#141414" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <!-- kućište / rogovi (vanjski obris sprijeda) -->
+    <path d="M150 360
+             L150 150
+             Q150 92 208 84
+             L304 84
+             Q362 92 362 150
+             L362 360 Z"/>
+    <!-- bočni priključak (lijevo) -->
+    <path d="M150 300 L124 300"/>
+    <!-- bočni priključak (desno) -->
+    <path d="M362 300 L388 300"/>
+    <!-- durbin / otvor u sredini (uspravni prozor) -->
+    <path d="M214 150 L298 150 L298 300 L214 300 Z"/>
+    <!-- gornja luka iznad durbina (ručka/poklopac) -->
+    <path d="M206 120 Q256 70 306 120"/>
   </g>
-  <!-- spojnica nogu -->
-  <path d="M214 418 L298 418" stroke="#0d2444" stroke-width="12" stroke-linecap="round" opacity="0.65"/>
-
-  <!-- ===== PODNOŽJE / TRIBRAH ===== -->
-  <path d="M206 366 L306 366 L292 340 L220 340 Z" fill="#0d2444"/>
-  <rect x="236" y="356" width="40" height="18" rx="4" fill="#0d2444"/>
-
-  <!-- ===== TIJELO (alhidada, žuto) ===== -->
-  <rect x="196" y="238" width="120" height="112" rx="22" fill="url(#yel)" stroke="#0d2444" stroke-width="11"/>
-  <!-- bočne tipke -->
-  <circle cx="214" cy="300" r="10" fill="#0d2444"/>
-  <!-- ekran -->
-  <rect x="236" y="300" width="60" height="34" rx="6" fill="#102b4e"/>
-  <rect x="244" y="326" width="44" height="5" rx="2" fill="#0d2444"/>
-
-  <!-- ===== DURBIN (teleskop, vodoravno kroz vrh tijela) ===== -->
-  <rect x="150" y="214" width="212" height="54" rx="27" fill="url(#scope)" stroke="#0d2444" stroke-width="11"/>
-  <!-- objektiv lijevo -->
-  <circle cx="156" cy="241" r="24" fill="#0d2444"/>
-  <circle cx="156" cy="241" r="12" fill="#4aa3ff"/>
-  <!-- okular desno -->
-  <rect x="352" y="229" width="20" height="24" rx="6" fill="#0d2444"/>
-
-  <!-- ===== RUČKA ===== -->
-  <path d="M212 216 q44 -60 88 0" fill="none" stroke="#161616" stroke-width="16" stroke-linecap="round"/>
-
-  <!-- ===== VIZURA (ciljna linija + meta) ===== -->
-  <path d="M374 226 L432 182" stroke="#ffd84a" stroke-width="12" stroke-linecap="round" stroke-dasharray="1 24"/>
-  <circle cx="440" cy="176" r="18" fill="#2ec27e" stroke="#ffffff" stroke-width="6"/>
+  <!-- objektiv (tačka u sredini) -->
+  <circle cx="256" cy="200" r="26" fill="#141414"/>
+  <!-- baza / tribrah (donja crtica) -->
+  <rect x="186" y="398" width="140" height="26" rx="8" fill="#141414"/>
 </svg>
