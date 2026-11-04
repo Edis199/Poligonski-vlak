@@ -436,6 +436,39 @@ function preuzmi(blob, ime) {
   document.body.removeChild(a);
 }
 
+/* ---------- Lijepljenje poznatih tačaka iz Excela ----------
+   Zalijepljeni blok (redovi = tačke, kolone razdvojene tabom) raspoređuje se
+   po ćelijama počevši od ćelije u koju se lijepi: kolone Broj tačke, Y, X, H;
+   redovi A, B, C, D. Radi i s ; kao razdvajačem.                          */
+(function () {
+  const REDOVI = ["A", "B", "C", "D"];
+  const KOLONE = ["naziv", "Y", "X", "H"];
+  const tabela = document.getElementById("tabelaDate");
+  if (!tabela) return;
+  tabela.addEventListener("paste", (ev) => {
+    const cilj = ev.target;
+    if (!cilj || !cilj.dataset || cilj.dataset.red === undefined) return;
+    const tekstCB = (ev.clipboardData || window.clipboardData).getData("text");
+    if (!tekstCB) return;
+    const linije = tekstCB.replace(/\r/g, "").split("\n").filter((l) => l.trim() !== "");
+    // jedna jednostavna vrijednost: pusti uobičajeno lijepljenje u tu ćeliju
+    const imaViseCelija = linije.length > 1 || /[\t;]/.test(linije[0] || "");
+    if (!imaViseCelija) return;
+    ev.preventDefault();
+    const r0 = REDOVI.indexOf(cilj.dataset.red);
+    const k0 = parseInt(cilj.dataset.kol, 10);
+    linije.forEach((linija, ri) => {
+      const celije = linija.includes("\t") ? linija.split("\t") : linija.split(";");
+      celije.forEach((v, ci) => {
+        const r = r0 + ri, k = k0 + ci;
+        if (r >= REDOVI.length || k >= KOLONE.length) return;
+        const polje = document.getElementById(REDOVI[r] + "_" + KOLONE[k]);
+        if (polje) polje.value = v.trim();
+      });
+    });
+  });
+})();
+
 /* ---------- Početno stanje ---------- */
 generirajTabelu(4, {
   uglovi: ["", "", "", ""],

@@ -73,6 +73,11 @@ input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,
 .tabela th,.tabela td{border:1px solid var(--obrub);padding:8px 10px;text-align:center}
 .tabela th{background:var(--svijetla);color:var(--plava-tamna);font-weight:600}
 .tabela input{text-align:center}
+/* tablica poznatih tačaka (unos / lijepljenje iz Excela) */
+.tabela-omot{overflow-x:auto}
+.tabela-date td.uloga{text-align:left;color:var(--plava-tamna);font-weight:600;white-space:nowrap}
+.tabela-date td{padding:4px 6px}
+.tabela-date input{width:100%;min-width:90px;box-sizing:border-box;margin:0}
 .tabela tr:nth-child(even) td{background:#fafcfe}
 
 .sazetak-kartice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 24px}

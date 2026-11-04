@@ -62,46 +62,45 @@
     </div>
 
     <h2>Date (poznate) tačke</h2>
-    <div class="mreza2">
-      <fieldset>
-        <legend>Početak vlaka</legend>
-        <label>Orijentacijska tačka A (pozadi)</label>
-        <div class="red3">
-          <input id="A_naziv" placeholder="Naziv" value="P646" />
-          <input id="A_Y" type="text" inputmode="decimal" placeholder="Y" value="6534004.099" />
-          <input id="A_X" type="text" inputmode="decimal" placeholder="X" value="4856781.708" />
-        </div>
-        <label>Nadmorska visina H orijentacijske tačke A</label>
-        <input id="A_H" type="text" inputmode="decimal" placeholder="H (m)" value="540.177" />
-        <label>Početna stanica B</label>
-        <div class="red3">
-          <input id="B_naziv" placeholder="Naziv" value="P647" />
-          <input id="B_Y" type="text" inputmode="decimal" placeholder="Y" value="6534077.333" />
-          <input id="B_X" type="text" inputmode="decimal" placeholder="X" value="4856802.045" />
-        </div>
-        <label>Nadmorska visina H početne stanice B (za visinsko izravnanje)</label>
-        <input id="B_H" type="text" inputmode="decimal" placeholder="H (m) — npr. 539.234" value="539.234" />
-      </fieldset>
-
-      <fieldset>
-        <legend>Kraj vlaka</legend>
-        <label>Krajnja stanica C</label>
-        <div class="red3">
-          <input id="C_naziv" placeholder="Naziv" value="P568" />
-          <input id="C_Y" type="text" inputmode="decimal" placeholder="Y" value="6534219.852" />
-          <input id="C_X" type="text" inputmode="decimal" placeholder="X" value="4856903.011" />
-        </div>
-        <label>Nadmorska visina H krajnje stanice C (za visinsko izravnanje)</label>
-        <input id="C_H" type="text" inputmode="decimal" placeholder="H (m) — npr. 540.370" value="540.370" />
-        <label>Orijentacijska tačka D (naprijed)</label>
-        <div class="red3">
-          <input id="D_naziv" placeholder="Naziv" value="G48" />
-          <input id="D_Y" type="text" inputmode="decimal" placeholder="Y" value="6534197.2695" />
-          <input id="D_X" type="text" inputmode="decimal" placeholder="X" value="4856958.4162" />
-        </div>
-        <label>Nadmorska visina H orijentacijske tačke D</label>
-        <input id="D_H" type="text" inputmode="decimal" placeholder="H (m)" value="540.969" />
-      </fieldset>
+    <p class="napomena">Možete kopirati iz Excela cijeli blok (broj tačke, Y, X, H) i zalijepiti ga
+      (<b>Ctrl+V</b>) u prvu ćeliju — vrijednosti se same raspodijele po ćelijama. Redovi idu redom A, B, C, D.
+      H je potrebno za visinsko izravnanje (B i C obavezno).</p>
+    <div class="tabela-omot">
+    <table class="tabela tabela-date" id="tabelaDate">
+      <thead>
+        <tr><th>Tačka</th><th>Broj tačke</th><th>Y</th><th>X</th><th>H (m)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="uloga">A — orijentacijska tačka (pozadi)</td>
+          <td><input id="A_naziv" data-red="A" data-kol="0" placeholder="Broj tačke" value="P646" /></td>
+          <td><input id="A_Y" data-red="A" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534004.099" /></td>
+          <td><input id="A_X" data-red="A" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856781.708" /></td>
+          <td><input id="A_H" data-red="A" data-kol="3" type="text" inputmode="decimal" placeholder="H (m)" value="540.177" /></td>
+        </tr>
+        <tr>
+          <td class="uloga">B — početna stanica</td>
+          <td><input id="B_naziv" data-red="B" data-kol="0" placeholder="Broj tačke" value="P647" /></td>
+          <td><input id="B_Y" data-red="B" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534077.333" /></td>
+          <td><input id="B_X" data-red="B" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856802.045" /></td>
+          <td><input id="B_H" data-red="B" data-kol="3" type="text" inputmode="decimal" placeholder="H (m)" value="539.234" /></td>
+        </tr>
+        <tr>
+          <td class="uloga">C — krajnja stanica</td>
+          <td><input id="C_naziv" data-red="C" data-kol="0" placeholder="Broj tačke" value="P568" /></td>
+          <td><input id="C_Y" data-red="C" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534219.852" /></td>
+          <td><input id="C_X" data-red="C" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856903.011" /></td>
+          <td><input id="C_H" data-red="C" data-kol="3" type="text" inputmode="decimal" placeholder="H (m)" value="540.370" /></td>
+        </tr>
+        <tr>
+          <td class="uloga">D — orijentacijska tačka (naprijed)</td>
+          <td><input id="D_naziv" data-red="D" data-kol="0" placeholder="Broj tačke" value="G48" /></td>
+          <td><input id="D_Y" data-red="D" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534197.2695" /></td>
+          <td><input id="D_X" data-red="D" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856958.4162" /></td>
+          <td><input id="D_H" data-red="D" data-kol="3" type="text" inputmode="decimal" placeholder="H (m)" value="540.969" /></td>
+        </tr>
+      </tbody>
+    </table>
     </div>
 
     <h2>Prelomni uglovi i dužine</h2>
