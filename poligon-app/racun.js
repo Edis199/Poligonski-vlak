@@ -257,17 +257,78 @@ function izravnajUmetnutiVlak(ulaz) {
   };
 }
 
+/* =====================================================================
+   SLIJEPI POLIGONSKI VLAK
+   Počinje na poznatoj tački B (s orijentacijom na poznatu A), a ne završava na poznatoj tački.
+   Nema uglovnog ni linearnog odstupanja, pa nema ni popravki: direkcioni uglovi se nižu iz
+   izmjerenih uglova, a koordinate iz (po potrebi redukovanih) dužina.
+   Ulaz: { datePocetne:{A,B}, prelomniUglovi:[sms…] (jedan po stanici s girusom),
+           duzine:[…] (jedna po stranici — isti broj kao uglova), nazivi:[…] (nove tačke),
+           nazivPocetne }
+   Rezultat ima isti oblik kao kod umetnutog vlaka (fβ, fd… su 0 / null).
+   ===================================================================== */
+function izracunajSlijepiVlak(ulaz) {
+  const greske = [];
+  const A = ulaz.datePocetne.A, B = ulaz.datePocetne.B;
+  const alfaPocetni = direkcijskiUgao(A.Y, A.X, B.Y, B.X);
+  const beta = ulaz.prelomniUglovi.map(smsUDecimalni);
+  const d = ulaz.duzine.map(Number);
+  const n = beta.length;
+  if (n < 1) greske.push("Slijepi vlak mora imati bar jedan prelomni ugao.");
+  if (d.length !== n) greske.push("Broj dužina mora biti jednak broju uglova (jedna dužina po stranici).");
+
+  const alfe = [];
+  let prethodni = alfaPocetni;
+  for (let i = 0; i < n; i++) {
+    const a = norm360(prethodni + beta[i] + 180);   // bez popravke ugla
+    alfe.push(a);
+    prethodni = a;
+  }
+
+  const dy = d.map((di, i) => di * Math.sin(uRad(alfe[i])));
+  const dx = d.map((di, i) => di * Math.cos(uRad(alfe[i])));
+  const sumaDy = dy.reduce((s, v) => s + v, 0);
+  const sumaDx = dx.reduce((s, v) => s + v, 0);
+  const sumaD = d.reduce((s, v) => s + v, 0);
+  const sumaBeta = beta.reduce((s, b) => s + b, 0);
+
+  const tocke = [{ naziv: ulaz.nazivPocetne || "B", Y: round(B.Y, 4), X: round(B.X, 4), tip: "data" }];
+  let Y = B.Y, X = B.X;
+  for (let i = 0; i < n; i++) {
+    Y += dy[i]; X += dx[i];
+    tocke.push({ naziv: (ulaz.nazivi && ulaz.nazivi[i]) ? ulaz.nazivi[i] : `T${i + 1}`,
+                 Y: round(Y, 4), X: round(X, 4), tip: "nova" });
+  }
+  const nule = d.map(() => 0);
+  return {
+    slijepi: true,
+    alfaPocetni, alfaKrajnji: null,
+    beta, betaPopr: beta, alfe,
+    n, brStranica: n,
+    sumaBeta, ima: null, treba: null,
+    fBeta: 0, fBetaSek: 0, popravakUgla: 0,
+    dopustenoFbetaSek: null, kutnoOK: null,
+    d, dy, dx, sumaDy, sumaDx, sumaD,
+    fy: 0, fx: 0, fd: 0, dopustenoFd: null, linearnoOK: null,
+    vy: nule, vx: nule, dyPopr: dy, dxPopr: dx,
+    tocke, odstY: 0, odstX: 0,
+    alfaKontrola: null,
+    alfaZadnjeUnazad: n ? norm360(alfe[n - 1] + 180) : null,   // smjer zadnja tačka → prethodna
+    greske
+  };
+}
+
 // Export za korištenje u pregledniku
 if (typeof window !== "undefined") {
   window.Racun = {
     smsUDecimalni, decimalniUSms, direkcijskiUgao, odstojanje,
-    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round, faktorRedukcijeDuzina
+    horizontalnaDuzina, izravnajUmetnutiVlak, izracunajSlijepiVlak, norm360, round, faktorRedukcijeDuzina
   };
 }
 // Export za Node (test)
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     smsUDecimalni, decimalniUSms, direkcijskiUgao, odstojanje,
-    horizontalnaDuzina, izravnajUmetnutiVlak, norm360, round, faktorRedukcijeDuzina
+    horizontalnaDuzina, izravnajUmetnutiVlak, izracunajSlijepiVlak, norm360, round, faktorRedukcijeDuzina
   };
 }

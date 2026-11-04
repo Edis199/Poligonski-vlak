@@ -27,7 +27,7 @@ function round(x, n) { const f = Math.pow(10, n); return Math.round((x + Number.
    visinaPocetna, visinaKrajnja = date nadmorske visine (B i C)
    Vraća rezultat s nizom tačaka i njihovim visinama.
    --------------------------------------------------------------------- */
-function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije, tolerancije) {
+function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije, tolerancije, slijepi) {
   const greske = [];
   // broj stranica vlaka = broj stanica - 1 (zadnja stanica je krajnja data)
   const brSt = stranice.length - 1;
@@ -35,7 +35,7 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
 
   // Način računa: s redukcijom dužina (novi Excel) → bez međuzaokruživanja (6 decimala);
   // bez redukcije → kao stari Excel (visinske razlike na cm, dužine u stotinama metara).
-  const tacno = !!(faktorRedukcije && faktorRedukcije > 0);
+  const tacno = true;   // visine se računaju bez međuzaokruživanja (kao u obrascima 2019)
   const pDH = tacno ? 6 : 2;   // preciznost visinskih razlika
   const pM = tacno ? 6 : 3;    // preciznost popravki, visina i ostalog
 
@@ -83,7 +83,8 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
 
   // Zatvaranje
   const sumaDH = round(redovi.reduce((s, r) => s + r.dHsred, 0), pM);
-  const fh = round((visinaKrajnja - visinaPocetna) - sumaDH, pM);  // m
+  // slijepi vlak: krajnja tačka nije poznata, pa nema zatvaranja (f_h) ni popravki
+  const fh = slijepi ? 0 : round((visinaKrajnja - visinaPocetna) - sumaDH, pM);  // m
 
   // Σ odstojanja (Excel L16) i broj razlika n
   const sumaOdst = tacno ? redovi.reduce((s, r) => s + r.odstojanjeKm, 0) : round(redovi.reduce((s, r) => s + r.odstojanjeKm, 0), 1);
@@ -95,7 +96,7 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
   if (novaTol) {
     const sumaT = redovi.reduce((s, r) => s + d100(r), 0);
     const nn = Math.max(1, n - 1);
-    dopustenoFh = round((4 * (sumaT / nn) * Math.sqrt(nn) + 2) / 100, 3);
+    dopustenoFh = slijepi ? null : round((4 * (sumaT / nn) * Math.sqrt(nn) + 2) / 100, 3);
   } else {
     const srOdst = sumaOdst / n;
     dopustenoFh = round((4 * srOdst * Math.sqrt(n) + 2) / 100, 3);
@@ -127,7 +128,7 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
   tocke.push({ naziv: stranice[0].stanica, H: round(H, pM), tip: "data" });
   redovi.forEach((r, i) => {
     H = round(H + r.dHpopr, pM);
-    const zadnja = (i === redovi.length - 1);
+    const zadnja = (i === redovi.length - 1) && !slijepi;
     tocke.push({
       naziv: r.do,
       H: zadnja ? round(visinaKrajnja, pM) : round(H, pM),
@@ -139,7 +140,8 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije,
 
   return {
     redovi, sumaDH, fh, dopustenoFh,
-    visinskiOK: Math.abs(fh) <= dopustenoFh,
+    visinskiOK: slijepi ? null : Math.abs(fh) <= dopustenoFh,
+    slijepi: !!slijepi,
     sumaOdst, n, tocke, kontrola, greske
   };
 }

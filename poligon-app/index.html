@@ -109,9 +109,15 @@
     </table>
     </div>
 
-    <label class="zatvoreni-vlak"><input type="checkbox" id="zatvoreniVlak" />
-      <b>Zatvoren vlak</b> — krajnja stanica C je ista tačka kao početna B, a orijentacija D ista kao A
-      (C i D se tada popunjavaju automatski)</label>
+    <div class="zatvoreni-vlak">
+      <label for="vrstaVlaka"><b>Vrsta vlaka:</b></label>
+      <select id="vrstaVlaka">
+        <option value="umetnuti" selected>Umetnuti (počinje i završava na poznatim tačkama)</option>
+        <option value="zatvoreni">Zatvoreni (C = B, D = A)</option>
+        <option value="slijepi">Slijepi (počinje na poznatoj tački, ne završava na poznatoj)</option>
+      </select>
+      <div class="napomena" id="napomenaVrste"></div>
+    </div>
 
     <div class="redukcija-blok">
       <label for="redukcijaNacin"><b>Redukcija dužina na nultu plohu:</b></label>

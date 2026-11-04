@@ -116,8 +116,25 @@ document.getElementById("redukcijaNacin").addEventListener("change", osvjeziPolj
 osvjeziPoljaRedukcije();
 
 /* ---------- Zatvoren vlak: C = B, D = A ---------- */
+function vrstaVlaka() { return document.getElementById("vrstaVlaka").value; }
+function postaviVrstu(v) { document.getElementById("vrstaVlaka").value = v; primijeniVrstu(); }
+function primijeniVrstu() {
+  const v = vrstaVlaka();
+  ["C", "D"].forEach((k) => {
+    const tr = document.getElementById(k + "_naziv").closest("tr");
+    if (tr) tr.style.display = v === "slijepi" ? "none" : "";
+  });
+  document.getElementById("napomenaVrste").textContent = v === "slijepi"
+    ? "Slijepi vlak: unesite koordinate i visinu za A (orijentacija) i B (početna stanica). Nema uglovnog ni linearnog odstupanja ni popravki."
+    : "";
+  if (v === "slijepi") {
+    document.getElementById("redukcijaNacin").value = "nema";
+    osvjeziPoljaRedukcije();
+  }
+  sinkronizirajZatvoreni();
+}
 function sinkronizirajZatvoreni() {
-  const zat = document.getElementById("zatvoreniVlak").checked;
+  const zat = vrstaVlaka() === "zatvoreni";
   [["C", "B"], ["D", "A"]].forEach(([cilj, izvor]) => {
     ["naziv", "Y", "X", "H"].forEach((k) => {
       const cp = document.getElementById(cilj + "_" + k), sp = document.getElementById(izvor + "_" + k);
@@ -126,20 +143,21 @@ function sinkronizirajZatvoreni() {
     });
   });
 }
-document.getElementById("zatvoreniVlak").addEventListener("change", sinkronizirajZatvoreni);
+document.getElementById("vrstaVlaka").addEventListener("change", primijeniVrstu);
 ["A", "B"].forEach((p) => ["naziv", "Y", "X", "H"].forEach((k) => {
   document.getElementById(p + "_" + k).addEventListener("input", () => {
-    if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
+    if (vrstaVlaka() === "zatvoreni") sinkronizirajZatvoreni();
   });
 }));
 
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
+  if (vrstaVlaka() === "slijepi") { izracunajSlijepi(); return; }
   if (!obradjeneStanice || !obradjeneStanice.length) {
     alert("Prvo učitajte tahimetrijski zapisnik (mjerenja) — uglovi i dužine se računaju iz njega.");
     return;
   }
-  if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
+  if (vrstaVlaka() === "zatvoreni") sinkronizirajZatvoreni();
   const uglovi = [...document.querySelectorAll(".in-ugao")].map((e) => e.value);
   const duzine = [...document.querySelectorAll(".in-duzina")].map((e) => parseDec(e.value) || 0);
   const nazivi = [...document.querySelectorAll(".in-naziv")].map((e) => e.value);
@@ -195,39 +213,83 @@ document.getElementById("izracunaj").addEventListener("click", () => {
 
   try {
     const r = window.Racun.izravnajUmetnutiVlak(ulaz);
-    zadnjiRezultat = r;
+    nastaviIzracun(r, false);
 
-    // --- Visinsko izravnanje (ako ima podataka iz zapisnika i date visine) ---
-    zadnjiRezultatVisine = null;
-    const Hb = parseDec(document.getElementById("B_H").value);
-    const Hc = parseDec(document.getElementById("C_H").value);
-    if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
-      try {
-        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije, "nove");
-      } catch (ev) {
-        console.warn("Visinsko izravnanje preskočeno:", ev.message);
-      }
-    }
-
-    // --- Detaljne tačke (nakon izravnanja vlaka; izravnanje se ne mijenja) ---
-    zadnjiDetalji = null;
-    if (obradjeneStanice && obradjeneStanice.some((s) => s.detalji && s.detalji.length)) {
-      try {
-        const visine = zadnjiRezultatVisine ? zadnjiRezultatVisine.tocke.map((t) => t.H) : null;
-        const A = { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") };
-        zadnjiDetalji = window.Detalj.izracunajDetalje(obradjeneStanice, r.tocke, A, visine);
-      } catch (ed) {
-        console.warn("Računanje detalja preskočeno:", ed.message);
-      }
-    }
-
-    prikaziRezultate(r, zadnjiRezultatVisine);
-    idiNa("rezultati");
   } catch (e) {
     alert("Greška u izračunu: " + e.message);
     console.error(e);
   }
 });
+
+
+function nastaviIzracun(r, slijepi) {
+  zadnjiRezultat = r;
+
+  // --- Visinsko izravnanje (ako ima podataka iz zapisnika i date visine) ---
+  zadnjiRezultatVisine = null;
+  const Hb = parseDec(document.getElementById("B_H").value);
+  const Hc = parseDec(document.getElementById("C_H").value);
+  if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && (slijepi || !isNaN(Hc))) {
+    try {
+      zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, slijepi ? null : Hc, zadnjiFaktorRedukcije, "nove", slijepi);
+    } catch (ev) {
+      console.warn("Visinsko izravnanje preskočeno:", ev.message);
+    }
+  }
+
+  // --- Detaljne tačke (nakon izravnanja vlaka; izravnanje se ne mijenja) ---
+  zadnjiDetalji = null;
+  if (obradjeneStanice && obradjeneStanice.some((s) => s.detalji && s.detalji.length)) {
+    try {
+      const visine = zadnjiRezultatVisine ? zadnjiRezultatVisine.tocke.map((t) => t.H) : null;
+      const A = { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") };
+      zadnjiDetalji = window.Detalj.izracunajDetalje(obradjeneStanice, r.tocke, A, visine);
+    } catch (ed) {
+      console.warn("Računanje detalja preskočeno:", ed.message);
+    }
+  }
+
+  prikaziRezultate(r, zadnjiRezultatVisine);
+  idiNa("rezultati");
+}
+
+function izracunajSlijepi() {
+  const ob = obradjeneStanice;
+  const m = ob.length - 1;
+  if (m < 1 || !ob[m].samoOrijentacija) {
+    alert("Za slijepi vlak zadnja stanica u zapisniku treba imati samo vizuru unazad (bez girusa).");
+    return;
+  }
+  const faktorRed = null;   // slijepi vlak: bez redukcije dužina (kao u primjeru), osim ručno unesenog faktora
+  const nacin = document.getElementById("redukcijaNacin").value;
+  let k = null;
+  if (nacin === "auto") {
+    const m0 = parseDec(document.getElementById("redukcijaM0").value);
+    const Hb = parseDec(document.getElementById("B_H").value);
+    k = window.Racun.faktorRedukcijeDuzina(Hb, Hb, broj("B_Y"), broj("B_Y"), isNaN(m0) ? 1 : m0);
+  } else if (nacin === "rucno") {
+    const f = parseDec(document.getElementById("redukcijaFaktor").value);
+    k = isNaN(f) ? null : f;
+  }
+  zadnjiFaktorRedukcije = k || faktorRed;
+  const f = k || 1;
+  const prelomni = ob.slice(0, m).map((o) => decimalniUSmsBroj(o.prelomniUgao));
+  const duzine = ob.slice(0, m).map((o, i) => (o.horizDuzina + ob[i + 1].horizDuzinaZadnja) / 2 * f);
+  const ulaz = {
+    datePocetne: { A: { Y: broj("A_Y"), X: broj("A_X") }, B: { Y: broj("B_Y"), X: broj("B_X") } },
+    prelomniUglovi: prelomni,
+    duzine,
+    nazivi: ob.slice(0, m).map((o) => o.nazPrednja),
+    nazivPocetne: tekst("B_naziv") || "B",
+  };
+  try {
+    const r = window.Racun.izracunajSlijepiVlak(ulaz);
+    nastaviIzracun(r, true);
+  } catch (e) {
+    alert("Greška u izračunu: " + e.message);
+    console.error(e);
+  }
+}
 
 /* ---------- Prikaz rezultata ---------- */
 // Prikaz ugla iz sekundi u obliku  M'SS"  (ili samo SS" ako < 60").
@@ -253,12 +315,13 @@ function prikaziRezultate(r, rv) {
   const sek = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "\"";
 
   // sažetak kartice
+  const SL = !!r.slijepi;
   const kutnoKlasa = r.kutnoOK ? "ok" : "ne";
   const linKlasa = r.linearnoOK ? "ok" : "ne";
   document.getElementById("sazetak").innerHTML = `
-    <h2>Sažetak izravnanja</h2>
+    <h2>Sažetak izravnanja${SL ? " — slijepi vlak (bez odstupanja i popravki)" : ""}</h2>
     <div class="sazetak-kartice">
-      <div class="sk ${kutnoKlasa}">
+      ${SL ? "" : `<div class="sk ${kutnoKlasa}">
         <div class="oznaka">Uglovno odstupanje f&beta;</div>
         <div class="vrijednost">${sekMinSek(r.fBetaSek, true)}</div>
         <div class="napomena">dopušteno ±${sekMinSek(r.dopustenoFbetaSek, false)}</div>
@@ -267,7 +330,7 @@ function prikaziRezultate(r, rv) {
         <div class="oznaka">Linearno odstupanje f<sub>d</sub></div>
         <div class="vrijednost">${r.fd.toFixed(3)} m</div>
         <div class="napomena">dopušteno ${r.dopustenoFd.toFixed(3)} m</div>
-      </div>
+      </div>`}
       <div class="sk">
         <div class="oznaka">Broj prelomnih uglova</div>
         <div class="vrijednost">${r.n}</div>
@@ -277,7 +340,7 @@ function prikaziRezultate(r, rv) {
         <div class="vrijednost">${r.sumaD.toFixed(2)} m</div>
         <div class="napomena">${zadnjiFaktorRedukcije ? "redukovana na nultu plohu, k = " + zadnjiFaktorRedukcije.toFixed(8).replace(".", ",") : "bez redukcije"}</div>
       </div>
-      ${rv ? `
+      ${rv && !SL ? `
       <div class="sk ${rv.visinskiOK ? "ok" : "ne"}">
         <div class="oznaka">Visinsko odstupanje f<sub>h</sub></div>
         <div class="vrijednost">${(rv.fh*1000).toFixed(0)} mm</div>
@@ -293,7 +356,7 @@ function prikaziRezultate(r, rv) {
       <thead><tr>
         <th>Stranica</th><th>Direkcioni ugao &alpha;</th>
         <th>Dužina d (m)</th><th>&Delta;y</th><th>&Delta;x</th>
-        <th>Popravka v<sub>y</sub></th><th>Popravka v<sub>x</sub></th>
+        ${SL ? "" : "<th>Popravka v<sub>y</sub></th><th>Popravka v<sub>x</sub></th>"}
       </tr></thead><tbody>`;
   for (let i = 0; i < r.brStranica; i++) {
     tblAlfe += `<tr>
@@ -302,8 +365,7 @@ function prikaziRezultate(r, rv) {
       <td>${r.d[i].toFixed(3)}</td>
       <td>${r.dy[i].toFixed(4)}</td>
       <td>${r.dx[i].toFixed(4)}</td>
-      <td>${r.vy[i].toFixed(4)}</td>
-      <td>${r.vx[i].toFixed(4)}</td>
+      ${SL ? "" : `<td>${r.vy[i].toFixed(4)}</td><td>${r.vx[i].toFixed(4)}</td>`}
     </tr>`;
   }
   tblAlfe += `<tr style="font-weight:700;background:#eef4fb">
@@ -311,17 +373,17 @@ function prikaziRezultate(r, rv) {
       <td>${r.sumaD.toFixed(3)}</td>
       <td>${r.sumaDy.toFixed(4)}</td>
       <td>${r.sumaDx.toFixed(4)}</td>
-      <td colspan="2"></td></tr>`;
+      ${SL ? "" : '<td colspan="2"></td>'}</tr>`;
   tblAlfe += `</tbody></table>`;
 
   // tabela prelomnih uglova (mjereni i popravljeni)
   let tblBeta = `
     <h2>Prelomni uglovi</h2>
-    <p class="napomena">Popravka na svaki ugao: ${sekMinSek(r.popravakUgla*3600, true)}</p>
+    ${SL ? "" : `<p class="napomena">Popravka na svaki ugao: ${sekMinSek(r.popravakUgla*3600, true)}</p>`}
     <table class="tabela">
-      <thead><tr><th>#</th><th>Mjereni ugao</th><th>Popravljeni ugao</th></tr></thead><tbody>`;
+      <thead><tr><th>#</th><th>Mjereni ugao</th>${SL ? "" : "<th>Popravljeni ugao</th>"}</tr></thead><tbody>`;
   for (let i = 0; i < r.n; i++) {
-    tblBeta += `<tr><td>${i+1}</td><td>${D(r.beta[i])}</td><td>${D(r.betaPopr[i])}</td></tr>`;
+    tblBeta += `<tr><td>${i+1}</td><td>${D(r.beta[i])}</td>${SL ? "" : `<td>${D(r.betaPopr[i])}</td>`}</tr>`;
   }
   tblBeta += `</tbody></table>`;
 
@@ -339,10 +401,10 @@ function prikaziRezultate(r, rv) {
     </tr>`;
   });
   tblKoord += `</tbody></table>`;
-  tblKoord += `<p class="napomena">Kontrola zatvaranja na krajnjoj tački: &Delta;Y=${r.odstY} m, &Delta;X=${r.odstX} m</p>`;
+  if (!SL) tblKoord += `<p class="napomena">Kontrola zatvaranja na krajnjoj tački: &Delta;Y=${r.odstY} m, &Delta;X=${r.odstX} m</p>`;
 
   // status kontrola
-  const statusHtml = `
+  const statusHtml = SL ? "" : `
     <h2>Kontrola dopuštenih odstupanja</h2>
     <p>Uglovno izravnanje:
       <span class="oznaka-status ${r.kutnoOK?'status-ok':'status-ne'}">
@@ -363,12 +425,12 @@ function prikaziRezultate(r, rv) {
   if (rv) {
     tblVisine = `
       <h2>Visinsko izravnanje</h2>
-      <p class="napomena">Zatvaranje visina f<sub>h</sub> = ${(rv.fh*1000).toFixed(0)} mm,
-        dopušteno ${(rv.dopustenoFh*1000).toFixed(0)} mm.</p>
+      ${SL ? "" : `<p class="napomena">Zatvaranje visina f<sub>h</sub> = ${(rv.fh*1000).toFixed(0)} mm,
+        dopušteno ${(rv.dopustenoFh*1000).toFixed(0)} mm.</p>`}
       <table class="tabela">
         <thead><tr>
           <th>Stranica</th><th>&Delta;H naprijed</th><th>&Delta;H nazad</th>
-          <th>&Delta;H sredina</th><th>Popravka</th><th>&Delta;H popravljeno</th>
+          <th>&Delta;H sredina</th>${SL ? "" : "<th>Popravka</th><th>&Delta;H popravljeno</th>"}
         </tr></thead><tbody>`;
     rv.redovi.forEach((row) => {
       tblVisine += `<tr>
@@ -376,8 +438,7 @@ function prikaziRezultate(r, rv) {
         <td>${row.dHnaprijed.toFixed(2)}</td>
         <td>${row.dHnazad.toFixed(2)}</td>
         <td>${row.dHsred.toFixed(3)}</td>
-        <td>${row.popravka.toFixed(3)}</td>
-        <td>${row.dHpopr.toFixed(3)}</td>
+        ${SL ? "" : `<td>${row.popravka.toFixed(3)}</td><td>${row.dHpopr.toFixed(3)}</td>`}
       </tr>`;
     });
     tblVisine += `</tbody></table>
@@ -390,7 +451,7 @@ function prikaziRezultate(r, rv) {
   } else {
     tblVisine = `<div class="info" style="margin-top:20px">
       <b>Visinsko izravnanje</b> nije izračunato. Za visine: učitajte zapisnik (sadrži zenitne uglove)
-      i unesite nadmorske visine H za početnu (B) i krajnju (C) stanicu.</div>`;
+      i unesite nadmorske visine H za početnu (B)${SL ? "" : " i krajnju (C)"} stanicu.</div>`;
   }
 
   document.getElementById("rezultatiSadrzaj").innerHTML =
@@ -482,12 +543,14 @@ document.getElementById("izvozExcel").addEventListener("click", () => {
       csv += `${t.naziv};${t.Y.toFixed(4)};${t.X.toFixed(4)};${t.tip}\n`;
     }
   });
-  csv += `\nUglovno odstupanje fbeta;${sekMinSek(r.fBetaSek, true)}\n`;
-  csv += `Dopusteno uglovno;${sekMinSek(r.dopustenoFbetaSek, false)}\n`;
-  csv += `Linearno odstupanje fd (m);${r.fd.toFixed(3)}\n`;
-  csv += `Dopusteno linearno (m);${r.dopustenoFd.toFixed(3)}\n`;
+  if (!r.slijepi) {
+    csv += `\nUglovno odstupanje fbeta;${sekMinSek(r.fBetaSek, true)}\n`;
+    csv += `Dopusteno uglovno;${sekMinSek(r.dopustenoFbetaSek, false)}\n`;
+    csv += `Linearno odstupanje fd (m);${r.fd.toFixed(3)}\n`;
+    csv += `Dopusteno linearno (m);${r.dopustenoFd.toFixed(3)}\n`;
+  }
   csv += `Ukupna duzina (m);${r.sumaD.toFixed(2)}\n`;
-  if (zadnjiRezultatVisine) {
+  if (zadnjiRezultatVisine && !r.slijepi) {
     csv += `Visinsko odstupanje fh (mm);${(zadnjiRezultatVisine.fh*1000).toFixed(0)}\n`;
     csv += `Dopusteno visinsko (mm);${(zadnjiRezultatVisine.dopustenoFh*1000).toFixed(0)}\n`;
   }
@@ -547,7 +610,7 @@ function preuzmi(blob, ime) {
         if (polje && !polje.readOnly) polje.value = v.trim();
       });
     });
-    if (document.getElementById("zatvoreniVlak").checked) sinkronizirajZatvoreni();
+    if (vrstaVlaka() === "zatvoreni") sinkronizirajZatvoreni();
   });
 })();
 
@@ -686,7 +749,9 @@ function obradiUcitaneStanice(stanice, ponovo) {
   const duzInputi = document.querySelectorAll(".in-duzina");
   const nazInputi = document.querySelectorAll(".in-naziv");
 
+  const slijepi = validne.length >= 2 && !!validne[validne.length - 1].samoOrijentacija;
   validne.forEach((o, i) => {
+    if (o.samoOrijentacija) return;   // slijepi vlak: zadnja stanica nema prelomni ugao
     // prelomni ugao upisujemo u čitljivom zapisu SSS°MM'SS" (jezgra ga razumije preko parsiranja)
     if (uglInputi[i]) uglInputi[i].value = window.Girus.decUStr(o.prelomniUgao);
     // dužina (ima je svaka stanica osim zadnje): sredina horizontalne dužine naprijed i nazad
@@ -705,13 +770,24 @@ function obradiUcitaneStanice(stanice, ponovo) {
     return;
   }
 
+  if (slijepi) {
+    postaviVrstu("slijepi");
+    obrisiStareDateTacke({ A: validne[0].nazZadnja, B: validne[0].stanica });
+    document.getElementById("A_naziv").value = validne[0].nazZadnja || document.getElementById("A_naziv").value;
+    document.getElementById("B_naziv").value = validne[0].stanica;
+    postaviStatus(`Učitano ${n} stanica — prepoznat SLIJEPI vlak (zadnja stanica ${validne[n - 1].stanica} nema girus, samo orijentaciju unazad). Upišite koordinate (Y, X) i visine (H) za ${document.getElementById("A_naziv").value} i ${document.getElementById("B_naziv").value}, zatim kliknite Izračunaj.`, true);
+    if (greske.length) alert("Napomena:\n" + greske.join("\n"));
+    return;
+  }
+
   // zapisnik s mjerenjima: dužine se redukuju na nultu plohu (kao u Excel obrascu TO 18D)
   document.getElementById("redukcijaNacin").value = "auto";
   osvjeziPoljaRedukcije();
 
   // zatvoren vlak: prva i zadnja stanica su ista tačka (npr. T809 … T809)
   const zatvoren = n >= 3 && String(validne[0].stanica).trim() === String(validne[n - 1].stanica).trim();
-  document.getElementById("zatvoreniVlak").checked = zatvoren;
+  postaviVrstu(zatvoren ? "zatvoreni" : "umetnuti");
+  
   obrisiStareDateTacke(zatvoren
     ? { A: validne[0].nazZadnja, B: validne[0].stanica, C: validne[0].stanica, D: validne[0].nazZadnja }
     : { A: validne[0].nazZadnja, B: validne[0].stanica, C: validne[n - 1].stanica, D: validne[n - 1].nazPrednja });
@@ -1043,6 +1119,7 @@ function sloziObrazac25() {
     { naziv: tekst("C_naziv"), Y: broj("C_Y"), X: broj("C_X"), H: brojOpc("C_H") },
     { naziv: tekst("D_naziv"), Y: broj("D_Y"), X: broj("D_X"), H: brojOpc("D_H") },
   ];
+  if (r.slijepi) dateTacke.length = 2;
 
   // nove tačke: iz rezultata (tip "nova")
   const noveTacke = r.tocke
@@ -1057,8 +1134,8 @@ function dateTackeABCD() {
   return {
     A: { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") },
     B: { naziv: tekst("B_naziv"), Y: broj("B_Y"), X: broj("B_X") },
-    C: { naziv: tekst("C_naziv"), Y: broj("C_Y"), X: broj("C_X") },
-    D: { naziv: tekst("D_naziv"), Y: broj("D_Y"), X: broj("D_X") },
+    C: vrstaVlaka() === "slijepi" ? null : { naziv: tekst("C_naziv"), Y: broj("C_Y"), X: broj("C_X") },
+    D: vrstaVlaka() === "slijepi" ? null : { naziv: tekst("D_naziv"), Y: broj("D_Y"), X: broj("D_X") },
   };
 }
 

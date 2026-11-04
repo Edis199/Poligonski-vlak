@@ -70,10 +70,21 @@ Poslije izmjene ponovo kliknite „Izračunaj".
 ### Zatvoren vlak
 
 Ako vlak počinje i završava na istoj tački (npr. T809 → 69 → 70 → 71 → T809, s orijentacijom na
-istu tačku na početku i na kraju), uključite **„Zatvoren vlak"** ispod tabele date tačke: tada su
+istu tačku na početku i na kraju), u polju **„Vrsta vlaka"** ispod tabele date tačke odaberite **Zatvoreni**: tada su
 C = B i D = A i popunjavaju se same, pa unosite samo A i B. Pri učitavanju zapisnika aplikacija
 zatvoren vlak prepozna sama (prva i zadnja stanica imaju isti naziv). Izravnanje, visine i detalji
 računaju se isto kao kod umetnutog vlaka.
+
+### Slijepi vlak
+
+Slijepi vlak počinje na poznatoj tački B s orijentacijom na A, a ne završava na poznatoj tački
+(do dvije nepoznate tačke). U zapisniku zadnja stanica (nova tačka) ima **samo jednu vizuru unazad**
+na prethodnu stanicu (orijentacija, bez girusa) i eventualno detalje. Aplikacija ga prepozna sama
+i bira **Vrsta vlaka → Slijepi**; unosite koordinate i visinu samo za A i B (C i D su skriveni).
+Nema uglovnog ni linearnog odstupanja, nema popravki uglova, koordinata ni visina; direkcioni uglovi
+se nižu iz izmjerenih prelomnih uglova, a koordinate i visine iz izmjerenih dužina i visinskih razlika.
+Zadana redukcija dužina je „Bez redukcije" (može se promijeniti). Obrazac 19 završava zadnjom tačkom
+sa smjerom unazad; Obrazac K i 28P rade bez popravki.
 
 **Vertikalni ugao** (TO 1V, 18D, 28P) uzima se iz **zadnjeg girusa**, zaokružen na cijelu sekundu,
 kao u Excel obrascima; kose dužine su sredina iz svih girusa.
@@ -158,5 +169,4 @@ numeracijom strana (npr. „Strana 2 / 3") kad obrazac prelazi na sljedeću stra
 
 ## Napomena
 
-Trenutno je podržan **umetnuti (priključni) vlak**. Struktura je pripremljena
-tako da se kasnije mogu dodati **zatvoreni** i **slijepi** vlak.
+Podržani su **umetnuti**, **zatvoreni** i **slijepi** vlak.

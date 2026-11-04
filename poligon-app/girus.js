@@ -190,6 +190,37 @@ function obradiStanicu(stanica, visinaInstr, mjerenja, izbor) {
   };
 }
 
+/* Zadnja stanica SLIJEPOG vlaka: nema girusa, samo vizura unazad na prethodnu tačku
+   (jedan položaj, ili I i II položaj) — služi za orijentaciju detalja i za dužinu/visinsku razliku nazad. */
+function obradiOrijentaciju(stanica, visinaInstr, redovi) {
+  const r1 = redovi[0], r2 = redovi[1];
+  let h1 = parsirajUgao(r1.horiz), z1 = parsirajUgao(r1.zenit);
+  if (h1 === null || z1 === null) return { greska: `Stanica ${stanica}: nedostaje pravac ili zenitni ugao na ${r1.vizura}.` };
+  let pravac, zenit, kosa;
+  if (r2) {
+    pravac = sredinaIIpolozaj(h1, parsirajUgao(r2.horiz));
+    zenit = zenitSredina(z1, parsirajUgao(r2.zenit));
+    kosa = prosjek([Number(r1.kosa), Number(r2.kosa)]);
+  } else {
+    if (z1 > 180) { z1 = 360 - z1; h1 = (h1 + 180) % 360; }   // mjereno u II položaju
+    pravac = h1; zenit = z1; kosa = Number(r1.kosa);
+  }
+  pravac = zaokruziNaSekundu(pravac);
+  zenit = zaokruziSekParno(zenit);
+  const horizZadnja = Math.abs(round(kosa * Math.sin((zenit * Math.PI) / 180), 3));
+  return {
+    stanica, visinaInstr: Number(visinaInstr),
+    nazZadnja: r1.vizura, nazPrednja: null,
+    pravacZadnja: pravac, pravacPrednja: null,
+    prelomniUgao: null,
+    zenitPrednja: null, kosaPrednja: null, horizDuzina: null, visinaSignalaPrednja: null,
+    zenitZadnja: zenit, kosaZadnja: kosa, visinaSignalaZadnja: Number(r1.visinaSignala),
+    horizDuzinaZadnja: horizZadnja,
+    brGirusa: 0, brGirusaUkupno: 0, pregledGirusa: [], girusDetalji: [],
+    samoOrijentacija: true,
+  };
+}
+
 // zenitni kut: II položaj = 360 - z2 ; sredina s z1
 function zenitSredina(z1, z2) {
   const z2c = 360 - z2;
@@ -260,8 +291,8 @@ function decUStr(dec) {
 }
 
 if (typeof window !== "undefined") {
-  window.Girus = { parsirajUgao, obradiStanicu, decUStr };
+  window.Girus = { parsirajUgao, obradiStanicu, obradiOrijentaciju, decUStr };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { parsirajUgao, obradiStanicu, decUStr, sredinaIIpolozaj, prosjekKruzni };
+  module.exports = { parsirajUgao, obradiStanicu, obradiOrijentaciju, decUStr, sredinaIIpolozaj, prosjekKruzni };
 }

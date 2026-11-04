@@ -122,26 +122,36 @@ function ucitajRedove(redovi) {
   if (!stanice.length) throw new Error("Nije pronađeno nijedno mjerenje. Provjerite zaglavlje stupaca.");
 
   // Na svakoj stanici odvoji girusna mjerenja (vlak) od detaljnih tačaka.
-  stanice.forEach((s) => {
-    const { girus, detalji } = razdvojiGirusIDetalje(s.mjerenja);
+  stanice.forEach((s, i) => {
+    // zadnja stanica može biti bez girusa (slijepi vlak): vizura unazad na prethodnu stanicu + detalji
+    const prethodna = (i === stanice.length - 1 && i > 0) ? stanice[i - 1].stanica : null;
+    const { girus, detalji, orijentacija } = razdvojiGirusIDetalje(s.mjerenja, prethodna);
     s.sviRedovi = s.mjerenja;   // sva mjerenja, originalnim redoslijedom (za obrazac TZ)
     s.mjerenja = girus;         // samo girus (4 vizure po girusu)
     s.detalji = detalji;        // detaljne tačke (po jedno mjerenje, I položaj)
+    if (orijentacija) s.orijentacija = orijentacija;   // 1–2 reda: vizura unazad (bez girusa)
   });
   return stanice;
 }
 
 /* Girus = 4 reda: ZADNJA, PREDNJA, PREDNJA, ZADNJA (isti nazivi tačaka u svakom girusu).
    Redovi iza zadnjeg potpunog girusa su detaljne tačke.                             */
-function razdvojiGirusIDetalje(m) {
+function razdvojiGirusIDetalje(m, prethodna) {
   const naz = (r) => String(r.vizura || "").trim();
-  if (m.length < 4) return { girus: m, detalji: [] };
+  // zadnja stanica bez girusa: vizura unazad na prethodnu stanicu (1 ili 2 reda: I i II položaj)
+  const bezGirusa = () => {
+    if (!prethodna || !m.length) return null;
+    let j = 0;
+    while (j < m.length && j < 2 && naz(m[j]) === String(prethodna).trim()) j++;
+    return j > 0 ? { girus: [], detalji: m.slice(j), orijentacija: m.slice(0, j) } : null;
+  };
+  if (m.length < 4) return bezGirusa() || { girus: m, detalji: [] };
   const Z = naz(m[0]), P = naz(m[1]);
   let k = 0;
   while (k + 4 <= m.length &&
          naz(m[k]) === Z && naz(m[k + 1]) === P &&
          naz(m[k + 2]) === P && naz(m[k + 3]) === Z) k += 4;
-  if (k === 0) return { girus: m, detalji: [] };   // ne liči na girus — neka obrada javi grešku
+  if (k === 0) return bezGirusa() || { girus: m, detalji: [] };   // ne liči na girus — neka obrada javi grešku
   return { girus: m.slice(0, k), detalji: m.slice(k) };
 }
 
@@ -159,7 +169,9 @@ function pripremiIzStanica(stanice, izbori) {
   const obradjene = [];
   const greske = [];
   for (const s of stanice) {
-    const r = G.obradiStanicu(s.stanica, s.visinaInstr, s.mjerenja, izbori && izbori[obradjene.length]);
+    const r = s.orijentacija
+      ? G.obradiOrijentaciju(s.stanica, s.visinaInstr, s.orijentacija)
+      : G.obradiStanicu(s.stanica, s.visinaInstr, s.mjerenja, izbori && izbori[obradjene.length]);
     if (r.greska) greske.push(r.greska);
     r.detalji = s.detalji || [];          // detaljne tačke ove stanice
     obradjene.push(r);

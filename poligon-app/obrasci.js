@@ -93,7 +93,7 @@ function obrazac19(r, ctx) {
     const tk = tocke[i];
     const naz = tk ? tk.naziv : "";
     // mali red popravke vβ (iznad prelomnog ugla)
-    redovi += red(["", "", `<span class="mali">${vbeta}</span>`, "", "", "", "", "", "", ""], "tanko");
+    if (!r.slijepi) redovi += red(["", "", `<span class="mali">${vbeta}</span>`, "", "", "", "", "", "", ""], "tanko");
 
     // glavni red tačke
     const imaStr = (i < r.brStranica);               // stranica postoji (osim zadnje tačke)
@@ -108,6 +108,13 @@ function obrazac19(r, ctx) {
     ]);
   }
 
+  if (r.slijepi) {
+    // zadnja (nova) tačka slijepog vlaka: koordinate + smjer unazad prema prethodnoj tački
+    const z = tocke[r.n];
+    redovi += red(["", z.naziv, "", ug(r.alfaZadnjeUnazad), "", "", "", fz(z.Y, 3), fz(z.X, 3), z.naziv]);
+  }
+
+  if (!r.slijepi) {
   // --- Σ red (sume dužina i priraštaja) ---
   redovi += red([
     "", "Σ", "", "", fz(r.sumaD,3),
@@ -121,6 +128,7 @@ function obrazac19(r, ctx) {
   redovi += red(["", "ima", formatBigAngle(r.ima), "", "fd=", fz(r.fd,3), "", "", "", ""]);
   redovi += red(["", "f<sub>β</sub>=", fbetaStr, "Δβ= "+dBetaStr, "Δd=", fz(r.dopustenoFd,3), "", "", "", ""]);
   redovi += red(["", "v<sub>β</sub>=", vbeta, "", "", "", "", "", "", ""]);
+  }
 
   // nekoliko praznih redova
   for (let i = 0; i < 4; i++) redovi += `<tr>${'<td>&nbsp;</td>'.repeat(PRAZNO)}</tr>`;
@@ -251,6 +259,20 @@ function obrazac1i2(obradjeneStanice) {
   let redovi = "";
   (obradjeneStanice || []).forEach((st) => {
     if (st.greska || !st.girusDetalji) return;
+    if (st.samoOrijentacija) {
+      // zadnja stanica slijepog vlaka: samo vizura unazad (orijentacija)
+      redovi += `<tr>
+        <td class="c">${st.stanica}</td>
+        <td class="c">${st.nazZadnja}</td>
+        <td class="c">${ug(st.pravacZadnja)}</td>
+        <td class="c">${ug((st.pravacZadnja + 180) % 360)}</td>
+        <td class="c mali"></td>
+        <td class="c">${ug(st.pravacZadnja)}</td>
+        <td class="c">${ug(0)}</td>
+        <td class="c">${ug(0)}</td>
+      </tr><tr class="tz-vi"><td colspan="8">&nbsp;</td></tr>`;
+      return;
+    }
     const brG = st.girusDetalji.length;
 
     st.girusDetalji.forEach((gd, gi) => {
@@ -344,7 +366,16 @@ function obrazac1V(obradjeneStanice) {
 
   let redovi = "";
   (obradjeneStanice || []).forEach((st) => {
-    if (st.greska || !st.girusDetalji || !st.girusDetalji.length) return;
+    if (st.greska) return;
+    if (st.samoOrijentacija) {
+      redovi += redPara(st.stanica, st.visinaInstr, {
+        vizura: st.nazZadnja, zenitKL: st.zenitZadnja, zenitKD: 360 - st.zenitZadnja,
+        zbrojZen: 360, dvostrukiVis: 2 * st.zenitZadnja, srZenit: st.zenitZadnja,
+        visSignala: st.visinaSignalaZadnja });
+      redovi += `<tr class="razmak"><td colspan="6">&nbsp;</td></tr>`;
+      return;
+    }
+    if (!st.girusDetalji || !st.girusDetalji.length) return;
     const gd = st.girusDetalji[st.girusDetalji.length - 1]; // vertikalni uglovi — iz zadnjeg girusa (kao u Excelu)
     // red na zadnju i na prednju
     redovi += redPara(st.stanica, st.visinaInstr, gd.zadnja);
@@ -473,7 +504,7 @@ function obrazac8(date) {
   }
 
   // polazni smjer A->B i dolazni C->D
-  const redovi = blok(date.A, date.B) + blok(date.C, date.D);
+  const redovi = blok(date.A, date.B) + (date.C && date.D ? blok(date.C, date.D) : "");
 
   return `
   <div class="obrazac-naslov-linija">Trigonom. obrazac br.8 — Direkcioni uglovi i odstojanja</div>
@@ -631,12 +662,12 @@ function obrazacK(rez) {
       <td class="d">${fz(sDHpopr, 3)}</td>
       <td class="d"></td>
     </tr>
-    <tr class="tz-sum">
+    ${rez.slijepi ? "" : `<tr class="tz-sum">
       <td colspan="10">
         f<sub>h</sub> = ${fhMM} mm &nbsp;&nbsp;|&nbsp;&nbsp;
         dozvoljeno &Delta;h = &plusmn;${dopMM} mm &nbsp;(${ok})
       </td>
-    </tr>`;
+    </tr>`}`;
 
   return `
   <div class="obrazac-naslov-linija">Obrazac „K" — Izravnanje visina</div>
