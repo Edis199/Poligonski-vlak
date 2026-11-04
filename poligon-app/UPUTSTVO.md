@@ -119,7 +119,9 @@ tačaka (po jedno mjerenje u I položaju). Aplikacija ih sama prepoznaje.
 - Nakon izračuna detalji se računaju iz izravnatih koordinata i visina stanica
   (orijentacija na zadnju tačku, polarna metoda; visina uz korekciju zakrivljenosti i refrakcije).
 - Rezultat je u obrascu **„Računanje detalja"** (kartica Geodetski obrasci), a može se izvesti i kao
-  TXT (`Y;X;H;broj;H`) preko **„Detaljne tačke (TXT)"** na kartici Ispis / Izvoz.
+  TXT preko dugmadi „Tačke vlaka (TXT)" i „Detaljne tačke (TXT)" na kartici Ispis / Izvoz.
+  To su dva odvojena fajla (`tacke_vlaka.txt`, `detaljne_tacke.txt`), red po tački: `broj,Y,X,H,kod`
+  (razdvojeno zarezom, decimalna tačka; kod je iz kolone Kod u zapisniku).
 
 ### 2. Rezultati
 Prikazuje:
