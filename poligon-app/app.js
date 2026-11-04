@@ -110,7 +110,8 @@ function obrisiStareDateTacke(noviNazivi) {
 function osvjeziPoljaRedukcije() {
   const nacin = document.getElementById("redukcijaNacin").value;
   document.getElementById("redukcijaFaktor").style.display = nacin === "rucno" ? "inline-block" : "none";
-  document.getElementById("m0Blok").style.display = nacin === "auto" ? "inline-block" : "none";
+  document.getElementById("faktorBlok").style.display = nacin === "rucno" ? "inline-flex" : "none";
+  document.getElementById("m0Blok").style.display = nacin === "auto" ? "inline-flex" : "none";
 }
 document.getElementById("redukcijaNacin").addEventListener("change", osvjeziPoljaRedukcije);
 osvjeziPoljaRedukcije();

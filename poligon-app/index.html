@@ -121,16 +121,20 @@
     </div>
 
     <div class="redukcija-blok">
-      <label for="redukcijaNacin"><b>Redukcija dužina na nultu plohu:</b></label>
-      <select id="redukcijaNacin">
-        <option value="auto" selected>Dužina u projekcijskoj ravni</option>
-        <option value="nema">Horizontalna dužina</option>
-        <option value="rucno">Ručno unesen faktor</option>
-      </select>
-      <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none;width:130px" />
-      <label id="m0Blok" for="redukcijaM0">m<sub>0</sub> (mjerilo na srednjem meridijanu):
-        <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" style="width:90px" />
-      </label>
+      <div class="redukcija-naslov">Vrsta dužine za izračun</div>
+      <div class="redukcija-red">
+        <select id="redukcijaNacin">
+          <option value="auto" selected>Dužina u projekcijskoj ravni</option>
+          <option value="nema">Horizontalna dužina</option>
+          <option value="rucno">Ručno unesen faktor</option>
+        </select>
+        <label id="faktorBlok" for="redukcijaFaktor">Faktor&nbsp;k:
+          <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none" />
+        </label>
+        <label id="m0Blok" for="redukcijaM0">m<sub>0</sub> (mjerilo na srednjem meridijanu):
+          <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" />
+        </label>
+      </div>
       <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
         Horizontalne dužine iz zapisnika množe se ovim faktorom pri izračunu.</div>
     </div>

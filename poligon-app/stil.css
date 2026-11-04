@@ -80,8 +80,22 @@ input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,
 .tabela-date input{width:100%;min-width:90px;box-sizing:border-box;margin:0}
 .tabela-date input[readonly]{background:#eef2f7;color:#64748b}
 .zatvoreni-vlak{display:block;margin:10px 0 4px;font-size:14px}
-.redukcija-blok{margin:10px 0}
-.redukcija-blok label{margin-right:8px}
+.redukcija-blok{
+  margin:16px 0;padding:16px 18px;
+  background:#f7fbff;border:1px solid var(--obrub);
+  border-left:4px solid var(--plava);border-radius:10px;
+}
+.redukcija-naslov{font-size:15px;font-weight:700;color:var(--plava-tamna);margin-bottom:10px}
+.redukcija-red{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.redukcija-red label{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--tekst)}
+.redukcija-blok select{
+  font-size:15px;padding:9px 12px;min-width:240px;
+  border:1px solid var(--obrub);border-radius:8px;background:#fff;color:var(--tekst);cursor:pointer;
+}
+.redukcija-blok select:hover{border-color:var(--plava)}
+.redukcija-blok select:focus,.redukcija-blok input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 3px rgba(30,90,168,.15)}
+.redukcija-blok input{font-size:14px;padding:8px 10px;width:130px;border:1px solid var(--obrub);border-radius:8px}
+.redukcija-blok .napomena{margin-top:10px}
 .tabela tr:nth-child(even) td{background:#fafcfe}
 
 .sazetak-kartice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 24px}
