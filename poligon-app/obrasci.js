@@ -222,7 +222,7 @@ function obrazacTZ(ucitaneStanice, lokalitet) {
     <thead>
       <tr><td colspan="9" class="naslov">TAHIMETRIJSKI ZAPISNIK</td></tr>
       <tr class="podnaslov-red">
-        <td class="c" colspan="2" style="text-align:left">LOKALITET: ${lokalitet || ""}</td>
+        <td class="c" colspan="2">LOKALITET: ${lokalitet || ""}</td>
         <td colspan="7"></td>
       </tr>
       <tr class="zaglavlje-red">
@@ -612,7 +612,7 @@ function obrazacK(rez) {
 
   const suma = `
     <tr class="tz-sum">
-      <td class="c" colspan="2" style="text-align:right">&Sigma;</td>
+      <td class="c" colspan="2">&Sigma;</td>
       <td class="d">${fz(sPrvo, 3)}</td>
       <td class="d">${fz(sDrugo, 3)}</td>
       <td class="d">${fz(sSred, 3)}</td>
@@ -623,7 +623,7 @@ function obrazacK(rez) {
       <td class="d"></td>
     </tr>
     <tr class="tz-sum">
-      <td colspan="10" style="text-align:center">
+      <td colspan="10">
         f<sub>h</sub> = ${fhMM} mm &nbsp;&nbsp;|&nbsp;&nbsp;
         dozvoljeno &Delta;h = &plusmn;${dopMM} mm &nbsp;(${ok})
       </td>

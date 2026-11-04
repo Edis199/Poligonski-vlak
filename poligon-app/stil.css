@@ -146,8 +146,8 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazac th:last-child,.obrazac td:last-child{border-right:none}
 .obrazac .naslov{font-weight:bold;font-size:14px;letter-spacing:.5px;padding:6px}
 .obrazac .zaglavlje-red th{font-weight:600;height:72px}
-.obrazac td.c{text-align:center}
-.obrazac td.d{text-align:right;padding-right:12px;font-variant-numeric:tabular-nums}
+.obrazac th,.obrazac td,.obrazac td.c,.obrazac td.d{text-align:center !important;vertical-align:middle !important}
+.obrazac td.d{font-variant-numeric:tabular-nums}
 .obrazac .sekcija{font-weight:400;letter-spacing:.6px;color:var(--plava-tamna);background:#eef4fb}
 .obrazac .crvena{color:#c0392b}
 .obrazac .crveni-tekst td{color:#c0392b;font-weight:400}
@@ -188,7 +188,11 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 
 /* Ispis OBRAZACA (kad body ima klasu print-obrasci) — svaki obrazac na A4 */
 @media print{
-  @page { size:A4 portrait; margin:10mm; }
+  /* margina 0 = preglednik ne ispisuje zaglavlje/podnožje (naslov, adresa, datum) */
+  @page { size:A4 portrait; margin:0; }
+  body.print-obrasci{margin:0;padding:0}
+  body.print-obrasci .obrazac-stranica{padding:10mm}
+  body.print-rezultati{padding:10mm}
 
   body.print-obrasci{background:#fff}
   body.print-obrasci .kartice,
