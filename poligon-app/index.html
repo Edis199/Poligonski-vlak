@@ -135,8 +135,12 @@
           <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" />
         </label>
       </div>
-      <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).
-        Horizontalne dužine iz zapisnika množe se ovim faktorom pri izračunu.</div>
+      <ul class="redukcija-opis">
+        <li><b>Dužina u projekcijskoj ravni</b> — horizontalne dužine iz zapisnika (sredina iz obostranih mjerenja) množe se faktorom k i svode na državni koordinatni sistem (spuštanje na nivo mora + ispravka Gauss-Krügerove projekcije). Faktor k aplikacija računa sama iz visina H i koordinate Y datih tačaka. <i>Preporučeno za većinu računanja.</i></li>
+        <li><b>Horizontalna dužina</b> — uzimaju se horizontalne dužine kako su izmjerene na terenu (sredina iz obostranih mjerenja), bez svođenja na projekciju (k = 1). Za male/lokalne mreže ili već svedena mjerenja.</li>
+        <li><b>Ručno unesen faktor</b> — sam upisuješ faktor k kojim se množe dužine (npr. kad ga imaš iz drugog izvora).</li>
+      </ul>
+      <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).</div>
     </div>
 
     <div id="rucniUnos" style="display:none" aria-hidden="true">
