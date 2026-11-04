@@ -298,16 +298,21 @@ function izracunajSlijepi() {
 /* ---------- Prikaz rezultata ---------- */
 // Prikaz ugla iz sekundi u obliku  M'SS"  (ili samo SS" ako < 60").
 // predznak=true dodaje + ili - ispred.
-function sekMinSek(ukupnoSek, predznak) {
+function sekMinSek(ukupnoSek, predznak, bezDecimala) {
   const neg = ukupnoSek < 0;
   let s = Math.abs(ukupnoSek);
-  const min = Math.floor(s / 60);
-  const sek = s - min * 60;
+  const dec = bezDecimala ? 0 : 1;
+  const sirina = bezDecimala ? 2 : 4;
+  let min = Math.floor(s / 60);
+  let sek = s - min * 60;
+  // zaokruži sekunde na traženi broj decimala (pazi na prelazak u minute)
+  sek = Number(sek.toFixed(dec));
+  if (sek >= 60) { sek -= 60; min += 1; }
   let txt;
   if (min > 0) {
-    txt = `${min}'${sek.toFixed(1).padStart(4, "0")}"`;
+    txt = `${min}'${sek.toFixed(dec).padStart(sirina, "0")}"`;
   } else {
-    txt = `${sek.toFixed(1)}"`;
+    txt = `${sek.toFixed(dec)}"`;
   }
   if (predznak) txt = (neg ? "-" : "+") + txt;
   else if (neg) txt = "-" + txt;
@@ -328,7 +333,7 @@ function prikaziRezultate(r, rv) {
       ${SL ? "" : `<div class="sk ${kutnoKlasa}">
         <div class="oznaka">Uglovno odstupanje f&beta;</div>
         <div class="vrijednost">${sekMinSek(r.fBetaSek, true)}</div>
-        <div class="napomena">dopušteno ±${sekMinSek(r.dopustenoFbetaSek, false)}</div>
+        <div class="napomena">dopušteno ±${sekMinSek(r.dopustenoFbetaSek, false, true)}</div>
       </div>
       <div class="sk ${linKlasa}">
         <div class="oznaka">Linearno odstupanje f<sub>d</sub></div>
@@ -471,10 +476,23 @@ function nacrtaj(r) {
   const tocke = r.tocke;
   if (!tocke || !tocke.length) return;
 
-  const ys = tocke.map((t) => t.Y);
-  const xs = tocke.map((t) => t.X);
-  const minY = Math.min(...ys), maxY = Math.max(...ys);
-  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  // orijentacione tačke A (pozadi) i D (naprijed) iz polja — prikazuju se u crtežu
+  const orijent = [];
+  const prvaVlaka = tocke[0], zadnjaVlaka = tocke[tocke.length - 1];
+  try {
+    const d = dateTackeABCD();
+    if (d.A && !isNaN(d.A.Y) && !isNaN(d.A.X) && (d.A.Y || d.A.X)) {
+      orijent.push({ naziv: d.A.naziv || "A", Y: d.A.Y, X: d.A.X, veza: prvaVlaka });
+    }
+    if (d.D && !isNaN(d.D.Y) && !isNaN(d.D.X) && (d.D.Y || d.D.X)) {
+      orijent.push({ naziv: d.D.naziv || "D", Y: d.D.Y, X: d.D.X, veza: zadnjaVlaka });
+    }
+  } catch (e) { /* ignoriraj ako polja nisu dostupna */ }
+
+  const sveY = tocke.map((t) => t.Y).concat(orijent.map((t) => t.Y));
+  const sveX = tocke.map((t) => t.X).concat(orijent.map((t) => t.X));
+  const minY = Math.min(...sveY), maxY = Math.max(...sveY);
+  const minX = Math.min(...sveX), maxX = Math.max(...sveX);
   const pad = 60;
   const sirina = c.width - 2 * pad;
   const visina = c.height - 2 * pad;
@@ -486,6 +504,18 @@ function nacrtaj(r) {
   const px = (Y) => pad + (Y - minY) * skala;
   const py = (X) => c.height - pad - (X - minX) * skala;
 
+  // crtkane linije orijentacije (A→B, C→D)
+  ctx.strokeStyle = "#f0a40d";
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6, 5]);
+  orijent.forEach((o) => {
+    ctx.beginPath();
+    ctx.moveTo(px(o.veza.Y), py(o.veza.X));
+    ctx.lineTo(px(o.Y), py(o.X));
+    ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
   // linije vlaka
   ctx.strokeStyle = "#1e5aa8";
   ctx.lineWidth = 2;
@@ -495,6 +525,16 @@ function nacrtaj(r) {
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
   ctx.stroke();
+
+  // orijentacione tačke (kvadratić, narandžasto)
+  orijent.forEach((o) => {
+    const x = px(o.Y), y = py(o.X);
+    ctx.fillStyle = "#f0a40d";
+    ctx.fillRect(x - 5, y - 5, 10, 10);
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "13px Segoe UI";
+    ctx.fillText(o.naziv, x + 9, y - 6);
+  });
 
   // tačke i oznake
   tocke.forEach((t) => {
@@ -525,6 +565,10 @@ function nacrtaj(r) {
   ctx.fillStyle = "#1f9d55";
   ctx.beginPath(); ctx.arc(pad + 120, 31, 5, 0, 2 * Math.PI); ctx.fill();
   ctx.fillStyle = "#1e293b"; ctx.fillText("nove tačke", pad + 132, 35);
+  // kvadratić — orijentacione
+  ctx.fillStyle = "#f0a40d";
+  ctx.fillRect(pad + 228, 26, 10, 10);
+  ctx.fillStyle = "#1e293b"; ctx.fillText("orijentacione tačke", pad + 244, 35);
 }
 
 /* ---------- Izvoz u PDF (preko ispisa) ---------- */
@@ -663,11 +707,9 @@ function prikaziPanelGirusa(obradjene) {
   okvir.style.display = "block";
   let html = `<table><thead><tr><th>Stanica</th>`;
   for (let g = 1; g <= maxG; g++) html += `<th>Girus ${g}</th>`;
-  html += `<th>Sredina</th><th>Rasipanje</th></tr></thead><tbody>`;
+  html += `<th>Sredina</th></tr></thead><tbody>`;
   obradjene.forEach((o, i) => {
     const pg = o.pregledGirusa || [];
-    const koristeni = pg.filter((p) => p.koristi).map((p) => p.reduk);
-    const raspon = koristeni.length > 1 ? Math.round((Math.max(...koristeni) - Math.min(...koristeni)) * 3600) : 0;
     html += `<tr class="${pg.length >= 3 ? "tri-girusa" : ""}"><td>${o.stanica}</td>`;
     for (let g = 0; g < maxG; g++) {
       const p = pg[g];
@@ -675,7 +717,7 @@ function prikaziPanelGirusa(obradjene) {
         ? `<td class="${p.koristi ? "" : "isklj"}"><label><input type="checkbox" data-stan="${i}" data-g="${g}" ${p.koristi ? "checked" : ""} /> ${window.Girus.decUStr(p.reduk)}</label></td>`
         : `<td></td>`;
     }
-    html += `<td>${window.Girus.decUStr(o.prelomniUgao)}</td><td>${raspon ? raspon + "″" : "—"}</td></tr>`;
+    html += `<td>${window.Girus.decUStr(o.prelomniUgao)}</td></tr>`;
   });
   html += `</tbody></table>`;
   const panel = document.getElementById("girusPanel");
