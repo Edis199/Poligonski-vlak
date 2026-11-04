@@ -141,6 +141,11 @@ Svaki se obrazac može ispisati pojedinačno, ili svi odjednom
 (**„Ispiši SVE obrasce"**) — svaki ide na zaseban A4 list, s automatskom
 numeracijom strana (npr. „Strana 2 / 3") kad obrazac prelazi na sljedeću stranu.
 
+**Napomena o ispisu svih obrazaca:** Chrome i Edge ne mogu u jednom ispisu miješati uspravne i landscape
+strane (veličina prve strane vrijedi za sve). Zato „Ispiši SVE obrasce" ispisuje **dva dokumenta**:
+prvo svi uspravni obrasci (A4 portrait), pa zasebno „Detaljne tačke" (A4 landscape). Aplikacija te pita
+prije svakog dokumenta. U dijalogu ispisa ostavi margine „Bez" i ne mijenjaj orijentaciju.
+
 ### 5. Ispis / Izvoz
 - **Izvoz u Excel (CSV)** — sprema tabelu koordinata (Excel je otvara direktno).
 - **Ispis / Spremi u PDF** — otvara dijalog štampe; odaberite „Spremi kao PDF".

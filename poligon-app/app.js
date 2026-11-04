@@ -774,28 +774,65 @@ document.getElementById("stampajSve").addEventListener("click", () => {
 // Obrasci koji se ispisuju na A4 LANDSCAPE (ostali su uspravni).
 const LANDSCAPE_OBRASCI = ["det"];
 
-// Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
-function ispisiObrasce(lista) {
-  const el = document.getElementById("obrazacSadrzaj");
-  const original = el.innerHTML;         // zapamti trenutni prikaz
+/* Složi odabrane obrasce, svaki na svoj A4 list, pa pokreni ispis.
+   Preglednici (Chrome/Edge) ne podržavaju uspravne i landscape strane u JEDNOM ispisu
+   (veličina prve strane vrijedi za sve), pa se obrasci ispisuju u zasebnim dokumentima
+   po orijentaciji: prvo uspravni, zatim landscape. */
+async function ispisiObrasce(lista) {
+  const uspravni = lista.filter((k) => !LANDSCAPE_OBRASCI.includes(k));
+  const landscape = lista.filter((k) => LANDSCAPE_OBRASCI.includes(k));
 
-  // 1) složi sve obrasce
-  let html = "";
-  lista.forEach((kod) => {
-    const sadrzaj = generirajObrazacHTML(kod);
-    if (sadrzaj) html += `<div class="obrazac-stranica${LANDSCAPE_OBRASCI.includes(kod) ? " ls" : ""}" data-kod="${kod}">${sadrzaj}</div>`;
+  if (uspravni.length && landscape.length) {
+    const ok = confirm(
+      "Obrasci se ispisuju u DVA dokumenta jer imaju različitu orijentaciju:\n" +
+      "  1) uspravni obrasci (A4 portrait)\n" +
+      "  2) Detaljne tačke (A4 landscape)\n\nNastaviti?");
+    if (!ok) return;
+  }
+
+  if (uspravni.length) await ispisiGrupu(uspravni);
+
+  if (landscape.length) {
+    if (uspravni.length && !confirm("Sada slijedi ispis obrasca Detaljne tačke (A4 landscape). Nastaviti?")) return;
+    await ispisiGrupu(landscape);
+  }
+}
+
+// Ispis jedne grupe obrazaca iste orijentacije; vraća Promise kad je ispis završen.
+function ispisiGrupu(kodovi) {
+  return new Promise((resolve) => {
+    const el = document.getElementById("obrazacSadrzaj");
+    const original = el.innerHTML;         // zapamti trenutni prikaz
+
+    // 1) složi obrasce
+    let html = "";
+    kodovi.forEach((kod) => {
+      const sadrzaj = generirajObrazacHTML(kod);
+      if (sadrzaj) html += `<div class="obrazac-stranica${LANDSCAPE_OBRASCI.includes(kod) ? " ls" : ""}" data-kod="${kod}">${sadrzaj}</div>`;
+    });
+    el.innerHTML = html;
+    document.body.classList.add("print-obrasci");
+
+    // 2) razbij svaki obrazac na A4 stranice po visini i dodaj "Strana N / M"
+    paginirajObrasce(el);
+
+    let zavrseno = false;
+    const zavrsi = () => {
+      if (zavrseno) return;
+      zavrseno = true;
+      window.removeEventListener("afterprint", zavrsi);
+      el.innerHTML = original;
+      document.body.classList.remove("print-obrasci");
+      resolve();
+    };
+    window.addEventListener("afterprint", zavrsi);
+
+    const t0 = performance.now();
+    window.print();
+    // Chrome/Edge: print() blokira dok je dijalog otvoren — kad se vrati, ispis je gotov.
+    // Ostali preglednici vraćaju odmah; tada se čeka događaj "afterprint".
+    if (performance.now() - t0 > 300) setTimeout(zavrsi, 400);
   });
-  el.innerHTML = html;
-  document.body.classList.add("print-obrasci");
-
-  // 2) razbij svaki obrazac na A4 stranice po visini i dodaj "Strana N / M"
-  paginirajObrasce(el);
-
-  window.print();
-  setTimeout(() => {
-    el.innerHTML = original;
-    document.body.classList.remove("print-obrasci");
-  }, 600);
 }
 
 /* Razbija svaki obrazac (tablicu) na više A4 stranica po visini,
