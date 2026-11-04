@@ -92,11 +92,15 @@ function obrazac19(r, ctx) {
   for (let i = 0; i < r.n; i++) {
     const tk = tocke[i];
     const naz = tk ? tk.naziv : "";
-    // mali red popravke vβ (iznad prelomnog ugla)
-    if (!r.slijepi) redovi += red(["", "", `<span class="mali">${vbeta}</span>`, "", "", "", "", "", "", ""], "tanko");
-
-    // glavni red tačke
     const imaStr = (i < r.brStranica);               // stranica postoji (osim zadnje tačke)
+    // mali red: popravka ugla vβ + popravke koordinatnih razlika vy, vx (iznad glavnog reda)
+    if (!r.slijepi) {
+      const vyTxt = imaStr ? `<span class="mali">${fz(r.vy[i], 3)}</span>` : "";
+      const vxTxt = imaStr ? `<span class="mali">${fz(r.vx[i], 3)}</span>` : "";
+      redovi += red(["", "", `<span class="mali">${vbeta}</span>`, "", "", vyTxt, vxTxt, "", "", ""], "tanko");
+    }
+
+    // glavni red tačke (koordinatne razlike BEZ popravke)
     const dir = (i < r.alfe.length && imaStr) ? ug(r.alfe[i]) : "";
     const duz = imaStr ? fz(r.d[i], 2) : "";
     const dy  = imaStr ? fz(r.dy[i], 3) : "";
