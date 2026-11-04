@@ -729,6 +729,13 @@ document.getElementById("stampajObrazac").addEventListener("click", () => {
   ispisiObrasce([trenutniObrazac]);
 });
 
+document.getElementById("izvozVlakTxt").addEventListener("click", () => {
+  if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
+  const visine = zadnjiRezultatVisine ? zadnjiRezultatVisine.tocke.map((t) => t.H) : null;
+  const blob = new Blob([window.Detalj.tackeVlakaUTxt(zadnjiRezultat, visine)], { type: "text/plain;charset=utf-8" });
+  preuzmi(blob, "tacke_vlaka.txt");
+});
+
 document.getElementById("izvozDetaljiTxt").addEventListener("click", () => {
   if (!zadnjiDetalji || !zadnjiDetalji.ukupno) { alert("Nema izračunatih detaljnih tačaka. Učitajte zapisnik s detaljem i kliknite Izračunaj izravnanje."); return; }
   const blob = new Blob([window.Detalj.detaljiUTxt(zadnjiDetalji)], { type: "text/plain;charset=utf-8" });

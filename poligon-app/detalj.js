@@ -106,20 +106,34 @@ function izracunajDetalje(stanice, tocke, A, visine) {
   return { stanice: izlaz, ukupno, preskoceno };
 }
 
-/* Tekstualni izvoz — format iz Excela (stupac "Priprema za txt"):  Y;X;H;broj;H
-   (decimalni zarez, razdjelnik ;).                                                */
+/* Tekstualni izvoz — raspored: broj tačke, Y, X, H, kod (razdvojeno zarezom, decimalna tačka).
+   Dva odvojena fajla: tačke vlaka i detaljne tačke.                                           */
+function _txtRed(naziv, Y, X, H, kod) {
+  const br = (v) => (v === null || v === undefined || isNaN(v)) ? "" : Number(v).toFixed(3);
+  return [naziv, br(Y), br(X), br(H), kod || ""].join(",");
+}
+
+// detaljne tačke (iz rezultata izracunajDetalje)
 function detaljiUTxt(rez) {
-  const zarez = (v) => (v === null || v === undefined || isNaN(v)) ? "" : String(v).replace(".", ",");
   const linije = [];
-  rez.stanice.forEach((s) => s.tacke.forEach((t) => {
-    linije.push([zarez(t.Y), zarez(t.X), zarez(t.H), t.naziv, zarez(t.H)].join(";"));
-  }));
+  rez.stanice.forEach((s) => s.tacke.forEach((t) => linije.push(_txtRed(t.naziv, t.Y, t.X, t.H, t.kod))));
   return linije.join("\r\n");
 }
 
+// tačke vlaka: r = rezultat izravnanja (r.tocke), visine = niz H istim redom ili null
+function tackeVlakaUTxt(r, visine) {
+  let tocke = r.tocke.map((t, i) => ({ naziv: t.naziv, Y: t.Y, X: t.X, H: visine ? visine[i] : null }));
+  // zatvoren vlak: zadnja tačka je ista kao prva — ne ponavljaj je
+  if (tocke.length > 1) {
+    const p = tocke[0], z = tocke[tocke.length - 1];
+    if (p.naziv === z.naziv && Math.abs(p.Y - z.Y) < 1e-6 && Math.abs(p.X - z.X) < 1e-6) tocke = tocke.slice(0, -1);
+  }
+  return tocke.map((t) => _txtRed(t.naziv, t.Y, t.X, t.H, "")).join("\r\n");
+}
+
 if (typeof window !== "undefined") {
-  window.Detalj = { racunajDetalj, izracunajDetalje, detaljiUTxt };
+  window.Detalj = { racunajDetalj, izracunajDetalje, detaljiUTxt, tackeVlakaUTxt };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { racunajDetalj, izracunajDetalje, detaljiUTxt };
+  module.exports = { racunajDetalj, izracunajDetalje, detaljiUTxt, tackeVlakaUTxt };
 }
