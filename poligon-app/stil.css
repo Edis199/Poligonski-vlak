@@ -224,3 +224,12 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
+
+/* Kontrola girusa */
+.girus-panel{margin:10px 0;padding:8px 12px;background:#f6f9fd;border:1px solid var(--obrub);border-radius:8px}
+.girus-panel summary{cursor:pointer;color:var(--plava-tamna)}
+.girus-panel table{border-collapse:collapse;margin-top:6px;font-size:13px}
+.girus-panel th,.girus-panel td{border:1px solid var(--obrub);padding:4px 10px;text-align:center}
+.girus-panel th{background:var(--svijetla);color:var(--plava-tamna)}
+.girus-panel td.isklj{color:#94a3b8;text-decoration:line-through}
+.girus-panel tr.tri-girusa td:first-child{font-weight:700}

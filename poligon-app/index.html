@@ -53,6 +53,12 @@
         </label>
         <span id="statusUcitavanja" class="napomena"></span>
       </div>
+      <details id="girusPanelOkvir" class="girus-panel" style="display:none">
+        <summary><b>Kontrola girusa</b> — izbor girusa koji se koriste u obradi</summary>
+        <p class="napomena">Za svaki girus prikazan je redukovani ugao (prednja − zadnja). Girus koji ne želite koristiti
+          (npr. loše mjerenje) isključite kvačicom; sredina se tada računa iz preostalih. Nakon promjene ponovo kliknite „Izračunaj".</p>
+        <div id="girusPanel"></div>
+      </details>
       <div class="info" style="font-size:13px">
         <b>Girusna metoda:</b> red po stanici ide <b>zadnja → prednja → prednja (II položaj) → zadnja (II položaj)</b>.
         Dozvoljeno 1, 2 ili 3 girusa po stanici. Stanicu i visinu instrumenta upišite samo u prvom redu stanice.
@@ -117,6 +123,12 @@
     </div>
 
     <div class="redukcija-blok">
+      <label for="tolerancijeNacin"><b>Dozvoljena odstupanja:</b></label>
+      <select id="tolerancijeNacin">
+        <option value="nove" selected>Prema obrascima 2019 (20″√n; 0,03+0,001√Σd+0,00012Σd)</option>
+        <option value="stare">Raniji Excel (45″√n; 0,05+0,0045√Σd+0,0003Σd)</option>
+      </select>
+      <br />
       <label for="redukcijaNacin"><b>Redukcija dužina na nultu plohu:</b></label>
       <select id="redukcijaNacin">
         <option value="auto">Automatski (iz visina H tačaka B i C i koordinate Y)</option>

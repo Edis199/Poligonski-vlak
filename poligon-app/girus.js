@@ -71,12 +71,17 @@ function sredinaIIpolozaj(ug1, ug2) {
    mjerenja = niz redova (po 4 vizure × broj girusa), svaki red:
      { vizura, horiz, zenit, kosa, visinaSignala }
    Vraća: { zadnja, prednja, prelomniUgao(dec), horizDuzina, ... }       */
-function obradiStanicu(stanica, visinaInstr, mjerenja) {
+function obradiStanicu(stanica, visinaInstr, mjerenja, izbor) {
   const n = mjerenja.length;
   if (n % 4 !== 0) {
     return { greska: `Stanica ${stanica}: broj mjerenja (${n}) nije djeljiv s 4 (girus = 4 vizure).` };
   }
-  const brGirusa = n / 4;
+  const brGirusaUkupno = n / 4;
+
+  // izbor girusa: niz true/false (koji girusi se koriste); bez izbora koriste se svi
+  const koristi = (Array.isArray(izbor) && izbor.length === brGirusaUkupno && izbor.some(Boolean))
+    ? izbor : Array(brGirusaUkupno).fill(true);
+  const pregledGirusa = [];   // za sve girus-e (i isključene): redukovani ugao
 
   // skupi pravce na zadnju i prednju, po girusu i položaju
   const pravciZadnja = []; // svedeni na I položaj
@@ -91,7 +96,7 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
 
   const girusDetalji = []; // detaljni međurezultati za obrazac TO 1 i 2
 
-  for (let g = 0; g < brGirusa; g++) {
+  for (let g = 0; g < brGirusaUkupno; g++) {
     const baza = g * 4;
     const z1 = mjerenja[baza];     // zadnja, I
     const p1 = mjerenja[baza + 1]; // prednja, I
@@ -105,6 +110,8 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
 
     const srZad = sredinaIIpolozaj(hz1, hz2);
     const srPre = sredinaIIpolozaj(hp1, hp2);
+    pregledGirusa.push({ girus: g + 1, reduk: razlika360(srPre, srZad), koristi: koristi[g] });
+    if (!koristi[g]) continue;      // girus isključen iz obrade
     pravciZadnja.push(srZad);
     pravciPrednja.push(srPre);
 
@@ -151,7 +158,7 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
   // zatim se uzima sredina iz svih girusa i tek na kraju zaokružuje na sekundu
   // (isti redoslijed kao u Excelu: "Redukov. sredina" po girusu → "sredina iz svih girusa").
   const redukPoGirusu = pravciPrednja.map((p, g) => razlika360(p, pravciZadnja[g]));
-  const prelomni = zaokruziNaSekundu(prosjekKruzni(redukPoGirusu));
+  const prelomni = zaokruziSekParno(prosjekKruzni(redukPoGirusu));
 
   // zenitni (srednji)
   // Zenitni (vertikalni) ugao uzima se iz ZADNJEG girusa (kao u Excel obrascu TO 1V);
@@ -176,7 +183,7 @@ function obradiStanicu(stanica, visinaInstr, mjerenja) {
     kosaZadnja: prosjek(kosaZadnja),
     visinaSignalaZadnja: prosjek(visZadnja),
     horizDuzinaZadnja: Math.abs(round(prosjek(kosaZadnja) * Math.sin((zadnjiG(zenitZadnja) * Math.PI) / 180), 3)),
-    brGirusa,
+    brGirusa: pravciZadnja.length, brGirusaUkupno, pregledGirusa,
     girusDetalji,
     // redukovana sredina prednje (sredina iz svih girusa prednje - zadnje), = prelomni
     reduk: { zadnja: 0, prednja: prelomni }

@@ -154,12 +154,12 @@ function normZaglavlje(s) {
 /* Iz učitanih stanica izračunaj prelomne uglove i dužine (girusna obrada)
    te složi ulaz za izravnanje umetnutog vlaka.
    Potrebne su i date tačke (A,B,C,D) koje korisnik unese u aplikaciji.    */
-function pripremiIzStanica(stanice) {
+function pripremiIzStanica(stanice, izbori) {
   const G = (typeof window !== "undefined") ? window.Girus : require("./girus.js");
   const obradjene = [];
   const greske = [];
   for (const s of stanice) {
-    const r = G.obradiStanicu(s.stanica, s.visinaInstr, s.mjerenja);
+    const r = G.obradiStanicu(s.stanica, s.visinaInstr, s.mjerenja, izbori && izbori[obradjene.length]);
     if (r.greska) greske.push(r.greska);
     r.detalji = s.detalji || [];          // detaljne tačke ove stanice
     obradjene.push(r);

@@ -13,6 +13,7 @@
    Visine:      H(i) = H(i-1) + (ΔH(i) + Vi)
    ===================================================================== */
 
+function d100(r) { return r.duzina / 100; }
 function cot(deg) { return 1 / Math.tan((deg * Math.PI) / 180); }
 function round(x, n) { const f = Math.pow(10, n); return Math.round((x + Number.EPSILON) * f) / f; }
 
@@ -26,7 +27,7 @@ function round(x, n) { const f = Math.pow(10, n); return Math.round((x + Number.
    visinaPocetna, visinaKrajnja = date nadmorske visine (B i C)
    Vraća rezultat s nizom tačaka i njihovim visinama.
    --------------------------------------------------------------------- */
-function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije) {
+function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije, tolerancije) {
   const greske = [];
   // broj stranica vlaka = broj stanica - 1 (zadnja stanica je krajnja data)
   const brSt = stranice.length - 1;
@@ -88,8 +89,17 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije)
   const sumaOdst = tacno ? redovi.reduce((s, r) => s + r.odstojanjeKm, 0) : round(redovi.reduce((s, r) => s + r.odstojanjeKm, 0), 1);
   const n = redovi.length;
   // Dozvoljeno (Excel G20): (4 * (L16/n) * √n + 2) / 100   [m]
-  const srOdst = sumaOdst / n;
-  const dopustenoFh = round((4 * srOdst * Math.sqrt(n) + 2) / 100, 3);
+  //   "nove" (obrasci 2019): n' = broj stranica − 1, Σ bez zaokruživanja: (4·Σ/√n' + 2)/100
+  const novaTol = tolerancije === "nove";
+  let dopustenoFh;
+  if (novaTol) {
+    const sumaT = redovi.reduce((s, r) => s + d100(r), 0);
+    const nn = Math.max(1, n - 1);
+    dopustenoFh = round((4 * (sumaT / nn) * Math.sqrt(nn) + 2) / 100, 3);
+  } else {
+    const srOdst = sumaOdst / n;
+    dopustenoFh = round((4 * srOdst * Math.sqrt(n) + 2) / 100, 3);
+  }
 
   // Popravke proporcionalno odstojanju: Vi = (fh/Σodst)·odst(i)
   redovi.forEach((r) => {
@@ -105,7 +115,10 @@ function izravnajVisine(stranice, visinaPocetna, visinaKrajnja, faktorRedukcije)
     r.razlikaDvostruko = round((r.drugoMjerenje - r.prvoMjerenje) * 100, 0);
     // Maksimalno dozvoljeno po stranici: 0.00075·(1+cot²(z))·D  [m] -> ·100 [mm]
     const c = cot(r.zenitNaprijed);
-    r.maxDozMM = round(0.00075 * (1 + c * c) * r.duzina * 100, 0);
+    // "stare": 0.00075·(1+cot²z)·D ; "nove": 0.02 + 0.0004·D   [m] -> ·100
+    r.maxDozMM = novaTol
+      ? round((0.02 + 0.0004 * r.duzina) * 100, 0)
+      : round(0.00075 * (1 + c * c) * r.duzina * 100, 0);
   });
 
   // Nadmorske visine

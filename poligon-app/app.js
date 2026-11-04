@@ -3,6 +3,7 @@
 let zadnjiRezultat = null;
 let zadnjiRezultatVisine = null;
 let zadnjiDetalji = null;
+let izborGirusa = [];            // po stanici: niz true/false (koji girusi se koriste)
 let zadnjiFaktorRedukcije = null; // faktor redukcije dužina korišten u zadnjem izračunu (null = bez redukcije)       // koordinate detaljnih tačaka (računaju se nakon izravnanja vlaka)
 let obradjeneStanice = null;   // iz učitanog zapisnika (za visinsko izravnanje)
 let ucitaneStanice = null;     // sirova mjerenja iz zapisnika (za obrazac TZ)
@@ -169,6 +170,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     nazivi: naziviNovih,
     nazivPocetne: tekst("B_naziv") || "B",
     nazivKrajnje: tekst("C_naziv") || "C",
+    tolerancije: document.getElementById("tolerancijeNacin").value,
   };
 
   try {
@@ -181,7 +183,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     const Hc = parseDec(document.getElementById("C_H").value);
     if (obradjeneStanice && obradjeneStanice.length >= 2 && !isNaN(Hb) && !isNaN(Hc)) {
       try {
-        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije);
+        zadnjiRezultatVisine = window.Visine.izravnajVisine(obradjeneStanice, Hb, Hc, zadnjiFaktorRedukcije, document.getElementById("tolerancijeNacin").value);
       } catch (ev) {
         console.warn("Visinsko izravnanje preskočeno:", ev.message);
       }
@@ -603,9 +605,48 @@ function obradiUcitaniCSV(tekst) {
   obradiUcitaneStanice(stanice);
 }
 
-function obradiUcitaneStanice(stanice) {
+/* Kontrola girusa: tablica s redukovanim uglom svakog girusa i kvačicama za izbor. */
+function prikaziPanelGirusa(obradjene) {
+  const okvir = document.getElementById("girusPanelOkvir");
+  const maxG = Math.max(0, ...obradjene.map((o) => (o.pregledGirusa || []).length));
+  if (!maxG) { okvir.style.display = "none"; return; }
+  okvir.style.display = "block";
+  let html = `<table><thead><tr><th>Stanica</th>`;
+  for (let g = 1; g <= maxG; g++) html += `<th>Girus ${g}</th>`;
+  html += `<th>Sredina</th><th>Rasipanje</th></tr></thead><tbody>`;
+  obradjene.forEach((o, i) => {
+    const pg = o.pregledGirusa || [];
+    const koristeni = pg.filter((p) => p.koristi).map((p) => p.reduk);
+    const raspon = koristeni.length > 1 ? Math.round((Math.max(...koristeni) - Math.min(...koristeni)) * 3600) : 0;
+    html += `<tr class="${pg.length >= 3 ? "tri-girusa" : ""}"><td>${o.stanica}</td>`;
+    for (let g = 0; g < maxG; g++) {
+      const p = pg[g];
+      html += p
+        ? `<td class="${p.koristi ? "" : "isklj"}"><label><input type="checkbox" data-stan="${i}" data-g="${g}" ${p.koristi ? "checked" : ""} /> ${window.Girus.decUStr(p.reduk)}</label></td>`
+        : `<td></td>`;
+    }
+    html += `<td>${window.Girus.decUStr(o.prelomniUgao)}</td><td>${raspon ? raspon + "″" : "—"}</td></tr>`;
+  });
+  html += `</tbody></table>`;
+  const panel = document.getElementById("girusPanel");
+  panel.innerHTML = html;
+  panel.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      const i = parseInt(cb.dataset.stan, 10), g = parseInt(cb.dataset.g, 10);
+      izborGirusa[i][g] = cb.checked;
+      if (!izborGirusa[i].some(Boolean)) {
+        izborGirusa[i][g] = true;
+        alert("Na svakoj stanici mora ostati bar jedan girus.");
+      }
+      obradiUcitaneStanice(ucitaneStanice, true);
+    });
+  });
+}
+
+function obradiUcitaneStanice(stanice, ponovo) {
   ucitaneStanice = stanice;   // sačuvaj sirova mjerenja za obrazac TZ
-  const { obradjene, greske } = window.Ucitavanje.pripremiIzStanica(stanice);
+  if (!ponovo) izborGirusa = stanice.map((s) => Array(Math.floor(s.mjerenja.length / 4)).fill(true));
+  const { obradjene, greske } = window.Ucitavanje.pripremiIzStanica(stanice, izborGirusa);
 
   const validne = obradjene.filter((o) => !o.greska);
   if (!validne.length) {
@@ -637,6 +678,12 @@ function obradiUcitaneStanice(stanice) {
     // naziv prednje tačke (nova tačka)
     if (nazInputi[i]) nazInputi[i].value = o.nazPrednja || "";
   });
+
+  prikaziPanelGirusa(validne);
+  if (ponovo) {
+    postaviStatus("Izbor girusa promijenjen — uglovi i dužine su ažurirani. Kliknite Izračunaj.", true);
+    return;
+  }
 
   // zapisnik s mjerenjima: dužine se redukuju na nultu plohu (kao u Excel obrascu TO 18D)
   document.getElementById("redukcijaNacin").value = "auto";

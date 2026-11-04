@@ -155,7 +155,11 @@ function izravnajUmetnutiVlak(ulaz) {
 
   // Dopušteno kutno odstupanje (Excel R22=0.0045 u zapisu 0°MM'SS" = 0°00'45" = 45"),
   // pomnoženo s √n:  dopušteno = 45" * √n
-  const dopustenoFbetaSek = 45 * Math.sqrt(n); // u sekundama
+  // Dozvoljeno uglovno odstupanje:
+  //   "stare"  (raniji Excel):  45″·√n,  n = broj prelomnih uglova
+  //   "nove"   (obrasci 2019):  20″·√(n−1) = 20″·√(broj stranica)
+  const novaTol = ulaz.tolerancije === "nove";
+  const dopustenoFbetaSek = novaTol ? 20 * Math.sqrt(Math.max(1, n - 1)) : 45 * Math.sqrt(n); // u sekundama
   const fBetaSek = fBeta * 3600;               // fβ u sekundama
 
   // Popravljeni prelomni uglovi
@@ -199,7 +203,11 @@ function izravnajUmetnutiVlak(ulaz) {
   const fd = Math.sqrt(fy * fy + fx * fx);
 
   // Dopušteno linearno (Excel K19): 0.0045*sqrt(Σd) + 0.0003*Σd + 0.05
-  const dopustenoFd = 0.0045 * Math.sqrt(sumaD) + 0.0003 * sumaD + 0.05;
+  // Dozvoljeno linearno odstupanje:
+  //   "stare": 0.05 + 0.0045·√Σd + 0.0003·Σd      "nove": 0.03 + 0.001·√Σd + 0.00012·Σd
+  const dopustenoFd = novaTol
+    ? 0.03 + 0.001 * Math.sqrt(sumaD) + 0.00012 * sumaD
+    : 0.0045 * Math.sqrt(sumaD) + 0.0003 * sumaD + 0.05;
 
   /* --- RASPORED LINEARNIH POPRAVAKA proporcionalno dužini ---
      vy(i) = (fy/Σd) * d(i),  vx(i) = (fx/Σd) * d(i)                 */

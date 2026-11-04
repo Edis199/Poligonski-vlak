@@ -506,8 +506,8 @@ function obrazac28P(rez) {
   (rez.redovi || []).forEach((r) => {
     // odstupanje između mjerenja naprijed i nazad (u metrima)
     const odst = Math.abs(r.dHnaprijed + r.dHnazad);
-    // dozvoljeno odstupanje po stranici (u metrima)
-    const dozv = (r.maxDozMM || 0) / 1000;
+    // dozvoljeno odstupanje po stranici (u metrima; interno u cm)
+    const dozv = (r.maxDozMM || 0) / 100;   // maxDozMM je u cm → m
     // gornji red: vizura + ia/ib + odstupanje i dozvoljeno odstupanje
     // donji red: zenitni ugao + lb/la + definitivna visinska razlika
     redovi += `
@@ -646,8 +646,8 @@ function obrazacK(rez) {
         <th rowspan="2">Brojevi<br>tačaka</th>
         <th rowspan="2">Podaci<br>uzeti</th>
         <th colspan="3">Visinske razlike (m)</th>
-        <th rowspan="2">Razlike<br>dvostr.<br>mjer.</th>
-        <th rowspan="2">Maks.<br>dozvolj.<br>(mm)</th>
+        <th rowspan="2">Razlike<br>dvostr.<br>mjer. (cm)</th>
+        <th rowspan="2">Maks.<br>dozvolj.<br>(cm)</th>
         <th rowspan="2">Popravke<br>V<sub>i</sub> (m)</th>
         <th rowspan="2">Poprav-<br>ljene<br>&Delta;H (m)</th>
         <th rowspan="2">Nadmor.<br>visine<br>(m)</th>

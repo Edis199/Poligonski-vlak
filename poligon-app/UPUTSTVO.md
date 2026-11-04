@@ -66,6 +66,20 @@ Stupci predloška:
 `Stanica ; VisinaInstrumenta ; Vizura ; Kod ; HorizontalniUgao ;
 ZenitniUgao ; KosaDuzina ; VisinaSignala`
 
+### Dozvoljena odstupanja i kontrola girusa
+
+Iznad tabele uglova bira se **Dozvoljena odstupanja**:
+
+- **Prema obrascima 2019** (zadano): uglovno `20″·√(broj stranica)`, linearno
+  `0,03 + 0,001·√Σd + 0,00012·Σd`, visinsko `(4·Σ(d/100)/√n′ + 2)/100` uz `n′ = broj stranica − 1`,
+  po stranici (TO 28P) `0,02 + 0,0004·d` [m].
+- **Raniji Excel**: uglovno `45″·√n`, linearno `0,05 + 0,0045·√Σd + 0,0003·Σd`.
+
+**Kontrola girusa** (kartica 1, ispod učitavanja zapisnika) prikazuje redukovani ugao svakog girusa i
+rasipanje. Girus koji ne želite koristiti isključite kvačicom; sredina uglova, dužina i vertikalnih uglova
+računa se iz preostalih, a TO 1 i 2 prikazuje samo korištene girus-e. Obrazac TZ i dalje prikazuje sva mjerenja.
+Poslije izmjene ponovo kliknite „Izračunaj".
+
 ### Zatvoren vlak
 
 Ako vlak počinje i završava na istoj tački (npr. T809 → 69 → 70 → 71 → T809, s orijentacijom na
