@@ -91,21 +91,21 @@ function predlozakZapisnikXlsx() {
     // st.3: zadnja b, prednja c
     ["3","b","I","13","1.827","1.867","",""],
     [ "","c","II","14","2.515","2.557","",""],
-    // st.4: zadnja c, prednja R101  → kraj 1. dionice (R100→R101)
+    // st.4: zadnja c, prednja R101  (prednja je reper → kraj 1. dionice R100→R101)
     ["4","c","I","11","1.410","1.437","",""],
-    [ "","R101","II","13","1.471","1.499","","kraj dionice R100→R101"],
+    [ "","R101","II","13","1.471","1.499","",""],
     // st.5: zadnja R101, prednja a
     ["5","R101","I","14","1.879","1.908","",""],
     [ "","a","II","15","2.302","2.331","",""],
-    // st.6: zadnja a, prednja R102 → kraj 2. dionice (R101→R102)
+    // st.6: zadnja a, prednja R102 (reper → kraj 2. dionice R101→R102)
     ["6","a","I","12","1.984","2.002","",""],
-    [ "","R102","II","12","2.489","2.507","","kraj dionice R101→R102"],
+    [ "","R102","II","12","2.489","2.507","",""],
     // st.7: zadnja R102, prednja a
     ["7","R102","I","14","1.531","1.544","",""],
     [ "","a","II","16","1.657","1.671","",""],
-    // st.8: zadnja a, prednja R50 → kraj 3. dionice (R102→R50)
+    // st.8: zadnja a, prednja R50 (reper → kraj 3. dionice R102→R50)
     ["8","a","I","12","1.024","1.043","",""],
-    [ "","R50","II","12","1.207","1.227","","kraj dionice R102→R50"],
+    [ "","R50","II","12","1.207","1.227","",""],
   ];
   // prazni redovi za dalje upisivanje
   const prazni = [];
