@@ -215,14 +215,44 @@ function ucitajRedove(redovi) {
     return segmenti;
   }
 
-  const segNaprijed = segmentiraj(mjerenja.filter((m) => m.smjer === "naprijed"));
-  const segNazad    = segmentiraj(mjerenja.filter((m) => m.smjer === "nazad"));
+  // Je li korisnik EKSPLICITNO naznačio smjer (stara kolona "Smjer")?
+  const imaSmjerKolonu = mjerenja.some((m) => m.smjer === "nazad");
+
+  let segNaprijed, segNazad;
+  if (imaSmjerKolonu) {
+    // poštuj eksplicitni smjer
+    segNaprijed = segmentiraj(mjerenja.filter((m) => m.smjer === "naprijed"));
+    segNazad    = segmentiraj(mjerenja.filter((m) => m.smjer === "nazad"));
+  } else {
+    // AUTOMATSKA detekcija smjera iz veznih tačaka:
+    // segmentiramo sve, pa dionice dijelimo na "naprijed" (prva pojava lanca repera)
+    // i "nazad" (kad se nizanje repera vrati — prednji reper je već bio posjećen).
+    const sviSeg = segmentiraj(mjerenja);
+    segNaprijed = [];
+    segNazad = [];
+    const vidjeni = new Set();   // reperi koje je lanac "naprijed" već dostigao
+    let krenuoNazad = false;
+    let prethodniDO = null;
+    sviSeg.forEach((s) => {
+      if (!krenuoNazad) {
+        // nazad počinje kad segment vodi ka REPERU koji je već posjećen (vraćanje),
+        // a OD je zadnji dostignuti reper
+        const vracaSe = vidjeni.has(s.do) && s.od === prethodniDO;
+        if (vracaSe) krenuoNazad = true;
+      }
+      if (krenuoNazad) segNazad.push(s);
+      else {
+        segNaprijed.push(s);
+        vidjeni.add(s.od); vidjeni.add(s.do);
+        prethodniDO = s.do;
+      }
+    });
+  }
 
   // 3) Spoji "naprijed" i "nazad" za ISTI par repera u jednu dionicu.
   //    Nazad se mjeri u suprotnom smjeru (DO→OD), pa segment {od:X, do:Y} nazad
   //    odgovara dionici {od:Y, do:X} naprijed (isti par repera).
   const dioniceMap = [];
-  const kljuc = (a, b) => [a, b].join("→");
 
   // redoslijed dionica diktira smjer "naprijed" (ako postoji), inače "nazad" obrnuto
   const bazni = segNaprijed.length ? segNaprijed

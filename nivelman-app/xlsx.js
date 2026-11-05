@@ -76,40 +76,34 @@ function predlozakZapisnikXlsx() {
                  "Čitanja","","Srednja visinska razlika","Primjedba"];
   const zagl2 = ["","","","","Čitanje 1. podjela","Čitanje 2. podjela","",""];
 
-  // PRIMJER (po originalnom Excelu, nivelman NAPRIJED):
-  //   R100 → a → b → c → R101 → a → R102 → a → R50.
+  // PRIMJER (nivelman NAPRIJED): R100 → a → b → c → R101 → a → R102 → a → R50.
   //   Vezna tačka = tačka tog položaja letve; red I = zadnja, red II = prednja.
   //   Reperi velikim R/P, vezne tačke malim slovima — dionice se prepoznaju same.
-  // Svaki unos = [stanicaBr, veznaTacka, I|II, odst, Čitanje1.podjela, Čitanje2.podjela, "", primjedba]
+  //   NIVELMAN NAZAD pišeš ODMAH ISPOD, bez razmaka: nastaviš nova stajališta koja
+  //   kreću od krajnjeg repera (R50) natrag prema R100. Program sam prepoznaje nazad
+  //   iz veznih tačaka (nizanje repera se vraća: R50 → R102 → R101 → R100).
+  // Svaki unos = [stanicaBr, veznaTacka, I|II, odst, Čit1.podjela, Čit2.podjela, "", primjedba]
   const stanice = [
-    // st.1: zadnja R100 (I), prednja a (II)
     ["1","R100","I","11","1.587","1.608","",""],
-    [  "", "a","II","12","1.704","1.725","",""],
-    // st.2: zadnja a, prednja b
+    [ "", "a","II","12","1.704","1.725","",""],
     ["2","a","I","13","1.823","1.869","",""],
     [ "","b","II","14","2.483","2.531","",""],
-    // st.3: zadnja b, prednja c
     ["3","b","I","13","1.827","1.867","",""],
     [ "","c","II","14","2.515","2.557","",""],
-    // st.4: zadnja c, prednja R101  (prednja je reper → kraj 1. dionice R100→R101)
     ["4","c","I","11","1.410","1.437","",""],
     [ "","R101","II","13","1.471","1.499","",""],
-    // st.5: zadnja R101, prednja a
     ["5","R101","I","14","1.879","1.908","",""],
     [ "","a","II","15","2.302","2.331","",""],
-    // st.6: zadnja a, prednja R102 (reper → kraj 2. dionice R101→R102)
     ["6","a","I","12","1.984","2.002","",""],
     [ "","R102","II","12","2.489","2.507","",""],
-    // st.7: zadnja R102, prednja a
     ["7","R102","I","14","1.531","1.544","",""],
     [ "","a","II","16","1.657","1.671","",""],
-    // st.8: zadnja a, prednja R50 (reper → kraj 3. dionice R102→R50)
     ["8","a","I","12","1.024","1.043","",""],
     [ "","R50","II","12","1.207","1.227","",""],
   ];
-  // prazni redovi za dalje upisivanje
+  // prazni redovi za dalje upisivanje (npr. povratni nivelman odmah ispod)
   const prazni = [];
-  for (let i = 0; i < 24; i++) prazni.push(new Array(8).fill(""));
+  for (let i = 0; i < 28; i++) prazni.push(new Array(8).fill(""));
   const sviRedovi = [zagl1, zagl2, ...stanice, ...prazni];
 
   const kolSlova = ["A","B","C","D","E","F","G","H"];
@@ -121,7 +115,7 @@ function predlozakZapisnikXlsx() {
     for (let ci = 0; ci < 8; ci++) {
       const val = red[ci] || "";
       const ref = kolSlova[ci] + rnum;
-      // reper/stanica (A ili B velikim R/P) → stil 4; zaglavlja → 2; ostalo → 3
+      // reper/stanica (A stanica br. ili B velikim R/P) → stil 4; zaglavlja → 2; ostalo → 3
       let stil = 3;
       if (jeZagl) stil = 2;
       else if ((ci === 0 && val) || (ci === 1 && /^[RP]/.test(val))) stil = 4;

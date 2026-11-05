@@ -41,7 +41,16 @@ Predložak vjerno slijedi originalni Excel obrazac **N.O.1**. Kolone:
 - **Čitanje 1. / 2. podjela** = očitanje letve na prvoj i drugoj skali.
   - Visinska razlika stanice = čitanje(I) − čitanje(II), sredina dvije podjele.
 - **Odstojanje od letve** = dužina (za računanje dužine dionice i dozvoljenog odstupanja).
-- (Opcionalno) kolona **Smjer** (`naprijed`/`nazad`) ako se mjeri dvostrano.
+
+### Nivelman nazad (dvostrano mjerenje)
+
+Kad završiš upis nivelmana **naprijed**, povratni nivelman (**nazad**) upiši **odmah ispod**,
+bez praznog reda i bez posebne kolone. Nastaviš nova stajališta koja se vraćaju od krajnjeg
+repera natrag prema početnom (npr. R50 → … → R100).
+
+Program **sam prepoznaje** gdje počinje nazad — iz veznih tačaka, jer se nizanje repera
+vraća na već posjećene repere. Naprijed i nazad za istu dionicu se automatski spajaju,
+a u **N.O.2** se računa odstupanje Δ i srednja visinska razlika.
 
 ### Reperi i vezne tačke (automatsko dijeljenje na dionice)
 
