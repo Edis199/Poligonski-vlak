@@ -455,7 +455,7 @@ function obrazac18D(obradjeneStanice, faktor) {
     : "";
 
   return `
-  <div class="obrazac-naslov-linija">Trigon. obrazac br. 18D — Redukcija dužina</div>
+  <div class="obrazac-naslov-linija">Trigon. obrazac br. 18D</div>
   ${napomena}
   <table class="obrazac obrazac18d">
     <thead>
@@ -512,7 +512,7 @@ function obrazac8(date) {
   const redovi = blok(date.A, date.B) + (date.C && date.D ? blok(date.C, date.D) : "");
 
   return `
-  <div class="obrazac-naslov-linija">Trigonom. obrazac br.8 — Direkcioni uglovi i odstojanja</div>
+  <div class="obrazac-naslov-linija">Trigonom. obrazac br.8</div>
   <table class="obrazac obrazac8">
     <thead>
       <tr class="zaglavlje-red">
@@ -571,7 +571,7 @@ function obrazac28P(rez) {
   });
 
   return `
-  <div class="obrazac-naslov-linija">Trigonom. obrazac br.28P — Trigonometrijska nivelacija</div>
+  <div class="obrazac-naslov-linija">Trigonom. obrazac br.28P</div>
   <table class="obrazac obrazac28p">
     <thead>
       <tr class="zaglavlje-red">
@@ -675,7 +675,7 @@ function obrazacK(rez) {
     </tr>`}`;
 
   return `
-  <div class="obrazac-naslov-linija">Obrazac „K" — Izravnanje visina</div>
+  <div class="obrazac-naslov-linija">Obrazac „K"</div>
   <table class="obrazac obrazacK">
     <thead>
       <tr class="zaglavlje-red">
@@ -744,18 +744,31 @@ function obrazacDetaljiPuni(rez) {
   (rez.stanice || []).forEach((s) => {
     const o = s.orijentacija || {};
     let redovi = "";
-    // red orijentacije (vizura unazad)
+    // 1. red: STANICA (sa svojim koordinatama)
     redovi += `
       <tr class="tz-stanica">
         <td class="c">${s.stanica}</td>
+        <td class="c"></td>
+        <td class="c"></td>
+        <td class="c"></td>
+        <td class="c"></td>
+        <td class="c"></td><td class="d"></td><td class="d"></td>
+        <td class="d"></td><td class="d"></td>
+        <td class="d">${fz(s.Y, 3)}</td><td class="d">${fz(s.X, 3)}</td>
+        <td class="d">${s.H != null ? fz(s.H, 3) : ""}</td>
+      </tr>`;
+    // 2. red: ORIJENTACIJA (vizura unazad, sa svojim koordinatama)
+    redovi += `
+      <tr class="tz-vi">
+        <td class="c"></td>
         <td class="c">${o.naziv || ""}</td>
         <td class="c"></td>
         <td class="c">${ug(o.pravac)}</td>
         <td class="c">${ug(o.dir)}</td>
         <td class="c"></td><td class="d"></td><td class="d"></td>
         <td class="d"></td><td class="d"></td>
-        <td class="d">${fz(s.Y, 3)}</td><td class="d">${fz(s.X, 3)}</td>
-        <td class="d">${s.H != null ? fz(s.H, 3) : ""}</td>
+        <td class="d">${o.Y != null ? fz(o.Y, 3) : ""}</td><td class="d">${o.X != null ? fz(o.X, 3) : ""}</td>
+        <td class="d"></td>
       </tr>`;
     s.tacke.forEach((t) => {
       redovi += `
