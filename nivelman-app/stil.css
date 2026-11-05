@@ -1,0 +1,268 @@
+:root{
+  --plava:#1e5aa8;
+  --plava-tamna:#17407a;
+  --zelena:#1f9d55;
+  --crvena:#d64545;
+  --siva:#64748b;
+  --svijetla:#f1f5f9;
+  --obrub:#d7dee8;
+  --obrub-obr:#7b8aa0;   /* tamnije linije unutar obrazaca */
+  --okvir-obr:#4a5a72;   /* okvir obrasca */
+  --tekst:#1e293b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;
+  color:var(--tekst);background:#eef2f7;line-height:1.5;
+}
+.zaglavlje{
+  display:flex;align-items:center;gap:16px;
+  background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+  color:#fff;padding:18px 28px;box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.zaglavlje .logo{display:flex;align-items:center;justify-content:center}
+.zaglavlje h1{margin:0;font-size:24px}
+.podnaslov{margin:2px 0 0;opacity:.9;font-size:14px}
+
+.kartice{display:flex;gap:4px;background:#fff;padding:0 20px;border-bottom:2px solid var(--obrub);overflow-x:auto}
+.kartica{
+  background:none;border:none;padding:14px 20px;font-size:15px;cursor:pointer;
+  color:var(--siva);border-bottom:3px solid transparent;white-space:nowrap;
+}
+.kartica:hover{color:var(--plava)}
+.kartica.aktivna{color:var(--plava);border-bottom-color:var(--plava);font-weight:600}
+
+main{max-width:1100px;margin:0 auto;padding:24px}
+.panel{display:none;background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.panel.vidljiv{display:block}
+
+h2{color:var(--plava-tamna);border-bottom:2px solid var(--svijetla);padding-bottom:6px;margin-top:28px}
+h2:first-child{margin-top:0}
+
+.info{background:#e8f1fc;border-left:4px solid var(--plava);padding:12px 16px;border-radius:6px;margin-bottom:8px;font-size:14px}
+.info code,code{background:#dde7f3;padding:1px 6px;border-radius:4px;font-size:13px}
+
+.mreza2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.mreza2{grid-template-columns:1fr}}
+fieldset{border:1px solid var(--obrub);border-radius:8px;padding:14px}
+legend{font-weight:600;color:var(--plava);padding:0 8px}
+label{display:block;font-size:13px;color:var(--siva);margin:10px 0 4px}
+.red3{display:grid;grid-template-columns:1fr 1.3fr 1.3fr;gap:8px}
+
+input{
+  width:100%;padding:8px 10px;border:1px solid var(--obrub);border-radius:6px;
+  font-size:14px;font-family:inherit;
+}
+input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,90,168,.15)}
+
+.alatna{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}
+.alatna input{width:80px}
+.napomena{font-size:13px;color:var(--siva)}
+
+.dugme{
+  background:#fff;border:1px solid var(--plava);color:var(--plava);
+  padding:9px 18px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit;
+}
+.dugme:hover{background:var(--svijetla)}
+.dugme.primarno{background:var(--plava);color:#fff}
+.dugme.primarno:hover{background:var(--plava-tamna)}
+
+.akcije{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+
+.tabela{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.tabela th,.tabela td{border:1px solid var(--obrub);padding:8px 10px;text-align:center}
+.tabela th{background:var(--svijetla);color:var(--plava-tamna);font-weight:600}
+.tabela input{text-align:center}
+/* tablica poznatih tačaka (unos / lijepljenje iz Excela) */
+.tabela-omot{overflow-x:auto}
+.tabela-date td.uloga{text-align:left;color:var(--plava-tamna);font-weight:600;white-space:nowrap}
+.tabela-date td{padding:4px 6px}
+.tabela-date input{width:100%;min-width:90px;box-sizing:border-box;margin:0}
+.tabela-date input[readonly]{background:#eef2f7;color:#64748b}
+.zatvoreni-vlak{display:block;margin:10px 0 4px;font-size:14px}
+.redukcija-blok{
+  margin:16px 0;padding:16px 18px;
+  background:#f7fbff;border:1px solid var(--obrub);
+  border-left:4px solid var(--plava);border-radius:10px;
+}
+.redukcija-naslov{font-size:15px;font-weight:700;color:var(--plava-tamna);margin-bottom:10px}
+.redukcija-red{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
+.redukcija-red label{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--tekst)}
+.redukcija-blok select{
+  font-size:15px;padding:9px 12px;min-width:240px;
+  border:1px solid var(--obrub);border-radius:8px;background:#fff;color:var(--tekst);cursor:pointer;
+}
+.redukcija-blok select:hover{border-color:var(--plava)}
+.redukcija-blok select:focus,.redukcija-blok input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 3px rgba(30,90,168,.15)}
+.redukcija-blok input{font-size:14px;padding:8px 10px;width:130px;border:1px solid var(--obrub);border-radius:8px}
+.redukcija-blok .napomena{margin-top:10px}
+.redukcija-opis{margin:12px 0 0;padding-left:18px;font-size:13px;color:var(--tekst);line-height:1.6}
+.redukcija-opis li{margin-bottom:6px}
+.redukcija-opis li b{color:var(--plava-tamna)}
+.redukcija-opis li i{color:var(--siva)}
+.tabela tr:nth-child(even) td{background:#fafcfe}
+
+.sazetak-kartice{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:8px 0 24px}
+.sk{padding:16px;border-radius:10px;border:1px solid var(--obrub);background:#fafcff}
+.sk .oznaka{font-size:13px;color:var(--siva)}
+.sk .vrijednost{font-size:20px;font-weight:700;margin-top:4px}
+.sk.ok{border-color:var(--zelena);background:#eafaf0}
+.sk.ok .vrijednost{color:var(--zelena)}
+.sk.ne{border-color:var(--crvena);background:#fdecec}
+.sk.ne .vrijednost{color:var(--crvena)}
+
+.oznaka-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.status-ok{background:#eafaf0;color:var(--zelena)}
+.status-ne{background:#fdecec;color:var(--crvena)}
+
+canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background:#fff}
+
+.podnozje{text-align:center;color:var(--siva);font-size:13px;padding:20px}
+
+.greska{background:#fdecec;border-left:4px solid var(--crvena);padding:10px 14px;border-radius:6px;color:var(--crvena);margin:10px 0}
+
+.ucitavanje-okvir{background:#f7fbff;border:1px dashed var(--plava);border-radius:10px;padding:16px;margin-bottom:8px}
+.uspjeh{color:var(--zelena);font-weight:600}
+.neuspjeh{color:var(--crvena);font-weight:600}
+
+/* ---------- Stil za ispis / PDF ---------- */
+/* Ispis REZULTATA (kad body ima klasu print-rezultati) */
+@media print{
+  body.print-rezultati .kartice,
+  body.print-rezultati .akcije,
+  body.print-rezultati .alatna,
+  body.print-rezultati footer,
+  body.print-rezultati .info{display:none !important}
+  body.print-rezultati .panel{display:none !important;box-shadow:none;padding:0}
+  body.print-rezultati #rezultati{display:block !important}
+  body.print-rezultati .zaglavlje{background:#fff !important;color:#000 !important;box-shadow:none;border-bottom:2px solid #000}
+  body.print-rezultati .zaglavlje svg{stroke:#000 !important}
+  body.print-rezultati{background:#fff}
+  body.print-rezultati .sk{break-inside:avoid}
+  body.print-rezultati .tabela{font-size:12px}
+}
+
+/* ---------- Geodetski obrasci (stil kao tablice u Rezultatima) ---------- */
+.obrazac-okvir{margin-top:16px;overflow-x:auto}
+.obrazac{
+  border-collapse:separate;border-spacing:0;margin:0 auto;background:#fff;
+  font-size:14px;color:var(--tekst);
+  font-family:"Segoe UI",system-ui,Arial,sans-serif;
+  border:2px solid var(--okvir-obr);
+  border-radius:10px;overflow:hidden;
+  box-shadow:0 1px 6px rgba(0,0,0,.08);
+}
+.obrazac th,.obrazac td{
+  border-right:1.5px solid var(--obrub-obr);
+  border-bottom:1px solid var(--obrub-obr);
+  padding:7px 10px;text-align:center;vertical-align:middle;
+}
+/* zaglavlja plava kao u rezultatima */
+.obrazac thead th{
+  background:var(--svijetla);color:var(--plava-tamna);font-weight:600;
+  border-bottom:2px solid var(--okvir-obr);
+}
+.obrazac .naslov{
+  background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+  color:#fff;font-weight:700;font-size:15px;letter-spacing:.4px;padding:10px;
+  border-right:none;
+}
+/* zebrasti redovi */
+.obrazac tbody tr:nth-child(even) td{background:#fafcfe}
+/* ukloni desni rub na zadnjoj koloni */
+.obrazac th:last-child,.obrazac td:last-child{border-right:none}
+.obrazac .naslov{font-weight:bold;font-size:14px;letter-spacing:.5px;padding:6px}
+.obrazac .zaglavlje-red th{font-weight:600;height:72px}
+.obrazac th,.obrazac td,.obrazac td.c,.obrazac td.d{text-align:center !important;vertical-align:middle !important}
+.obrazac td.d{font-variant-numeric:tabular-nums}
+.obrazac .sekcija{font-weight:400;letter-spacing:.6px;color:var(--plava-tamna);background:#eef4fb}
+.obrazac .crvena{color:#c0392b}
+.obrazac .crveni-tekst td{color:#c0392b;font-weight:400}
+.obrazac .mali{font-size:11px;color:var(--siva)}
+.obrazac .suma-red td{font-weight:400;background:#eef4fb !important;color:var(--plava-tamna)}
+.uspravno{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;display:inline-block}
+.obrazac25 .w-naziv{width:150px}
+.obrazac25 .w-gdje{width:60px}
+.obrazac25 th:nth-child(3),.obrazac25 th:nth-child(4),.obrazac25 th:nth-child(5){width:130px}
+.obrazac19 .uspravno-col{width:28px}
+.obrazac-naslov-linija{
+  text-align:right;font-weight:700;margin:0 auto 8px;max-width:980px;
+  font-family:"Segoe UI",system-ui,Arial,sans-serif;font-size:15px;color:var(--plava-tamna);
+}
+/* red s pod-zaglavljem Δy/Δx — niži i diskretniji */
+.obrazac19 .zaglavlje-red.pod th{height:auto;padding:4px 10px;font-size:13px;color:var(--siva);background:#f6f9fd}
+/* TZ obrazac */
+.obrazacTZ .podnaslov-red td{background:#f6f9fd;color:var(--plava-tamna);font-weight:400}
+.obrazacTZ .tz-stanica td{background:#eef4fb;font-weight:400}
+.obrazacTZ .tz-vi td{color:var(--siva)}
+.obrazac-podnaslov{text-align:center;font-size:13px;color:var(--siva);margin:0 auto 6px}
+/* TO 28P obrazac */
+.obrazac28p .tz-vi td{color:var(--siva)}
+.obrazac28p .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
+.obrazac28p .sitno{font-size:10px;color:var(--siva);font-weight:400}
+.obrazacDetalji{min-width:60%}
+/* Obrazac K */
+.obrazacK .tz-vi td{color:var(--tekst)}
+.obrazacK .tz-stanica2 td,.obrazacK .tz-stanica2{background:#eef4fb;font-weight:400}
+.obrazacK .tz-sum td{background:#f6f9fd;color:var(--plava-tamna)}
+/* odabrani obrazac — istaknut gumb */
+.obrazac-izbor{flex-wrap:wrap}
+.dugme.odabran{background:var(--plava);color:#fff;border-color:var(--plava)}
+/* oznaka broja strane (gornji desni kut svake A4 strane pri ispisu) */
+.oznaka-strane{text-align:right;font-size:11px;color:#333;margin-bottom:4px;font-family:"Segoe UI",Arial,sans-serif}
+@media screen{ .oznaka-strane{display:none} }
+/* mali redovi popravke vβ — niži */
+.obrazac19 tr.tanko td{padding:2px 10px;height:auto}
+.obrazac19 tr.tanko td .mali{font-size:11px}
+
+/* Ispis OBRAZACA (kad body ima klasu print-obrasci) — svaki obrazac na A4 */
+@media print{
+  /* margina 0 = preglednik ne ispisuje zaglavlje/podnožje (naslov, adresa, datum) */
+  @page { size:A4 portrait; margin:0; }
+  /* obrazac s mnogo kolona (detaljne tačke) ide na A4 LANDSCAPE */
+  @page ls { size:A4 landscape; margin:0; }
+  body.print-obrasci .obrazac-stranica.ls{page:ls}
+  body.print-obrasci{margin:0;padding:0}
+  body.print-obrasci .obrazac-stranica{padding:10mm}
+  body.print-rezultati{padding:10mm}
+
+  body.print-obrasci{background:#fff}
+  body.print-obrasci .kartice,
+  body.print-obrasci .akcije,
+  body.print-obrasci .alatna,
+  body.print-obrasci footer,
+  body.print-obrasci .info,
+  body.print-obrasci .zaglavlje{display:none !important}
+  body.print-obrasci .panel{display:none !important}
+  body.print-obrasci #obrasci{display:block !important;box-shadow:none;padding:0}
+  body.print-obrasci #obrasci h2,
+  body.print-obrasci #obrasci .napomena{display:none}
+  body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
+  /* svaki obrazac počinje na novoj A4 strani */
+  body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
+  body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
+  body.print-obrasci .obrazac tr{page-break-inside:avoid}
+  /* da se boje (plava zaglavlja, crvene date tačke) ispišu */
+  body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+
+/* Kontrola girusa */
+.girus-panel{margin:10px 0;padding:8px 12px;background:#f6f9fd;border:1px solid var(--obrub);border-radius:8px}
+.girus-panel summary{cursor:pointer;color:var(--plava-tamna)}
+.girus-panel table{border-collapse:collapse;margin-top:6px;font-size:13px}
+.girus-panel th,.girus-panel td{border:1px solid var(--obrub);padding:4px 10px;text-align:center}
+.girus-panel th{background:var(--svijetla);color:var(--plava-tamna)}
+.girus-panel td.isklj{color:#94a3b8;text-decoration:line-through}
+.girus-panel tr.tri-girusa td:first-child{font-weight:700}
+
+/* ---------- Nivelmanski obrasci (dodatno) ---------- */
+.obrazacNiv .sekcija td{text-align:left;font-weight:600;background:#eef4fb;color:var(--plava-tamna)}
+.obrazacNiv .mali{font-size:11px;color:var(--siva)}
+.obrazac-podnaslov{text-align:center;font-size:14px;color:var(--tekst);margin:10px auto 6px}
+.tabela-reperi td.uloga{text-align:left;color:var(--plava-tamna);font-weight:600;white-space:nowrap}
+.tabela-reperi input{width:100%;min-width:90px;margin:0}
+.dionice-info{background:#f7fbff;border:1px solid var(--obrub);border-left:4px solid var(--plava);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:14px}
+.dionice-info b{color:var(--plava-tamna)}
+.nazad-na-pocetak{display:inline-block;margin:0;color:#fff;text-decoration:none;font-size:13px;opacity:.9}
+.nazad-na-pocetak:hover{opacity:1;text-decoration:underline}

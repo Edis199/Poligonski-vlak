@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Geodetske mreže</title>
+<link rel="icon" type="image/png" sizes="512x512" href="poligon-app/ikona-512.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="poligon-app/ikona-192.png" />
+<link rel="icon" type="image/svg+xml" href="poligon-app/ikona-totalka.svg" />
+<link rel="shortcut icon" href="poligon-app/favicon.ico" />
+<meta name="theme-color" content="#1e5aa8" />
+<style>
+  :root{
+    --plava:#1e5aa8; --plava-tamna:#17407a; --zelena:#1f9d55;
+    --siva:#64748b; --svijetla:#f1f5f9; --obrub:#d7dee8; --tekst:#1e293b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;
+    color:var(--tekst);background:#eef2f7;line-height:1.5;min-height:100vh;
+    display:flex;flex-direction:column;
+  }
+  .zaglavlje{
+    display:flex;align-items:center;gap:16px;
+    background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+    color:#fff;padding:18px 28px;box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+  .zaglavlje .logo{display:flex;align-items:center;justify-content:center}
+  .zaglavlje h1{margin:0;font-size:24px}
+  .podnaslov{margin:2px 0 0;opacity:.9;font-size:14px}
+  main{max-width:900px;margin:0 auto;padding:40px 24px;flex:1;width:100%}
+  .uvod{text-align:center;margin-bottom:36px}
+  .uvod h2{color:var(--plava-tamna);font-size:26px;margin:0 0 8px;border:none}
+  .uvod p{color:var(--siva);font-size:16px;margin:0}
+  .izbor{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:680px){.izbor{grid-template-columns:1fr}}
+  .kartica-mreze{
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    background:#fff;border:1px solid var(--obrub);border-radius:16px;
+    padding:32px 24px;text-decoration:none;color:var(--tekst);
+    box-shadow:0 2px 8px rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,border-color .15s;
+  }
+  .kartica-mreze:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(30,90,168,.18);border-color:var(--plava)}
+  .kartica-mreze .ikona{
+    width:88px;height:88px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+    background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
+  }
+  .kartica-mreze h3{margin:0 0 8px;font-size:20px;color:var(--plava-tamna)}
+  .kartica-mreze p{margin:0 0 18px;color:var(--siva);font-size:14px;min-height:40px}
+  .kartica-mreze .otvori{
+    background:var(--plava);color:#fff;padding:10px 22px;border-radius:8px;
+    font-weight:600;font-size:14px;
+  }
+  .kartica-mreze:hover .otvori{background:var(--plava-tamna)}
+  .podnozje{text-align:center;color:var(--siva);font-size:13px;padding:20px}
+</style>
+</head>
+<body>
+<header class="zaglavlje">
+  <div class="logo" aria-hidden="true">
+    <svg width="44" height="44" viewBox="0 0 512 512">
+      <g fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M150 360 L150 150 Q150 92 208 84 L304 84 Q362 92 362 150 L362 360 Z"/>
+        <path d="M150 300 L124 300"/>
+        <path d="M362 300 L388 300"/>
+        <path d="M214 150 L298 150 L298 300 L214 300 Z"/>
+        <path d="M206 120 Q256 70 306 120"/>
+      </g>
+      <circle cx="256" cy="200" r="26" fill="#ffffff"/>
+      <rect x="186" y="398" width="140" height="26" rx="8" fill="#ffffff"/>
+    </svg>
+  </div>
+  <div>
+    <h1>Geodetske mreže</h1>
+    <p class="podnaslov">Izradio: Malanović Edis</p>
+  </div>
+</header>
+
+<main>
+  <div class="uvod">
+    <h2>Odaberite vrstu mreže</h2>
+    <p>Alat za izravnanje geodetskih mreža — radi offline u pregledniku.</p>
+  </div>
+
+  <div class="izbor">
+    <!-- Poligonska mreža -->
+    <a class="kartica-mreze" href="poligon-app/index.html">
+      <div class="ikona">
+        <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18,78 38,32 64,58 84,22"/>
+          <circle cx="18" cy="78" r="6" fill="#fff"/>
+          <circle cx="38" cy="32" r="6" fill="#fff"/>
+          <circle cx="64" cy="58" r="6" fill="#fff"/>
+          <circle cx="84" cy="22" r="6" fill="#fff"/>
+        </svg>
+      </div>
+      <h3>Poligonska mreža</h3>
+      <p>Izravnanje poligonskog vlaka (umetnuti, zatvoreni, slijepi) — koordinate i nadmorske visine.</p>
+      <span class="otvori">Otvori →</span>
+    </a>
+
+    <!-- Nivelmanska mreža -->
+    <a class="kartica-mreze" href="nivelman-app/index.html">
+      <div class="ikona">
+        <svg width="48" height="48" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="62" x2="88" y2="62"/>
+          <rect x="22" y="40" width="14" height="22" fill="#fff" stroke="none"/>
+          <rect x="64" y="30" width="14" height="32" fill="#fff" stroke="none"/>
+          <line x1="12" y1="40" x2="88" y2="40" stroke-dasharray="4 5" stroke-width="3"/>
+          <circle cx="50" cy="40" r="4" fill="#fff"/>
+        </svg>
+      </div>
+      <h3>Nivelmanska mreža</h3>
+      <p>Izravnanje nivelmanskog vlaka (geometrijski nivelman) — obrasci N.O.1, N.O.2 i N.O.3, nadmorske visine.</p>
+      <span class="otvori">Otvori →</span>
+    </a>
+  </div>
+</main>
+
+<footer class="podnozje">
+  Geodetski alat za izravnanje mreža · radi offline u pregledniku
+</footer>
+</body>
+</html>

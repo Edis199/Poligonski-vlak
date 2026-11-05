@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nivelmanska mreža</title>
+<link rel="icon" type="image/png" sizes="512x512" href="ikona-512.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="ikona-192.png" />
+<link rel="icon" type="image/svg+xml" href="ikona-totalka.svg" />
+<link rel="shortcut icon" href="favicon.ico" />
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#1e5aa8" />
+<link rel="stylesheet" href="stil.css" />
+</head>
+<body>
+<header class="zaglavlje">
+  <div class="logo" aria-hidden="true">
+    <svg width="44" height="44" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="62" x2="88" y2="62"/>
+      <rect x="22" y="40" width="14" height="22" fill="#fff" stroke="none"/>
+      <rect x="64" y="30" width="14" height="32" fill="#fff" stroke="none"/>
+      <line x1="12" y1="40" x2="88" y2="40" stroke-dasharray="4 5" stroke-width="3"/>
+      <circle cx="50" cy="40" r="4" fill="#fff"/>
+    </svg>
+  </div>
+  <div style="flex:1">
+    <h1>Nivelmanska mreža</h1>
+    <p class="podnaslov">Izradio: Malanović Edis &nbsp;·&nbsp; <a class="nazad-na-pocetak" href="../index.html">← Geodetske mreže</a></p>
+  </div>
+</header>
+
+<nav class="kartice">
+  <button class="kartica aktivna" data-cilj="unos">1. Unos podataka</button>
+  <button class="kartica" data-cilj="rezultati">2. Rezultati</button>
+  <button class="kartica" data-cilj="obrasci">3. Nivelmanski obrasci</button>
+  <button class="kartica" data-cilj="izvoz">4. Ispis / Izvoz</button>
+</nav>
+
+<main>
+  <!-- ========== UNOS ========== -->
+  <section id="unos" class="panel vidljiv">
+    <div class="info">
+      <strong>Uputa:</strong> 1) Preuzmite predložak N.O.1 i u njega prebacite čitanja letvi.
+      2) Učitajte zapisnik (N.O.1). 3) Upišite nadmorske visine datih repera (početni i završni).
+      4) Kliknite „Izračunaj izravnanje". Program obrađuje N.O.1, N.O.2 i N.O.3.
+    </div>
+
+    <h2>Učitavanje nivelmanskog zapisnika (N.O.1)</h2>
+    <div class="ucitavanje-okvir">
+      <div class="alatna">
+        <button id="preuzmiPredlozak" class="dugme">Preuzmi predložak (Excel)</button>
+        <label class="dugme" style="position:relative;cursor:pointer">
+          Učitaj zapisnik (Excel ili CSV)
+          <input id="datoteka" type="file" accept=".xlsx,.csv,text/csv"
+                 style="position:absolute;inset:0;opacity:0;cursor:pointer" />
+        </label>
+        <span id="statusUcitavanja" class="napomena"></span>
+      </div>
+      <div class="info" style="font-size:13px">
+        <b>Format N.O.1:</b> jedan red = jedna stanica nivelmana.
+        Kolone: <code>Smjer</code> (naprijed/nazad), <code>OD</code>, <code>DO</code> (reperi dionice — samo u prvom redu dionice),
+        <code>Vezna zad.</code>, <code>Vezna pred.</code>, <code>Odstojanje</code>,
+        <code>Zad 1</code>, <code>Pred 1</code>, <code>Zad 2</code>, <code>Pred 2</code>.
+        Visinska razlika stanice = (zadnja − prednja), sredina dvije podjele.
+      </div>
+      <div id="sazetakUcitavanja"></div>
+    </div>
+
+    <h2>Dati reperi (nadmorske visine)</h2>
+    <p class="napomena">Umetnuti vlak: <b>oba repera su data</b> — upišite nadmorsku visinu H za
+      <b>početni</b> i <b>završni</b> reper. Obje visine ulaze u izravnanje (zatvaranje f<sub>h</sub>
+      se raspoređuje kao popravke).</p>
+    <div class="tabela-omot">
+    <table class="tabela tabela-reperi" id="tabelaReperi">
+      <thead>
+        <tr><th>Uloga</th><th>Naziv repera</th><th>Nadmorska visina H (m)</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="uloga">Početni reper</td>
+          <td><input id="poc_naziv" placeholder="npr. R100" value="R100" /></td>
+          <td><input id="poc_H" type="text" inputmode="decimal" placeholder="H (m)" value="550.321" /></td>
+        </tr>
+        <tr>
+          <td class="uloga">Završni reper</td>
+          <td><input id="kraj_naziv" placeholder="npr. R50" value="R50" /></td>
+          <td><input id="kraj_H" type="text" inputmode="decimal" placeholder="H (m)" value="547.550" /></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="napomena" id="napomenaReperi"></p>
+
+    <div class="akcije">
+      <button id="izracunaj" class="dugme primarno">Izračunaj izravnanje</button>
+    </div>
+  </section>
+
+  <!-- ========== REZULTATI ========== -->
+  <section id="rezultati" class="panel">
+    <div id="sazetak"></div>
+    <div id="rezultatiSadrzaj"></div>
+  </section>
+
+  <!-- ========== OBRASCI ========== -->
+  <section id="obrasci" class="panel">
+    <h2>Nivelmanski obrasci</h2>
+    <p class="napomena">Obrasci N.O.1, N.O.2 i N.O.3 popunjeni rezultatima izravnanja. Svaki se može ispisati ili spremiti u PDF.</p>
+    <div class="alatna obrazac-izbor">
+      <button class="dugme" data-obrazac="no1">N.O.1 — Zapisnik</button>
+      <button class="dugme" data-obrazac="no2">N.O.2 — Poređenje</button>
+      <button class="dugme" data-obrazac="no3">N.O.3 — Izravnanje</button>
+      <button class="dugme" data-obrazac="spisak">Spisak visina</button>
+    </div>
+    <div class="akcije" style="margin-top:8px">
+      <button id="stampajObrazac" class="dugme">Ispis / PDF ovog obrasca</button>
+      <button id="stampajSve" class="dugme primarno">Ispiši SVE obrasce (svaki na A4)</button>
+    </div>
+    <div id="obrazacSadrzaj" class="obrazac-okvir"></div>
+  </section>
+
+  <!-- ========== IZVOZ ========== -->
+  <section id="izvoz" class="panel">
+    <h2>Ispis i izvoz</h2>
+    <div class="akcije">
+      <button id="izvozVisineTxt" class="dugme">Nadmorske visine (TXT)</button>
+      <button id="izvozPdf" class="dugme">Ispis / Spremi u PDF</button>
+    </div>
+    <p class="napomena">
+      „Nadmorske visine (TXT)" sprema red po reperu: naziv,H.<br />
+      „Ispis / PDF" otvara dijalog za štampu — odaberite „Spremi kao PDF".
+    </p>
+  </section>
+</main>
+
+<footer class="podnozje">
+  Geodetski alat za izravnanje nivelmanskog vlaka · radi offline u pregledniku
+</footer>
+
+<script src="racun.js"></script>
+<script src="ucitavanje.js"></script>
+<script src="obrasci.js"></script>
+<script src="xlsx.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
