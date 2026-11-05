@@ -238,6 +238,9 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci #obrasci h2,
   body.print-obrasci #obrasci .napomena{display:none}
   body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
+  /* landscape stranica (N.O.2): obrazac koristi punu širinu položenog A4 */
+  body.print-obrasci .obrazac-stranica.ls{padding:8mm 10mm}
+  body.print-obrasci .obrazac-stranica.ls .obrazac{width:100%;font-size:11px}
   /* Paginacija u JS već dijeli obrasce na fizičke A4 stranice (svaka sa svojim
      naslovom + zaglavljem + „Strana N / M") i postavlja pageBreakAfter inline.
      Ovdje samo osiguravamo da se jedna stranica NE lomi dalje. */

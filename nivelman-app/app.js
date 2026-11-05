@@ -193,20 +193,45 @@ function generirajObrazacHTML(kod) {
   return "";
 }
 
+// Obrasci koji se ispisuju na A4 LANDSCAPE (preširoki za portrait). N.O.2 ima
+// grupe „naprijed"/„nazad" pa je širok → ide položeno.
+const LANDSCAPE_OBRASCI = ["no2"];
+
 /* ---------- Ispis / PDF ----------
-   Složi odabrane obrasce (svaki na svoj A4), razbij duge obrasce na više A4
-   stranica uz ponovljeni naslov + zaglavlje i oznaku „Strana N / M", pa štampaj. */
-function ispisiObrasce(kodovi) {
+   Preglednici ne podržavaju portrait i landscape strane u JEDNOM ispisu
+   (orijentacija prve strane vrijedi za sve), pa razdvajamo: prvo uspravni
+   obrasci, zatim landscape (N.O.2). */
+async function ispisiObrasce(lista) {
+  idiNa("obrasci");
+  const uspravni = lista.filter((k) => !LANDSCAPE_OBRASCI.includes(k));
+  const polozeni = lista.filter((k) => LANDSCAPE_OBRASCI.includes(k));
+
+  if (uspravni.length && polozeni.length) {
+    const ok = confirm(
+      "Obrasci se ispisuju u DVA koraka jer imaju različitu orijentaciju:\n" +
+      "  1) uspravni obrasci — N.O.1, N.O.3, Spisak (A4 portrait)\n" +
+      "  2) N.O.2 (A4 landscape — položeno)\n\n" +
+      "U dijalogu štampe odaberite odgovarajuću orijentaciju. Nastaviti?");
+    if (!ok) return;
+  }
+  if (uspravni.length) await ispisiGrupu(uspravni);
+  if (polozeni.length) {
+    if (uspravni.length && !confirm("Sada slijedi ispis obrasca N.O.2 (A4 landscape — položeno). Nastaviti?")) return;
+    await ispisiGrupu(polozeni);
+  }
+}
+
+/* Ispis jedne grupe obrazaca iste orijentacije; vraća Promise kad je ispis gotov. */
+function ispisiGrupu(kodovi) {
+  return new Promise((resolve) => {
   const el = document.getElementById("obrazacSadrzaj");
   const original = el.innerHTML;
-
-  // prvo pređi na karticu (prelazak prepisuje sadržaj), pa onda ubaci obrasce
-  idiNa("obrasci");
 
   let html = "";
   kodovi.forEach((kod) => {
     const sadrzaj = generirajObrazacHTML(kod);
-    if (sadrzaj) html += `<div class="obrazac-stranica" data-kod="${kod}">${sadrzaj}</div>`;
+    const jeLs = LANDSCAPE_OBRASCI.includes(kod);
+    if (sadrzaj) html += `<div class="obrazac-stranica${jeLs ? " ls" : ""}" data-kod="${kod}">${sadrzaj}</div>`;
   });
   el.innerHTML = html;
   document.body.classList.add("print-obrasci");
@@ -221,6 +246,7 @@ function ispisiObrasce(kodovi) {
     window.removeEventListener("afterprint", zavrsi);
     el.innerHTML = original;
     document.body.classList.remove("print-obrasci");
+    resolve();
   };
   window.addEventListener("afterprint", zavrsi);
 
@@ -230,12 +256,15 @@ function ispisiObrasce(kodovi) {
     if (performance.now() - t0 > 300) setTimeout(zavrsi, 400);
     else setTimeout(zavrsi, 800);
   }, 150);
+  });
 }
 
 /* Razbija svaki obrazac (tablicu) na više A4 stranica po visini,
    te na svaku fizičku stranicu stavlja naslov + zaglavlje i „Strana N / M". */
 function paginirajObrasce(kontejner) {
-  const A4_VISINA_PX = Math.round(((297 - 20) / 25.4) * 96) - 70; // ≈ 977px korisne visine
+  // korisna visina: portrait A4 ≈ 297mm, landscape A4 ≈ 210mm (visina)
+  const PORTRET_PX = Math.round(((297 - 20) / 25.4) * 96) - 70;   // ≈ 977px
+  const LANDSCAPE_PX = Math.round(((210 - 20) / 25.4) * 96) - 50; // ≈ 668px
   const obrasci = [...kontejner.querySelectorAll(".obrazac-stranica")];
 
   obrasci.forEach((obr) => {
@@ -246,10 +275,12 @@ function paginirajObrasce(kontejner) {
     const tbody = tabela.querySelector("tbody");
     if (!tbody) return;
 
+    const jeLs = obr.classList.contains("ls");
+    const visStranice = jeLs ? LANDSCAPE_PX : PORTRET_PX;
     const redovi = [...tbody.children];
     const visinaNaslov = naslov ? naslov.offsetHeight + 8 : 0;
     const visinaThead = thead ? thead.offsetHeight : 0;
-    const raspoloziva = A4_VISINA_PX - visinaNaslov - visinaThead - 30;
+    const raspoloziva = visStranice - visinaNaslov - visinaThead - 30;
 
     // Grupiši redove u stranice. VAŽNO: stanica N.O.1 = 3 reda (I, II, Z−P) — ne lomi
     // ih; grupiši po „blokovima" koji počinju redom .niv-red-i (ili bilo kojim redom
