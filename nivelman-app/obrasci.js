@@ -162,7 +162,7 @@ function obrazacNO3(r) {
       <td>${d.rb}</td><td></td><td class="mali">N.O.2</td>
       <td>${fmt(d.dHn, 4)}</td>
       <td>${fmt(d.S, 3)}</td>
-      <td>${fmtMm(d.Vn)}</td>
+      <td>${fmt(d.Vn, 4)}</td>
       <td>${fmt(d.hDef, 4)}</td>
       <td></td><td></td>
     </tr>`;
@@ -178,7 +178,7 @@ function obrazacNO3(r) {
       <td></td><td>Σ</td><td></td>
       <td>${fmt(r.sumaDh, 4)}</td>
       <td>${fmt(r.sumaS, 3)}</td>
-      <td>${fmtMm(r.sumaV)}</td>
+      <td>${fmt(r.sumaV, 4)}</td>
       <td colspan="3"></td>
     </tr>`;
   h += `</tbody></table>`;

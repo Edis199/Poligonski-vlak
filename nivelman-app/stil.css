@@ -238,10 +238,14 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci #obrasci h2,
   body.print-obrasci #obrasci .napomena{display:none}
   body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
-  /* svaki obrazac počinje na novoj A4 strani */
+  /* svaki obrazac počinje na novoj A4 strani (before + after = pouzdanije u svim preglednicima) */
   body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
+  body.print-obrasci .obrazac-stranica + .obrazac-stranica{page-break-before:always;break-before:page}
   body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
-  body.print-obrasci .obrazac tr{page-break-inside:avoid}
+  /* dugačak obrazac (N.O.1) SMIJE se lomiti preko stranica; samo redovi ostaju cijeli */
+  body.print-obrasci .obrazac{page-break-inside:auto;break-inside:auto}
+  body.print-obrasci .obrazac tr{page-break-inside:avoid;break-inside:avoid}
+  body.print-obrasci .obrazac thead{display:table-header-group}
   /* da se boje (plava zaglavlja, crvene date tačke) ispišu */
   body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
@@ -285,7 +289,7 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazacNO1z .niv-red-raz td{border-bottom:1.5px solid var(--obrub-obr)}
 .obrazacNO1z .niv-red-raz td{color:var(--plava-tamna)}
 .obrazacNO1z .niv-red-raz .mali{color:var(--siva)}
-.obrazacNO1z .sred-cel{background:#f7fbff;font-size:14px}
+.obrazacNO1z .sred-cel{background:#f7fbff;font-size:13px !important;vertical-align:top !important;padding-top:4px}
 /* suma nivelmanske strane */
 .obrazacNO1z .niv-suma td{background:#eef4fb;color:var(--plava-tamna);font-weight:600}
 .obrazacNO1z .niv-suma td:first-child{text-align:right}
