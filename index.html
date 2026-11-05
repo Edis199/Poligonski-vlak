@@ -23,23 +23,21 @@
     background:#eef2f7;
     position:relative;
   }
-  /* suptilna pozadina: geodetska mreža tačaka i linija */
+  /* pozadina: geodetska (trijangulaciona) mreža — vidljiva, suptilno plava */
   body::before{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
-    background-image:
-      radial-gradient(circle at 12% 20%, rgba(30,90,168,.07) 0 2px, transparent 3px),
-      radial-gradient(circle at 32% 70%, rgba(30,90,168,.06) 0 2px, transparent 3px),
-      radial-gradient(circle at 62% 30%, rgba(30,90,168,.06) 0 2px, transparent 3px),
-      radial-gradient(circle at 85% 65%, rgba(30,90,168,.07) 0 2px, transparent 3px),
-      radial-gradient(circle at 50% 50%, rgba(30,90,168,.04) 0 1px, transparent 2px);
-    background-size:100% 100%;
-  }
-  body::after{
-    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
-    background-image:
-      linear-gradient(115deg, transparent 0 48%, rgba(30,90,168,.05) 48% 49%, transparent 49%),
-      linear-gradient(60deg, transparent 0 62%, rgba(30,90,168,.04) 62% 63%, transparent 63%),
-      linear-gradient(160deg, transparent 0 30%, rgba(30,90,168,.04) 30% 31%, transparent 31%);
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:1;
+    background-color:#eef2f7;
+    background-image:url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='560' height='480' viewBox='0 0 560 480'>\
+<g fill='none' stroke='%231e5aa8' stroke-opacity='0.16' stroke-width='1.1'>\
+<path d='M40 60 L210 30 L360 90 L520 50 M40 60 L150 200 L210 30 M360 90 L210 30 M360 90 L520 50 M520 50 L500 210 M360 90 L500 210 M150 200 L300 250 L360 90 M300 250 L500 210 M150 200 L90 360 L300 250 M300 250 L430 400 L500 210 M90 360 L260 420 L300 250 M260 420 L430 400 M90 360 L260 420'/>\
+</g>\
+<g fill='%231e5aa8' fill-opacity='0.22'>\
+<circle cx='40' cy='60' r='3.2'/><circle cx='210' cy='30' r='3.2'/><circle cx='360' cy='90' r='3.2'/><circle cx='520' cy='50' r='3.2'/>\
+<circle cx='150' cy='200' r='2.6'/><circle cx='300' cy='250' r='2.6'/><circle cx='500' cy='210' r='3.2'/>\
+<circle cx='90' cy='360' r='3.2'/><circle cx='260' cy='420' r='3.2'/><circle cx='430' cy='400' r='2.6'/>\
+</g></svg>");
+    background-size:560px 480px;
   }
   header, main, footer{position:relative;z-index:1}
 
@@ -49,12 +47,7 @@
     background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
     color:#fff;padding:16px 28px;box-shadow:0 2px 10px rgba(0,0,0,.18);
   }
-  .zaglavlje .logo{
-    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
-    width:52px;height:52px;border-radius:50%;background:#fff;
-    box-shadow:0 2px 6px rgba(0,0,0,.2);overflow:hidden;
-  }
-  .zaglavlje .logo img{width:46px;height:auto;object-fit:contain}
+  .zaglavlje .logo{display:flex;align-items:center;justify-content:center;flex:0 0 auto}
   .zaglavlje h1{margin:0;font-size:24px;font-weight:700;letter-spacing:.3px}
   .zaglavlje .naslov-blok{flex:1}
   .zaglavlje .autor{font-size:13px;opacity:.92;white-space:nowrap}
@@ -81,7 +74,7 @@
   }
   .kartica-mreze .ikona img{
     width:124px;height:124px;border-radius:50%;object-fit:cover;
-    box-shadow:0 6px 16px rgba(30,90,168,.28);
+    box-shadow:0 10px 22px rgba(30,90,168,.38), 0 3px 8px rgba(0,0,0,.14);
   }
   .kartica-mreze h3{margin:0 0 10px;font-size:21px;color:var(--plava-tamna);font-weight:700}
   .kartica-mreze p{margin:0 0 20px;color:var(--siva);font-size:14px;min-height:44px}
@@ -108,8 +101,18 @@
 <body>
 <header class="zaglavlje">
   <div class="logo" aria-hidden="true">
-    <!-- GLAVNI LOGO: totalna stanica sa mrežom tačaka (slika) -->
-    <img src="ikone/logo_main.png" alt="Geodetske mreže" />
+    <!-- originalna ikona totalne stanice (kao u poligonskoj app) -->
+    <svg width="44" height="44" viewBox="0 0 512 512">
+      <g fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M150 360 L150 150 Q150 92 208 84 L304 84 Q362 92 362 150 L362 360 Z"/>
+        <path d="M150 300 L124 300"/>
+        <path d="M362 300 L388 300"/>
+        <path d="M214 150 L298 150 L298 300 L214 300 Z"/>
+        <path d="M206 120 Q256 70 306 120"/>
+      </g>
+      <circle cx="256" cy="200" r="26" fill="#ffffff"/>
+      <rect x="186" y="398" width="140" height="26" rx="8" fill="#ffffff"/>
+    </svg>
   </div>
   <div class="naslov-blok"><h1>Geodetske mreže</h1></div>
   <div class="autor">Izradio: Malanović Edis</div>
