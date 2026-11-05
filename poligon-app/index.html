@@ -16,17 +16,7 @@
 <body>
 <header class="zaglavlje">
   <div class="logo" aria-hidden="true">
-    <svg width="44" height="44" viewBox="0 0 512 512">
-      <g fill="none" stroke="#ffffff" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M150 360 L150 150 Q150 92 208 84 L304 84 Q362 92 362 150 L362 360 Z"/>
-        <path d="M150 300 L124 300"/>
-        <path d="M362 300 L388 300"/>
-        <path d="M214 150 L298 150 L298 300 L214 300 Z"/>
-        <path d="M206 120 Q256 70 306 120"/>
-      </g>
-      <circle cx="256" cy="200" r="26" fill="#ffffff"/>
-      <rect x="186" y="398" width="140" height="26" rx="8" fill="#ffffff"/>
-    </svg>
+    <img src="logo_main.png" alt="Geodetske mreže" />
   </div>
   <div>
     <h1>Poligonska mreža</h1>
@@ -54,8 +44,12 @@
     <h2>Učitavanje tahimetrijskog zapisnika</h2>
     <div class="ucitavanje-okvir">
       <div class="alatna">
-        <button id="preuzmiPredlozak" class="dugme">Preuzmi predložak (Excel)</button>
-        <label class="dugme" style="position:relative;cursor:pointer">
+        <button id="preuzmiPredlozak" class="dugme dugme-ikona">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          Preuzmi predložak (Excel)
+        </button>
+        <label class="dugme primarno dugme-ikona" style="position:relative;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
           Učitaj zapisnik (Excel ili CSV)
           <input id="datotekaCSV" type="file" accept=".xlsx,.csv,text/csv"
                  style="position:absolute;inset:0;opacity:0;cursor:pointer" />
