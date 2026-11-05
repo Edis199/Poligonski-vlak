@@ -20,7 +20,12 @@ body{
   background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
   color:#fff;padding:18px 28px;box-shadow:0 2px 8px rgba(0,0,0,.15);
 }
-.zaglavlje .logo{display:flex;align-items:center;justify-content:center}
+.zaglavlje .logo{
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  width:52px;height:52px;border-radius:50%;background:#fff;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);overflow:hidden;
+}
+.zaglavlje .logo img{width:52px;height:52px;border-radius:50%;object-fit:cover}
 .zaglavlje h1{margin:0;font-size:24px}
 .podnaslov{margin:2px 0 0;opacity:.9;font-size:14px}
 
@@ -36,11 +41,17 @@ main{max-width:1100px;margin:0 auto;padding:24px}
 .panel{display:none;background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .panel.vidljiv{display:block}
 
-h2{color:var(--plava-tamna);border-bottom:2px solid var(--svijetla);padding-bottom:6px;margin-top:28px}
+h2{color:var(--plava-tamna);border-bottom:2px solid var(--svijetla);padding-bottom:8px;margin-top:40px}
 h2:first-child{margin-top:0}
 
-.info{background:#e8f1fc;border-left:4px solid var(--plava);padding:12px 16px;border-radius:6px;margin-bottom:8px;font-size:14px}
-.info code,code{background:#dde7f3;padding:1px 6px;border-radius:4px;font-size:13px}
+/* callout box — tamnoplavi, čitljiv tekst na blagoj prozirnoj sivo-plavoj pozadini */
+.info{
+  background:rgba(30,90,168,.07);border-left:4px solid var(--plava);
+  padding:14px 18px;border-radius:8px;margin-bottom:10px;font-size:14px;
+  color:var(--plava-tamna);line-height:1.6;
+}
+.info b,.info strong{color:var(--plava-tamna);font-weight:700}
+.info code,code{background:#dde7f3;color:#17407a;padding:1px 6px;border-radius:4px;font-size:13px;font-weight:600}
 
 .mreza2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:720px){.mreza2{grid-template-columns:1fr}}
@@ -60,10 +71,13 @@ input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,
 .napomena{font-size:13px;color:var(--siva)}
 
 .dugme{
-  background:#fff;border:1px solid var(--plava);color:var(--plava);
-  padding:9px 18px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit;
+  background:#fff;border:1.5px solid var(--plava);color:var(--plava-tamna);
+  padding:9px 18px;border-radius:7px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
 }
 .dugme:hover{background:var(--svijetla)}
+/* dugme sa ikonom */
+.dugme-ikona{display:inline-flex;align-items:center;gap:8px}
+.dugme-ikona svg{flex:0 0 auto}
 .dugme.primarno{background:var(--plava);color:#fff}
 .dugme.primarno:hover{background:var(--plava-tamna)}
 
@@ -265,8 +279,13 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazacNiv .sekcija td{text-align:left;font-weight:600;background:#eef4fb;color:var(--plava-tamna)}
 .obrazacNiv .mali{font-size:11px;color:var(--siva)}
 .obrazac-podnaslov{text-align:center;font-size:14px;color:var(--tekst);margin:10px auto 6px}
+/* tamno zaglavlje tabele repera (jasan odmak od podataka) */
+.tabela-reperi thead th{background:#334155;color:#fff;font-weight:600;border-color:#475569}
 .tabela-reperi td.uloga{text-align:left;color:var(--plava-tamna);font-weight:600;white-space:nowrap}
 .tabela-reperi input{width:100%;min-width:90px;margin:0}
+/* naziv repera lijevo, nadmorska visina H desno */
+.tabela-reperi td:nth-child(2) input{text-align:left}
+.tabela-reperi td:nth-child(3) input{text-align:right;font-variant-numeric:tabular-nums}
 .dionice-info{background:#f7fbff;border:1px solid var(--obrub);border-left:4px solid var(--plava);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:14px}
 .dionice-info b{color:var(--plava-tamna)}
 .nazad-na-pocetak{display:inline-block;margin:0;color:#fff;text-decoration:none;font-size:13px;opacity:.9}
