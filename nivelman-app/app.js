@@ -187,12 +187,15 @@ document.getElementById("stampajSve").addEventListener("click", () => {
   ispisi(stranice, true);
 });
 
-/* ---------- Ispis / PDF ---------- */
+/* ---------- Ispis / PDF ----------
+   VAŽNO: prvo pređi na karticu „obrasci" (to pozove prikaziObrazac koji prepisuje
+   #obrazacSadrzaj), pa TEK ONDA ubaci HTML za ispis — inače prelazak prepiše naš
+   sadržaj i ostane samo jedan obrazac. */
 function ispisi(html, sve) {
+  idiNa("obrasci");
   const cilj = document.getElementById("obrazacSadrzaj");
   const staro = cilj.innerHTML;
   cilj.innerHTML = html;
-  idiNa("obrasci");
   document.body.classList.add("print-obrasci");
   setTimeout(() => {
     window.print();

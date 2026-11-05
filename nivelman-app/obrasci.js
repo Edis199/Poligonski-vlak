@@ -169,7 +169,7 @@ function obrazacNO3(r) {
     h += `<tr class="reper-red ${datiReper ? "crveni-tekst" : ""}">
       <td></td><td><b>${reper ? reper.naziv : ""}</b></td><td></td>
       <td></td><td></td><td></td><td></td>
-      <td><b>${reper ? fmt(reper.H, 3) : ""}</b></td><td>${datiReper ? "dati reper" : ""}</td>
+      <td><b>${reper ? fmt(reper.H, 3) : ""}</b></td><td></td>
     </tr>`;
   });
 
