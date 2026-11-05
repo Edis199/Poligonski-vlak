@@ -175,45 +175,143 @@ function prikaziObrazac() {
 
 document.getElementById("stampajObrazac").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  prikaziObrazac();
-  ispisi(document.getElementById("obrazacSadrzaj").innerHTML);
+  ispisiObrasce([trenutniObrazac]);
 });
 document.getElementById("stampajSve").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  const O = window.ObrasciNiv;
-  const r = zadnjiRezultat;
-  const stranice = [O.obrazacNO1(r), O.obrazacNO2(r), O.obrazacNO3(r), O.obrazacSpisak(r)]
-    .map((h) => `<div class="obrazac-stranica">${h}</div>`).join("");
-  ispisi(stranice, true);
+  ispisiObrasce(["no1", "no2", "no3", "spisak"]);
 });
 
+/* HTML jednog obrasca po kodu (bez promjene prikaza). */
+function generirajObrazacHTML(kod) {
+  const O = window.ObrasciNiv, r = zadnjiRezultat;
+  if (!r) return "";
+  if (kod === "no1") return O.obrazacNO1(r);
+  if (kod === "no2") return O.obrazacNO2(r);
+  if (kod === "no3") return O.obrazacNO3(r);
+  if (kod === "spisak") return O.obrazacSpisak(r);
+  return "";
+}
+
 /* ---------- Ispis / PDF ----------
-   VAŽNO: prvo pređi na karticu „obrasci" (to pozove prikaziObrazac koji prepisuje
-   #obrazacSadrzaj), pa TEK ONDA ubaci HTML za ispis — inače prelazak prepiše naš
-   sadržaj i ostane samo jedan obrazac. */
-function ispisi(html, sve) {
+   Složi odabrane obrasce (svaki na svoj A4), razbij duge obrasce na više A4
+   stranica uz ponovljeni naslov + zaglavlje i oznaku „Strana N / M", pa štampaj. */
+function ispisiObrasce(kodovi) {
+  const el = document.getElementById("obrazacSadrzaj");
+  const original = el.innerHTML;
+
+  // prvo pređi na karticu (prelazak prepisuje sadržaj), pa onda ubaci obrasce
   idiNa("obrasci");
-  const cilj = document.getElementById("obrazacSadrzaj");
-  const staro = cilj.innerHTML;
-  cilj.innerHTML = html;
+
+  let html = "";
+  kodovi.forEach((kod) => {
+    const sadrzaj = generirajObrazacHTML(kod);
+    if (sadrzaj) html += `<div class="obrazac-stranica" data-kod="${kod}">${sadrzaj}</div>`;
+  });
+  el.innerHTML = html;
   document.body.classList.add("print-obrasci");
+
+  // razbij svaki obrazac na A4 stranice po visini i dodaj „Strana N / M"
+  paginirajObrasce(el);
+
+  let zavrseno = false;
+  const zavrsi = () => {
+    if (zavrseno) return;
+    zavrseno = true;
+    window.removeEventListener("afterprint", zavrsi);
+    el.innerHTML = original;
+    document.body.classList.remove("print-obrasci");
+  };
+  window.addEventListener("afterprint", zavrsi);
+
   setTimeout(() => {
+    const t0 = performance.now();
     window.print();
-    setTimeout(() => {
-      document.body.classList.remove("print-obrasci");
-      if (sve) cilj.innerHTML = staro;
-    }, 500);
-  }, 300);
+    if (performance.now() - t0 > 300) setTimeout(zavrsi, 400);
+    else setTimeout(zavrsi, 800);
+  }, 150);
+}
+
+/* Razbija svaki obrazac (tablicu) na više A4 stranica po visini,
+   te na svaku fizičku stranicu stavlja naslov + zaglavlje i „Strana N / M". */
+function paginirajObrasce(kontejner) {
+  const A4_VISINA_PX = Math.round(((297 - 20) / 25.4) * 96) - 70; // ≈ 977px korisne visine
+  const obrasci = [...kontejner.querySelectorAll(".obrazac-stranica")];
+
+  obrasci.forEach((obr) => {
+    const tabela = obr.querySelector("table.obrazac");
+    if (!tabela) return;
+    const naslov = obr.querySelector(".obrazac-naslov-linija");
+    const thead = tabela.querySelector("thead");
+    const tbody = tabela.querySelector("tbody");
+    if (!tbody) return;
+
+    const redovi = [...tbody.children];
+    const visinaNaslov = naslov ? naslov.offsetHeight + 8 : 0;
+    const visinaThead = thead ? thead.offsetHeight : 0;
+    const raspoloziva = A4_VISINA_PX - visinaNaslov - visinaThead - 30;
+
+    // Grupiši redove u stranice. VAŽNO: stanica N.O.1 = 3 reda (I, II, Z−P) — ne lomi
+    // ih; grupiši po „blokovima" koji počinju redom .niv-red-i (ili bilo kojim redom
+    // koji nije nastavak). Za ostale obrasce svaki red je svoj blok.
+    const blokovi = [];
+    redovi.forEach((tr) => {
+      const nastavak = tr.classList.contains("niv-red-ii") || tr.classList.contains("niv-red-raz");
+      if (nastavak && blokovi.length) blokovi[blokovi.length - 1].push(tr);
+      else blokovi.push([tr]);
+    });
+
+    const grupe = [[]];
+    let h = 0;
+    blokovi.forEach((blok) => {
+      const vh = blok.reduce((a, tr) => a + (tr.offsetHeight || 24), 0);
+      if (h + vh > raspoloziva && grupe[grupe.length - 1].length > 0) {
+        grupe.push([]);
+        h = 0;
+      }
+      blok.forEach((tr) => grupe[grupe.length - 1].push(tr));
+      h += vh;
+    });
+
+    const ukupno = grupe.length;
+    if (ukupno <= 1) { dodajOznakuStrane(obr, 1, 1); return; }
+
+    const naslovHTML = naslov ? naslov.outerHTML : "";
+    const theadHTML = thead ? thead.outerHTML : "";
+    const tabelaKlase = tabela.className;
+    const roditelj = obr.parentNode;
+    const refNext = obr.nextSibling;
+
+    grupe.forEach((grupa, gi) => {
+      const div = document.createElement("div");
+      div.className = obr.className;
+      const telo = grupa.map((tr) => tr.outerHTML).join("");
+      div.innerHTML = naslovHTML +
+        `<table class="${tabelaKlase}">${theadHTML}<tbody>${telo}</tbody></table>`;
+      dodajOznakuStrane(div, gi + 1, ukupno);
+      roditelj.insertBefore(div, refNext);
+    });
+    obr.remove();
+  });
+
+  // prijelom strane između svih fizičkih stranica, osim poslije zadnje
+  const sve = [...kontejner.querySelectorAll(".obrazac-stranica")];
+  sve.forEach((s) => { s.style.pageBreakAfter = "always"; });
+  if (sve.length) sve[sve.length - 1].style.pageBreakAfter = "auto";
+}
+
+function dodajOznakuStrane(obr, broj, ukupno) {
+  const oznaka = document.createElement("div");
+  oznaka.className = "oznaka-strane";
+  oznaka.textContent = `Strana ${broj} / ${ukupno}`;
+  obr.insertBefore(oznaka, obr.firstChild);
 }
 
 document.getElementById("izvozPdf").addEventListener("click", () => {
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  idiNa("rezultati");
-  document.body.classList.add("print-rezultati");
-  setTimeout(() => {
-    window.print();
-    setTimeout(() => document.body.classList.remove("print-rezultati"), 500);
-  }, 300);
+  // Ispis/PDF koristi istu paginaciju kao „Ispiši sve obrasce": svaki obrazac na
+  // svoj A4, uredni prijelomi stranica i oznaka „Strana N / M".
+  ispisiObrasce(["no1", "no2", "no3", "spisak"]);
 });
 
 /* ---------- Izvoz nadmorskih visina (TXT) ---------- */

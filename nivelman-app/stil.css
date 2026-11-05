@@ -238,14 +238,12 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci #obrasci h2,
   body.print-obrasci #obrasci .napomena{display:none}
   body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
-  /* svaki obrazac počinje na novoj A4 strani (before + after = pouzdanije u svim preglednicima) */
-  body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
-  body.print-obrasci .obrazac-stranica + .obrazac-stranica{page-break-before:always;break-before:page}
+  /* Paginacija u JS već dijeli obrasce na fizičke A4 stranice (svaka sa svojim
+     naslovom + zaglavljem + „Strana N / M") i postavlja pageBreakAfter inline.
+     Ovdje samo osiguravamo da se jedna stranica NE lomi dalje. */
+  body.print-obrasci .obrazac-stranica{page-break-inside:avoid;break-inside:avoid}
   body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
-  /* dugačak obrazac (N.O.1) SMIJE se lomiti preko stranica; samo redovi ostaju cijeli */
-  body.print-obrasci .obrazac{page-break-inside:auto;break-inside:auto}
   body.print-obrasci .obrazac tr{page-break-inside:avoid;break-inside:avoid}
-  body.print-obrasci .obrazac thead{display:table-header-group}
   /* da se boje (plava zaglavlja, crvene date tačke) ispišu */
   body.print-obrasci *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
