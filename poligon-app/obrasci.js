@@ -768,7 +768,7 @@ function obrazacDetaljiPuni(rez) {
         <td class="c"></td><td class="d"></td><td class="d"></td>
         <td class="d"></td><td class="d"></td>
         <td class="d">${o.Y != null ? fz(o.Y, 3) : ""}</td><td class="d">${o.X != null ? fz(o.X, 3) : ""}</td>
-        <td class="d"></td>
+        <td class="d">${o.H != null ? fz(o.H, 3) : ""}</td>
       </tr>`;
     s.tacke.forEach((t) => {
       redovi += `

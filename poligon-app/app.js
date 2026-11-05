@@ -249,7 +249,7 @@ function nastaviIzracun(r, slijepi) {
   if (obradjeneStanice && obradjeneStanice.some((s) => s.detalji && s.detalji.length)) {
     try {
       const visine = zadnjiRezultatVisine ? zadnjiRezultatVisine.tocke.map((t) => t.H) : null;
-      const A = { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X") };
+      const A = { naziv: tekst("A_naziv"), Y: broj("A_Y"), X: broj("A_X"), H: brojOpc("A_H") };
       zadnjiDetalji = window.Detalj.izracunajDetalje(obradjeneStanice, r.tocke, A, visine);
     } catch (ed) {
       console.warn("Računanje detalja preskočeno:", ed.message);
@@ -321,7 +321,7 @@ function izracunajPolarno() {
     if (!po || (!po.Y && !po.X)) nedostaju.push("orijentacija " + st.nazZadnja);
     tocke.push(ps ? { naziv: st.stanica, Y: ps.Y, X: ps.X } : { naziv: st.stanica, Y: 0, X: 0 });
     visine.push(ps ? ps.H : null);
-    st._orijTacka = po ? { naziv: st.nazZadnja, Y: po.Y, X: po.X } : null;
+    st._orijTacka = po ? { naziv: st.nazZadnja, Y: po.Y, X: po.X, H: po.H } : null;
   });
   if (nedostaju.length) {
     alert("Unesite koordinate (Y, X) za sve stanice i njihove orijentacijske tačke:\n" + [...new Set(nedostaju)].join(", "));

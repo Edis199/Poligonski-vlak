@@ -95,6 +95,7 @@ function izracunajDetalje(stanice, tocke, A, visine) {
       visinaInstr: st.visinaInstr,
       orijentacija: {
         naziv: zad.naziv || st.nazZadnja, Y: zad.Y, X: zad.X,
+        H: (zad.H !== undefined && zad.H !== null && !isNaN(zad.H)) ? zad.H : null,
         dir: alfaZadnja, pravac: st.pravacZadnja,
         zenit: st.zenitZadnja, kosa: st.kosaZadnja,
         horizDuzina: st.horizDuzinaZadnja, visinaSignala: st.visinaSignalaZadnja,
