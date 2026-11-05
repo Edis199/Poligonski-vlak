@@ -108,10 +108,15 @@ function ucitajRedove(redovi) {
   let rucniOD = "", rucniDO = "";
 
   if (imaBrojLetve) {
-    // --- N.O.1 FORMAT: svaki red = položaj letve (I/II), vezna tačka tog položaja ---
-    // red I (zadnja) nosi vezanu tačku "odakle"; red II (prednja) tačku "dokle".
-    // Čitanja: kolona "Z (1.podjela)" / "Z (2.podjela)" — u svakom redu po jedno čitanje te skale.
-    let polazniRed = null;  // red I u obradi (zadnja letva)
+    // --- N.O.1 FORMAT (kao u Excelu) ---
+    // Stanicu čine DVA reda: jedan I (zadnja letva) i jedan II (prednja letva).
+    // Vezna tačka (kolona B) upisuje se SAMO u prvom redu stanice = čvor na kojem
+    // se predaje letva. Druga tačka stanice je vezna tačka SLJEDEĆE stanice.
+    // Visinska razlika stanice: Δh = čitanje(I) − čitanje(II).
+    // Stanicu čine DVA reda s čitanjima: red I = zadnja letva, red II = prednja letva.
+    // Vezna tačka svakog reda je tačka na kojoj stoji ta letva (zadnja/prednja).
+    // Visinska razlika stanice: Δh = čitanje(I) − čitanje(II).
+    let prvi = null;
     for (let i = zaglRed + 1; i < redovi.length; i++) {
       const c = redovi[i];
       const smjer = normZaglavlje(uzmi(c, ["smjer", "nivelman"]));
@@ -120,33 +125,25 @@ function ucitajRedove(redovi) {
       const veznaT = uzmi(c, ["veznatacka", "vezna", "tacka"]);
       const letva = normZaglavlje(uzmi(c, ["brojletve", "letva", "polozaj"]));  // "i" ili "ii"
       const odst = parseBroj(uzmi(c, ["odstojanjeodletve", "odstojanje", "odst", "s"]));
-      // čitanja: 1. podjela i 2. podjela (svaki red po jedno čitanje po podjeli)
       const c1 = parseBroj(uzmi(c, ["citanje1podjela", "citanja1podjela", "citanja", "citanje", "citanja1", "citanje1", "podjela1", "1podjela", "z1podjela", "z1"]));
       const c2 = parseBroj(uzmi(c, ["citanje2podjela", "citanja2podjela", "citanja2", "citanje2", "podjela2", "2podjela", "z2podjela", "z2"]));
-      if (c1 === null && c2 === null) continue;  // red bez čitanja (npr. red razlike) → preskoči
+      if (c1 === null && c2 === null) continue;  // red bez čitanja (red razlike) → preskoči
 
-      if (letva === "i" || (!polazniRed && letva !== "ii")) {
-        // red I = zadnja letva (početak stanice)
-        polazniRed = { smjer: trenutniSmjer, veznaZad: veznaT, z1: c1, z2: (c2 !== null ? c2 : c1), odstZad: odst };
-      } else {
-        // red II = prednja letva (kraj stanice) → sklopi stanicu
-        const z1 = polazniRed ? polazniRed.z1 : null;
-        const z2 = polazniRed ? polazniRed.z2 : null;
-        const p1 = c1, p2 = (c2 !== null ? c2 : c1);
-        const odZ = polazniRed ? (polazniRed.odstZad || 0) : 0;
-        const odP = odst || 0;
-        mjerenja.push({
-          smjer: polazniRed ? polazniRed.smjer : trenutniSmjer,
-          od: "", doR: "",
-          stanica: {
-            veznaZad: polazniRed ? polazniRed.veznaZad : "",
-            veznaPred: veznaT,
-            zad1: z1, pred1: p1, zad2: z2, pred2: p2,
-            odstZad: odZ, odstPred: odP
-          }
-        });
-        polazniRed = null;
-      }
+      const red = { smjer: trenutniSmjer, letva, veznaT, p1: c1, p2: (c2 !== null ? c2 : c1), odst: odst || 0 };
+      if (!prvi) { prvi = red; continue; }
+
+      // Stanica = dva uzastopna reda. ZADNJA letva = PRVI red stanice, PREDNJA = DRUGI red.
+      // (Kao u originalnom N.O.1: Δh = prvi red − drugi red, neovisno o I/II oznaci skale.)
+      const redZad = prvi, redPred = red;
+      mjerenja.push({
+        smjer: prvi.smjer, od: "", doR: "",
+        stanica: {
+          veznaZad: redZad.veznaT, veznaPred: redPred.veznaT,
+          zad1: redZad.p1, pred1: redPred.p1, zad2: redZad.p2, pred2: redPred.p2,
+          odstZad: redZad.odst, odstPred: redPred.odst
+        }
+      });
+      prvi = null;
     }
   } else {
     // --- jednostavni format: jedan red = jedna stanica ---

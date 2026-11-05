@@ -48,9 +48,16 @@ Kad završiš upis nivelmana **naprijed**, povratni nivelman (**nazad**) upiši 
 bez praznog reda i bez posebne kolone. Nastaviš nova stajališta koja se vraćaju od krajnjeg
 repera natrag prema početnom (npr. R50 → … → R100).
 
+Za svaku stanicu: **prvi red = zadnja letva**, **drugi red = prednja letva**
+(visinska razlika stanice = čitanje prvog reda − čitanje drugog reda).
+
 Program **sam prepoznaje** gdje počinje nazad — iz veznih tačaka, jer se nizanje repera
 vraća na već posjećene repere. Naprijed i nazad za istu dionicu se automatski spajaju,
 a u **N.O.2** se računa odstupanje Δ i srednja visinska razlika.
+
+> **Preuzeti predložak već sadrži potpun primjer** — i mjerenja naprijed (stanice 1–8) i
+> mjerenja nazad (stanice 9–16), s podacima iz vježbe. Možeš odmah učitati zapisnik i
+> kliknuti „Izračunaj" da vidiš kako radi.
 
 ### Reperi i vezne tačke (automatsko dijeljenje na dionice)
 

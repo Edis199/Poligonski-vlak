@@ -84,6 +84,7 @@ function predlozakZapisnikXlsx() {
   //   iz veznih tačaka (nizanje repera se vraća: R50 → R102 → R101 → R100).
   // Svaki unos = [stanicaBr, veznaTacka, I|II, odst, Čit1.podjela, Čit2.podjela, "", primjedba]
   const stanice = [
+    // ===== NIVELMAN NAPRIJED: R100 → a → b → c → R101 → a → R102 → a → R50 =====
     ["1","R100","I","11","1.587","1.608","",""],
     [ "", "a","II","12","1.704","1.725","",""],
     ["2","a","I","13","1.823","1.869","",""],
@@ -100,10 +101,29 @@ function predlozakZapisnikXlsx() {
     [ "","a","II","16","1.657","1.671","",""],
     ["8","a","I","12","1.024","1.043","",""],
     [ "","R50","II","12","1.207","1.227","",""],
+    // ===== NIVELMAN NAZAD: R50 → a → R102 → a → R101 → a → b → c → R100 =====
+    // (upisan odmah ispod, bez razmaka — program sam prepoznaje povratni smjer).
+    // Prvi red stanice = ZADNJA letva, drugi red = PREDNJA letva.
+    ["9","R50","I","15","1.916","1.949","",""],
+    [ "","a","II","17","2.064","2.099","",""],
+    ["10","a","I","14","1.535","1.560","",""],
+    [ "","R102","II","15","1.077","1.102","",""],
+    ["11","R102","I","13","1.582","1.624","",""],
+    [ "","a","II","13","1.495","1.538","",""],
+    ["12","a","I","13","1.147","1.197","",""],
+    [ "","R101","II","13","0.307","0.359","",""],
+    ["13","R101","I","14","1.896","1.940","",""],
+    [ "","a","II","14","1.966","2.010","",""],
+    ["14","a","I","14","1.233","1.284","",""],
+    [ "","b","II","14","0.604","0.657","",""],
+    ["15","b","I","11","1.029","1.046","",""],
+    [ "","c","II","12","0.380","0.397","",""],
+    ["16","c","I","14","1.994","2.034","",""],
+    [ "","R100","II","16","1.673","1.715","",""],
   ];
-  // prazni redovi za dalje upisivanje (npr. povratni nivelman odmah ispod)
+  // prazni redovi za dalje upisivanje
   const prazni = [];
-  for (let i = 0; i < 28; i++) prazni.push(new Array(8).fill(""));
+  for (let i = 0; i < 12; i++) prazni.push(new Array(8).fill(""));
   const sviRedovi = [zagl1, zagl2, ...stanice, ...prazni];
 
   const kolSlova = ["A","B","C","D","E","F","G","H"];
