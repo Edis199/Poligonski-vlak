@@ -276,11 +276,19 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .obrazacNiv .zaglavlje-red.pod th{
   background:#f6f9fd;color:var(--plava-tamna);font-weight:600;font-size:12px;
 }
-/* N.O.1 zapisnik: par redova I/II po stanici */
-.obrazacNO1z td,.obrazacNO1z th{font-size:13px;padding:5px 8px}
-.obrazacNO1z .niv-red-i td{border-bottom:1px dashed var(--obrub-obr)}
-.obrazacNO1z .niv-red-ii td{background:#fafcfe}
-.obrazacNO1z .sekcija td{text-align:left;font-weight:600;background:#eef4fb;color:var(--plava-tamna)}
+/* N.O.1 zapisnik: TRI reda po stanici (I = zadnja, II = prednja, Z−P = razlika),
+   čitanja poravnata jedno ispod drugog u istoj koloni po podjeli. */
+.obrazacNO1z td,.obrazacNO1z th{font-size:13px;padding:4px 10px}
+.obrazacNO1z tbody td{text-align:center;font-variant-numeric:tabular-nums}
+/* tanke linije između tri reda stanice; puna linija na kraju stanice (ispod Z−P) */
+.obrazacNO1z .niv-red-i td,.obrazacNO1z .niv-red-ii td{border-bottom:1px dotted #c7d2e0}
+.obrazacNO1z .niv-red-raz td{border-bottom:1.5px solid var(--obrub-obr)}
+.obrazacNO1z .niv-red-raz td{color:var(--plava-tamna)}
+.obrazacNO1z .niv-red-raz .mali{color:var(--siva)}
+.obrazacNO1z .sred-cel{background:#f7fbff;font-size:14px}
+/* suma nivelmanske strane */
+.obrazacNO1z .niv-suma td{background:#eef4fb;color:var(--plava-tamna);font-weight:600}
+.obrazacNO1z .niv-suma td:first-child{text-align:right}
 /* N.O.2: grupe naprijed/nazad */
 .obrazacNO2 td,.obrazacNO2 th{font-size:13px}
 /* N.O.3: reper-redovi istaknuti, dionica-redovi blaži */

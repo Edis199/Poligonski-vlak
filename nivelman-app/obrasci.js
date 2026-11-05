@@ -16,48 +16,52 @@ function obrazacNO1(r) {
   <table class="obrazac obrazacNiv obrazacNO1z">
     <thead>
       <tr>
-        <th rowspan="3">Stanica</th><th rowspan="3">Vezna<br>tačka</th>
-        <th rowspan="3">Broj<br>letve</th><th rowspan="3">Odstojanje<br>od letve</th>
-        <th colspan="6">Čitanja</th>
-        <th rowspan="3">Proba</th>
-        <th rowspan="3">Srednja<br>visinska<br>razlika</th><th rowspan="3">Primjedba</th>
+        <th rowspan="2">Stanica</th><th rowspan="2">Vezna<br>tačka</th>
+        <th rowspan="2">Broj<br>letve</th><th rowspan="2">Odstojanje<br>od letve</th>
+        <th colspan="2">Čitanja</th>
+        <th rowspan="2">Srednja<br>visinska<br>razlika</th><th rowspan="2">Primjedba</th>
       </tr>
-      <tr><th colspan="3">1. podjela</th><th colspan="3">2. podjela</th></tr>
-      <tr><th>Z<sub>1</sub></th><th>P<sub>1</sub></th><th>Z<sub>1</sub>−P<sub>1</sub></th>
-          <th>Z<sub>2</sub></th><th>P<sub>2</sub></th><th>Z<sub>2</sub>−P<sub>2</sub></th></tr>
-      <tr class="broj-kolone"><td>1</td><td>2</td><td>3</td><td>4</td><td colspan="3">5</td><td colspan="3">6</td><td>7</td><td>8</td><td>9</td></tr>
+      <tr><th>1. podjela<br><span class="mali">Z / P / Z−P</span></th>
+          <th>2. podjela<br><span class="mali">Z / P / Z−P</span></th></tr>
+      <tr class="broj-kolone"><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
     </thead><tbody>`;
 
   let stBr = 0;
   r.redoviNO1.forEach((d) => {
     ["naprijed", "nazad"].forEach((smj) => {
       const blok = d[smj];
-      if (!blok) return;
-      h += `<tr class="sekcija"><td colspan="13">${smj === "naprijed" ? "NIVELMAN NAPRIJED" : "NIVELMAN NAZAD"}: ${d.od} → ${d.do}</td></tr>`;
+      if (!blok || !blok.stanice.length) return;
       blok.stanice.forEach((s) => {
         stBr++;
         const pZ1P1 = (s.zad1 - s.pred1), pZ2P2 = (s.zad2 - s.pred2);
-        // red I: zadnja letva (Z čitanja)
+        // Svaka stanica = TRI reda u istim kolonama čitanja:
+        //   red I  → zadnja letva (Z)
+        //   red II → prednja letva (P)
+        //   red razlike → Z−P (po podjeli), i srednja visinska razlika
         h += `<tr class="niv-red-i">
-          <td rowspan="2"><b>${stBr}</b></td>
-          <td>${s.veznaZad || ""}</td>
-          <td>I</td>
-          <td>${fmt(s.odstZad, 0)}</td>
-          <td>${fmt(s.zad1, 3)}</td><td></td><td rowspan="2">${fmt(pZ1P1, 3)}</td>
-          <td>${fmt(s.zad2, 3)}</td><td></td><td rowspan="2">${fmt(pZ2P2, 3)}</td>
-          <td rowspan="2"></td>
-          <td rowspan="2"><b>${fmt(s.dSred, 4)}</b></td>
-          <td rowspan="2"></td>
+          <td rowspan="3"><b>${stBr}</b></td>
+          <td>${s.veznaZad || ""}</td><td>I</td><td>${fmt(s.odstZad, 0)}</td>
+          <td>${fmt(s.zad1, 3)}</td><td>${fmt(s.zad2, 3)}</td>
+          <td rowspan="3" class="sred-cel"><b>${fmt(s.dSred, 4)}</b></td>
+          <td rowspan="3"></td>
         </tr>`;
-        // red II: prednja letva (P čitanja)
         h += `<tr class="niv-red-ii">
-          <td>${s.veznaPred || ""}</td>
-          <td>II</td>
-          <td>${fmt(s.odstPred, 0)}</td>
-          <td></td><td>${fmt(s.pred1, 3)}</td>
-          <td></td><td>${fmt(s.pred2, 3)}</td>
+          <td>${s.veznaPred || ""}</td><td>II</td><td>${fmt(s.odstPred, 0)}</td>
+          <td>${fmt(s.pred1, 3)}</td><td>${fmt(s.pred2, 3)}</td>
+        </tr>`;
+        h += `<tr class="niv-red-raz">
+          <td></td><td class="mali">Z−P</td><td></td>
+          <td>${fmt(pZ1P1, 3)}</td><td>${fmt(pZ2P2, 3)}</td>
         </tr>`;
       });
+      // SUMA nivelmanske strane: Σ odstojanja i Σ srednjih visinskih razlika te strane
+      h += `<tr class="suma-red niv-suma">
+        <td colspan="3">Σ strana</td>
+        <td>${fmt(blok.sumaOdst, 0)}</td>
+        <td colspan="2"></td>
+        <td><b>${fmt(blok.dHuk, 4)}</b></td>
+        <td></td>
+      </tr>`;
     });
   });
   h += `</tbody></table>`;
