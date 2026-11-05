@@ -30,16 +30,18 @@ Na početnoj stranici (`../index.html`) bira se vrsta mreže.
 
 ### Format zapisnika N.O.1
 
-Kolone predloška:
-`Smjer ; OD ; DO ; Vezna zad. ; Vezna pred. ; Odstojanje ; Zad 1 ; Pred 1 ; Zad 2 ; Pred 2 ; Primjedba`
+Predložak vjerno slijedi originalni Excel obrazac **N.O.1**. Kolone:
 
-- **Smjer** = `naprijed` ili `nazad` (upisuje se samo u prvom redu smjera; prazno = nasljeđuje se).
-- **OD / DO** = reperi dionice (mogu se upisati, ali se i **prepoznaju automatski** — vidi niže).
-- Svaki red mjerenja = jedna stanica: zadnja (nazad) i prednja (naprijed) letva.
-  - **Zad 1 / Pred 1** = čitanja na 1. podjeli letve (lijeva skala),
-  - **Zad 2 / Pred 2** = čitanja na 2. podjeli letve (desna skala).
-  - Visinska razlika stanice = (zadnja − prednja), sredina dvije podjele.
-- **Odstojanje** = dužina stanice [m] (za računanje dužine dionice i dozvoljenog odstupanja).
+`Stanica | Vezna tačka | Broj letve | Odstojanje od letve | Čitanje 1. podjela | Čitanje 2. podjela | Srednja visinska razlika | Primjedba`
+
+- Jedan **red** = jedan **položaj letve**. Stanicu čine **dva reda**:
+  - **Broj letve = I** → zadnja (nazad) letva,
+  - **Broj letve = II** → prednja (naprijed) letva.
+- **Vezna tačka** = tačka tog položaja letve (zadnja tačka u redu I, prednja u redu II).
+- **Čitanje 1. / 2. podjela** = očitanje letve na prvoj i drugoj skali.
+  - Visinska razlika stanice = čitanje(I) − čitanje(II), sredina dvije podjele.
+- **Odstojanje od letve** = dužina (za računanje dužine dionice i dozvoljenog odstupanja).
+- (Opcionalno) kolona **Smjer** (`naprijed`/`nazad`) ako se mjeri dvostrano.
 
 ### Reperi i vezne tačke (automatsko dijeljenje na dionice)
 

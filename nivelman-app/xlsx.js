@@ -58,53 +58,94 @@ function napraviZip(datoteke) {
 
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
-/* ---- Predložak nivelmanskog zapisnika (obrazac N.O.1) ---- */
+/* ---- Predložak nivelmanskog zapisnika (obrazac N.O.1) ----
+   Vjerno originalnom Excelu: jedan POLOŽAJ letve = jedan red.
+   Stanica zauzima dva reda: I (zadnja/nazad) i II (prednja/naprijed).
+   Kolone (10):
+     A Stanica | B Vezna tačka | C Broj letve (I/II) | D Odstojanje
+     E Z (1.podjela) | F P (1.podjela)
+     G Z (2.podjela) | H P (2.podjela)
+     I Srednja visinska razlika | J Primjedba
+   Za izravnanje su bitne: Vezna tačka, I/II, Odstojanje, i čitanja Z/P. */
 function predlozakZapisnikXlsx() {
-  // Stilovi:  1=naslov  2=zaglavlje kolone  3=ćelija s obrubom  4=ćelija dionice
-  const kolone = ["Smjer","OD","DO","Vezna zad.","Vezna pred.","Odstojanje (m)",
-                  "Zad 1","Pred 1","Zad 2","Pred 2","Primjedba"];
+  // Stilovi:  1=naslov  2=zaglavlje kolone  3=ćelija s obrubom  4=ćelija repera/stanice
+  // Dva reda zaglavlja (kao u Excelu): grupa "Čitanja" sa 1. i 2. podjelom.
+  // Svaki red ima JEDNO čitanje po podjeli (red I = zadnja, red II = prednja);
+  // visinska razlika stanice = čitanje(I) − čitanje(II), za svaku podjelu.
+  const zagl1 = ["Stanica","Vezna tačka","Broj letve","Odstojanje od letve",
+                 "Čitanja","","Srednja visinska razlika","Primjedba"];
+  const zagl2 = ["","","","","Čitanje 1. podjela","Čitanje 2. podjela","",""];
 
-  // Primjer (po originalnom Excelu, nivelman NAPRIJED):
-  // R100 → a → b → c → R101 → a → R102 → a → R50.
-  // Reperi su velikim R/P, vezne tačke malim slovima — dionice se prepoznaju same.
-  const primjer = [
-    // Smjer, OD, DO, VeznaZad, VeznaPred, Odst, Zad1, Pred1, Zad2, Pred2, Primjedba
-    ["naprijed","R100","","R100","a","23","1.587","1.704","1.608","1.725",""],
-    ["","","","a","b","27","1.823","2.483","1.869","2.531",""],
-    ["","","","b","c","27","1.827","2.515","1.867","2.557",""],
-    ["","","","c","R101","24","1.410","1.471","1.437","1.499","kraj 1. dionice"],
-    ["","","","R101","a","26","1.879","2.302","1.908","2.331",""],
-    ["","","","a","R102","12","1.984","2.489","2.002","2.507","kraj 2. dionice"],
-    ["","","","R102","a","14","1.531","1.657","1.544","1.671",""],
-    ["","","","a","R50","12","1.024","1.207","1.043","1.227","kraj 3. dionice"],
+  // PRIMJER (po originalnom Excelu, nivelman NAPRIJED):
+  //   R100 → a → b → c → R101 → a → R102 → a → R50.
+  //   Vezna tačka = tačka tog položaja letve; red I = zadnja, red II = prednja.
+  //   Reperi velikim R/P, vezne tačke malim slovima — dionice se prepoznaju same.
+  // Svaki unos = [stanicaBr, veznaTacka, I|II, odst, Čitanje1.podjela, Čitanje2.podjela, "", primjedba]
+  const stanice = [
+    // st.1: zadnja R100 (I), prednja a (II)
+    ["1","R100","I","11","1.587","1.608","",""],
+    [  "", "a","II","12","1.704","1.725","",""],
+    // st.2: zadnja a, prednja b
+    ["2","a","I","13","1.823","1.869","",""],
+    [ "","b","II","14","2.483","2.531","",""],
+    // st.3: zadnja b, prednja c
+    ["3","b","I","13","1.827","1.867","",""],
+    [ "","c","II","14","2.515","2.557","",""],
+    // st.4: zadnja c, prednja R101  → kraj 1. dionice (R100→R101)
+    ["4","c","I","11","1.410","1.437","",""],
+    [ "","R101","II","13","1.471","1.499","","kraj dionice R100→R101"],
+    // st.5: zadnja R101, prednja a
+    ["5","R101","I","14","1.879","1.908","",""],
+    [ "","a","II","15","2.302","2.331","",""],
+    // st.6: zadnja a, prednja R102 → kraj 2. dionice (R101→R102)
+    ["6","a","I","12","1.984","2.002","",""],
+    [ "","R102","II","12","2.489","2.507","","kraj dionice R101→R102"],
+    // st.7: zadnja R102, prednja a
+    ["7","R102","I","14","1.531","1.544","",""],
+    [ "","a","II","16","1.657","1.671","",""],
+    // st.8: zadnja a, prednja R50 → kraj 3. dionice (R102→R50)
+    ["8","a","I","12","1.024","1.043","",""],
+    [ "","R50","II","12","1.207","1.227","","kraj dionice R102→R50"],
   ];
+  // prazni redovi za dalje upisivanje
   const prazni = [];
-  for (let i = 0; i < 24; i++) prazni.push(new Array(11).fill(""));
-  const sviRedovi = [kolone, ...primjer, ...prazni];
+  for (let i = 0; i < 24; i++) prazni.push(new Array(8).fill(""));
+  const sviRedovi = [zagl1, zagl2, ...stanice, ...prazni];
 
-  const kolSlova = ["A","B","C","D","E","F","G","H","I","J","K"];
+  const kolSlova = ["A","B","C","D","E","F","G","H"];
   let rowsXml = "";
   sviRedovi.forEach((red, ri) => {
-    const rnum = ri + 2;
+    const rnum = ri + 2;                 // red 1 = naslov
+    const jeZagl = (ri <= 1);
     let cells = "";
-    red.forEach((val, ci) => {
+    for (let ci = 0; ci < 8; ci++) {
+      const val = red[ci] || "";
       const ref = kolSlova[ci] + rnum;
-      const stil = (ri === 0) ? 2 : (ci <= 2 && val ? 4 : 3);
+      // reper/stanica (A ili B velikim R/P) → stil 4; zaglavlja → 2; ostalo → 3
+      let stil = 3;
+      if (jeZagl) stil = 2;
+      else if ((ci === 0 && val) || (ci === 1 && /^[RP]/.test(val))) stil = 4;
       cells += `<c r="${ref}" s="${stil}" t="inlineStr"><is><t xml:space="preserve">${esc(val)}</t></is></c>`;
-    });
+    }
     rowsXml += `<row r="${rnum}">${cells}</row>`;
   });
   const naslovRed = `<row r="1"><c r="A1" s="1" t="inlineStr"><is><t>NIVELMANSKI ZAPISNIK — obrazac N.O.1</t></is></c></row>`;
 
+  // spojene ćelije: naslov A1:H1; grupa "Čitanja" E2:F2; ostala zaglavlja preko dva reda
+  const merge = [
+    'A1:H1',
+    'A2:A3','B2:B3','C2:C3','D2:D3','E2:F2','G2:G3','H2:H3'
+  ].map((r) => `<mergeCell ref="${r}"/>`).join("");
+
   const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 <cols>
-<col min="1" max="1" width="11"/><col min="2" max="3" width="9"/>
-<col min="4" max="5" width="11"/><col min="6" max="6" width="13"/>
-<col min="7" max="10" width="9"/><col min="11" max="11" width="14"/>
+<col min="1" max="1" width="8"/><col min="2" max="2" width="12"/>
+<col min="3" max="3" width="10"/><col min="4" max="4" width="16"/>
+<col min="5" max="6" width="16"/><col min="7" max="7" width="18"/><col min="8" max="8" width="16"/>
 </cols>
 <sheetData>${naslovRed}${rowsXml}</sheetData>
-<mergeCells count="1"><mergeCell ref="A1:K1"/></mergeCells>
+<mergeCells count="8">${merge}</mergeCells>
 </worksheet>`;
 
   const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
