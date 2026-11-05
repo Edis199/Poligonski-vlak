@@ -266,3 +266,26 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .dionice-info b{color:var(--plava-tamna)}
 .nazad-na-pocetak{display:inline-block;margin:0;color:#fff;text-decoration:none;font-size:13px;opacity:.9}
 .nazad-na-pocetak:hover{opacity:1;text-decoration:underline}
+
+/* ---------- Nivelmanski obrasci — vjerni Excelu ---------- */
+/* broj kolone (sitni red ispod zaglavlja, kao u obrascu) */
+.obrazacNiv .broj-kolone td{
+  font-size:11px;color:var(--siva);background:#f6f9fd;padding:2px 6px;font-weight:400;
+}
+/* pod-zaglavlja (drugi/treći red zaglavlja) */
+.obrazacNiv .zaglavlje-red.pod th{
+  background:#f6f9fd;color:var(--plava-tamna);font-weight:600;font-size:12px;
+}
+/* N.O.1 zapisnik: par redova I/II po stanici */
+.obrazacNO1z td,.obrazacNO1z th{font-size:13px;padding:5px 8px}
+.obrazacNO1z .niv-red-i td{border-bottom:1px dashed var(--obrub-obr)}
+.obrazacNO1z .niv-red-ii td{background:#fafcfe}
+.obrazacNO1z .sekcija td{text-align:left;font-weight:600;background:#eef4fb;color:var(--plava-tamna)}
+/* N.O.2: grupe naprijed/nazad */
+.obrazacNO2 td,.obrazacNO2 th{font-size:13px}
+/* N.O.3: reper-redovi istaknuti, dionica-redovi blaži */
+.obrazacNO3 .reper-red td{background:#eef4fb;font-weight:600}
+.obrazacNO3 .dionica-red td{background:#fff}
+.obrazacNO3 td,.obrazacNO3 th{font-size:13px}
+/* crveni tekst za date repere (kao u Excelu) */
+.obrazacNiv .crveni-tekst td,.obrazacNiv tr.crveni-tekst td{color:#c0392b}

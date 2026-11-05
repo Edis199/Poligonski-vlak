@@ -6,38 +6,56 @@
 function fmt(x, dec) { return (x === null || x === undefined || isNaN(x)) ? "" : Number(x).toFixed(dec); }
 function fmtMm(x) { return (x === null || x === undefined || isNaN(x)) ? "" : (x * 1000).toFixed(1); }
 
-/* ---------- N.O.1 — čitanja i visinske razlike po stanicama ---------- */
+/* ---------- N.O.1 — nivelmanski zapisnik (vjerno Excelu) ----------
+   Kolone: Stanica | Vezna tačka | Broj letve | Odstojanje od letve |
+   Čitanja [1. podjela: Z1 | P1 | Z1−P1] [2. podjela: Z2 | P2 | Z2−P2] |
+   Proba | Srednja visinska razlika | Primjedba.
+   Svaka stanica: red I (zadnja letva) + red II (prednja letva) + red razlike. */
 function obrazacNO1(r) {
   let h = `<div class="obrazac-naslov-linija">Nivelmanski obrazac br. 1</div>
-  <table class="obrazac obrazacNiv">
+  <table class="obrazac obrazacNiv obrazacNO1z">
     <thead>
-      <tr><th class="naslov" colspan="9">N.O.1 — Nivelmanski zapisnik (čitanja letvi)</th></tr>
-      <tr class="zaglavlje-red">
-        <th>Smjer</th><th>Vezna<br>zadnja</th><th>Vezna<br>prednja</th>
-        <th>Odstojanje<br>(m)</th>
-        <th>Zad − Pred<br>(1. podjela)</th><th>Zad − Pred<br>(2. podjela)</th>
-        <th>Zad 1 / Pred 1</th><th>Zad 2 / Pred 2</th>
-        <th>Srednja vis.<br>razlika (m)</th>
+      <tr>
+        <th rowspan="3">Stanica</th><th rowspan="3">Vezna<br>tačka</th>
+        <th rowspan="3">Broj<br>letve</th><th rowspan="3">Odstojanje<br>od letve</th>
+        <th colspan="6">Čitanja</th>
+        <th rowspan="3">Proba</th>
+        <th rowspan="3">Srednja<br>visinska<br>razlika</th><th rowspan="3">Primjedba</th>
       </tr>
+      <tr><th colspan="3">1. podjela</th><th colspan="3">2. podjela</th></tr>
+      <tr><th>Z<sub>1</sub></th><th>P<sub>1</sub></th><th>Z<sub>1</sub>−P<sub>1</sub></th>
+          <th>Z<sub>2</sub></th><th>P<sub>2</sub></th><th>Z<sub>2</sub>−P<sub>2</sub></th></tr>
+      <tr class="broj-kolone"><td>1</td><td>2</td><td>3</td><td>4</td><td colspan="3">5</td><td colspan="3">6</td><td>7</td><td>8</td><td>9</td></tr>
     </thead><tbody>`;
 
+  let stBr = 0;
   r.redoviNO1.forEach((d) => {
     ["naprijed", "nazad"].forEach((smj) => {
       const blok = d[smj];
       if (!blok) return;
-      h += `<tr class="sekcija"><td colspan="9">${smj.toUpperCase()}: ${d.od} → ${d.do}
-             &nbsp;|&nbsp; Σ Δh = ${fmt(blok.dHuk, 4)} m &nbsp;|&nbsp; Σ odst. = ${fmt(blok.sumaOdst, 1)} m</td></tr>`;
+      h += `<tr class="sekcija"><td colspan="13">${smj === "naprijed" ? "NIVELMAN NAPRIJED" : "NIVELMAN NAZAD"}: ${d.od} → ${d.do}</td></tr>`;
       blok.stanice.forEach((s) => {
-        h += `<tr>
-          <td class="mali">${smj === "naprijed" ? "n" : "z"}</td>
+        stBr++;
+        const pZ1P1 = (s.zad1 - s.pred1), pZ2P2 = (s.zad2 - s.pred2);
+        // red I: zadnja letva (Z čitanja)
+        h += `<tr class="niv-red-i">
+          <td rowspan="2"><b>${stBr}</b></td>
           <td>${s.veznaZad || ""}</td>
+          <td>I</td>
+          <td>${fmt(s.odstZad, 0)}</td>
+          <td>${fmt(s.zad1, 3)}</td><td></td><td rowspan="2">${fmt(pZ1P1, 3)}</td>
+          <td>${fmt(s.zad2, 3)}</td><td></td><td rowspan="2">${fmt(pZ2P2, 3)}</td>
+          <td rowspan="2"></td>
+          <td rowspan="2"><b>${fmt(s.dSred, 4)}</b></td>
+          <td rowspan="2"></td>
+        </tr>`;
+        // red II: prednja letva (P čitanja)
+        h += `<tr class="niv-red-ii">
           <td>${s.veznaPred || ""}</td>
-          <td>${fmt((s.odstZad || 0) + (s.odstPred || 0), 1)}</td>
-          <td>${fmt(s.d1, 4)}</td>
-          <td>${fmt(s.d2, 4)}</td>
-          <td class="mali">${fmt(s.zad1, 3)} / ${fmt(s.pred1, 3)}</td>
-          <td class="mali">${fmt(s.zad2, 3)} / ${fmt(s.pred2, 3)}</td>
-          <td><b>${fmt(s.dSred, 4)}</b></td>
+          <td>II</td>
+          <td>${fmt(s.odstPred, 0)}</td>
+          <td></td><td>${fmt(s.pred1, 3)}</td>
+          <td></td><td>${fmt(s.pred2, 3)}</td>
         </tr>`;
       });
     });
@@ -46,88 +64,125 @@ function obrazacNO1(r) {
   return h;
 }
 
-/* ---------- N.O.2 — poređenje naprijed/nazad ---------- */
+/* ---------- N.O.2 — poređenje naprijed/nazad (vjerno Excelu) ----------
+   Raspored kolona kao u originalu:
+   OD | DO | [Visinska razlika iz nivelanja "naprijed": S u km | Δh'p | odakle] |
+   [ "nazad": S u km | Δh'n ] | Odstupanje Δ=h'p−h'n u mm | Dozvoljeno Δh u mm |
+   Srednja visinska razlika | Primjedba                                          */
 function obrazacNO2(r) {
   let h = `<div class="obrazac-naslov-linija">Nivelmanski obrazac br. 2</div>
-  <table class="obrazac obrazacNiv">
+  <table class="obrazac obrazacNiv obrazacNO2">
     <thead>
-      <tr><th class="naslov" colspan="9">N.O.2 — Poređenje nivelmana naprijed / nazad</th></tr>
+      <tr>
+        <th class="naslov" colspan="12">........... nivelman ...........</th>
+      </tr>
       <tr class="zaglavlje-red">
-        <th>OD</th><th>DO</th>
-        <th>S naprijed<br>(km)</th><th>Δh'<sub>p</sub><br>naprijed (m)</th>
-        <th>S nazad<br>(km)</th><th>Δh'<sub>n</sub><br>nazad (m)</th>
-        <th>Odstupanje<br>Δ (mm)</th><th>Dozvoljeno<br>(mm)</th>
-        <th>Srednja vis.<br>razlika (m)</th>
+        <th rowspan="2">OD</th><th rowspan="2">DO</th>
+        <th colspan="3">Visinska razlika iz nivelanja „naprijed"</th>
+        <th colspan="3">Visinska razlika iz nivelanja „nazad"</th>
+        <th rowspan="2">Odstupanje<br>Δ = h'<sub>p</sub> − h'<sub>n</sub><br>u mm</th>
+        <th rowspan="2">Dozvoljeno<br>odstupanje<br>Δh u mm</th>
+        <th rowspan="2">Srednja<br>visinska<br>razlika</th>
+        <th rowspan="2">Primjedba</th>
+      </tr>
+      <tr class="zaglavlje-red pod">
+        <th>odakle<br>je uzeta</th><th>S u km</th><th>Δh'<sub>p</sub></th>
+        <th>odakle<br>je uzeta</th><th>S u km</th><th>Δh'<sub>n</sub></th>
+      </tr>
+      <tr class="broj-kolone">
+        <td>1</td><td>2</td><td></td><td>3</td><td></td><td></td><td>4</td><td></td><td>5</td><td>6</td><td>7</td><td></td>
       </tr>
     </thead><tbody>`;
   r.redoviNO2.forEach((d) => {
     const klasa = d.odstOK ? "" : "crveni-tekst";
     h += `<tr class="${klasa}">
       <td><b>${d.od}</b></td><td><b>${d.do}</b></td>
-      <td>${fmt(d.Sp, 3)}</td><td>${fmt(d.dHp, 4)}</td>
-      <td>${d.dHn !== null ? fmt(d.Sn, 3) : "—"}</td>
-      <td>${d.dHn !== null ? fmt(d.dHn, 4) : "—"}</td>
-      <td>${d.dHn !== null ? fmt(d.odstMm, 1) : "—"}</td>
-      <td>${d.dHn !== null ? "±" + fmt(d.dop, 1) : "—"}</td>
+      <td class="mali">N.O.1</td><td>${fmt(d.Sp, 3)}</td><td>${fmt(d.dHp, 4)}</td>
+      <td class="mali">${d.dHn !== null ? "N.O.1" : ""}</td><td>${d.dHn !== null ? fmt(d.Sn, 3) : ""}</td><td>${d.dHn !== null ? fmt(d.dHn, 4) : ""}</td>
+      <td>${d.dHn !== null ? fmt(d.odstMm, 1) : ""}</td>
+      <td>${d.dHn !== null ? fmt(d.dop, 1) : ""}</td>
       <td><b>${fmt(d.dHsred, 4)}</b></td>
+      <td></td>
     </tr>`;
   });
+  const sumSp = r.redoviNO2.reduce((a, d) => a + (d.Sp || 0), 0);
+  const sumSn = r.redoviNO2.reduce((a, d) => a + (d.Sn || 0), 0);
+  const sumDhp = r.redoviNO2.reduce((a, d) => a + (d.dHp || 0), 0);
+  const sumDhn = r.redoviNO2.reduce((a, d) => a + (d.dHn || 0), 0);
   h += `<tr class="suma-red">
       <td colspan="2">Σ</td>
-      <td colspan="4"></td>
-      <td colspan="2"></td>
-      <td><b>${fmt(r.sumaDh, 4)}</b></td>
+      <td></td><td>${fmt(sumSp, 3)}</td><td>${fmt(sumDhp, 4)}</td>
+      <td></td><td>${fmt(sumSn, 3)}</td><td>${fmt(sumDhn, 4)}</td>
+      <td></td><td></td>
+      <td><b>${fmt(r.sumaDh, 4)}</b></td><td></td>
     </tr>`;
   h += `</tbody></table>`;
   return h;
 }
 
-/* ---------- N.O.3 — izravnanje vlaka ---------- */
+/* ---------- N.O.3 — izravnanje vlaka (vjerno Excelu) ----------
+   Raspored: Broj vlaka | Rn | Odakle je uzeta | Δh'n | S u km |
+   Popravka Vn=(1/[S])·Si | Definitivna hn=h'n+Vn | Nadmorske visine Hn | Rn | Primjedba.
+   Reperi i njihove visine stoje u redovima-čvorovima; između njih red s Δh/S/Vn/hn. */
 function obrazacNO3(r) {
   let h = `<div class="obrazac-naslov-linija">Nivelmanski obrazac br. 3</div>
-  <table class="obrazac obrazacNiv">
+  <table class="obrazac obrazacNiv obrazacNO3">
     <thead>
-      <tr><th class="naslov" colspan="8">N.O.3 — Izravnanje nivelmanskog vlaka</th></tr>
-      <tr class="zaglavlje-red">
-        <th>Rb.</th><th>Reper<br>OD → DO</th>
-        <th>Visinska razlika<br>nivelanjem Δh'<sub>n</sub> (m)</th>
-        <th>Odstojanje<br>S (km)</th>
-        <th>Popravka<br>V<sub>n</sub> (mm)</th>
-        <th>Definitivna vis.<br>razlika h<sub>n</sub> (m)</th>
-        <th>Nadmorska<br>visina H (m)</th>
+      <tr>
+        <th>Broj<br>vlaka</th><th>R<sub>n</sub></th><th>Odakle<br>je uzeta</th>
+        <th>Visinske razlike<br>dobivene nivelanjem<br>Δh'<sub>n</sub></th>
+        <th>Odstojanje<br>između repera<br>S u km</th>
+        <th>Popravka<br>V<sub>n</sub> = (1/[S])·S<sub>i</sub></th>
+        <th>Definitivna<br>visinska razlika<br>h<sub>n</sub> = h'<sub>n</sub> + V<sub>n</sub></th>
+        <th>Nadmorske<br>visine<br>H<sub>n</sub> = H<sub>n-1</sub> + h<sub>n</sub></th>
+        <th>Primjedba</th>
+      </tr>
+      <tr class="broj-kolone">
+        <td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td><td>9</td>
       </tr>
     </thead><tbody>`;
 
-  // prvi reper (dati) kao polazni red
-  h += `<tr class="crveni-tekst"><td></td><td><b>${r.visine[0].naziv}</b></td>
-        <td colspan="4"></td><td><b>${fmt(r.visine[0].H, 3)}</b> <span class="mali">(dati)</span></td></tr>`;
+  // Prvi red: početni (dati) reper sa svojom nadmorskom visinom.
+  h += `<tr class="reper-red crveni-tekst">
+      <td></td><td><b>${r.visine[0].naziv}</b></td><td></td>
+      <td></td><td></td><td></td><td></td>
+      <td><b>${fmt(r.visine[0].H, 3)}</b></td><td></td>
+    </tr>`;
 
-  r.redoviNO3.forEach((d) => {
-    h += `<tr>
-      <td>${d.rb}</td>
-      <td>${d.od} → ${d.do}</td>
+  // Za svaku dionicu: red s izravnanjem (Δh'n, S, Vn, hn), pa red sa sljedećim reperom i njegovom visinom.
+  r.redoviNO3.forEach((d, i) => {
+    const zadnji = (i === r.redoviNO3.length - 1);
+    const reper = r.visine[i + 1];
+    const datiReper = reper && (reper.tip === "dati");
+    h += `<tr class="dionica-red">
+      <td>${d.rb}</td><td></td><td class="mali">N.O.2</td>
       <td>${fmt(d.dHn, 4)}</td>
       <td>${fmt(d.S, 3)}</td>
       <td>${fmtMm(d.Vn)}</td>
       <td>${fmt(d.hDef, 4)}</td>
-      <td><b>${fmt(d.Hdo, 3)}</b></td>
+      <td></td><td></td>
+    </tr>`;
+    h += `<tr class="reper-red ${datiReper ? "crveni-tekst" : ""}">
+      <td></td><td><b>${reper ? reper.naziv : ""}</b></td><td></td>
+      <td></td><td></td><td></td><td></td>
+      <td><b>${reper ? fmt(reper.H, 3) : ""}</b></td><td>${datiReper ? "dati reper" : ""}</td>
     </tr>`;
   });
 
+  // Suma
   h += `<tr class="suma-red">
-      <td colspan="2">Σ</td>
+      <td></td><td>Σ</td><td></td>
       <td>${fmt(r.sumaDh, 4)}</td>
       <td>${fmt(r.sumaS, 3)}</td>
       <td>${fmtMm(r.sumaV)}</td>
-      <td colspan="2"></td>
+      <td colspan="3"></td>
     </tr>`;
   h += `</tbody></table>`;
 
   if (r.imaKraj) {
     const okKlasa = r.visinskiOK ? "status-ok" : "status-ne";
     h += `<p class="obrazac-podnaslov">
-      Zatvaranje vlaka f<sub>h</sub> = ${fmtMm(r.fh)} mm &nbsp;
-      (dozvoljeno ±${fmtMm(r.dopFh)} mm)
+      f<sub>h</sub> = ${fmtMm(r.fh)} mm &nbsp; (dozvoljeno ±${fmtMm(r.dopFh)} mm)
       <span class="oznaka-status ${okKlasa}">${r.visinskiOK ? "U GRANICAMA" : "PREKORAČENO"}</span></p>`;
   }
   return h;
