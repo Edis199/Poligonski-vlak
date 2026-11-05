@@ -742,6 +742,9 @@ function obrazacDetaljiPuni(rez) {
 
   let blokovi = "";
   (rez.stanice || []).forEach((s) => {
+    // Prikaži SAMO stanice koje stvarno imaju detaljne tačke; stanice vlaka bez
+    // detalja (prazni čvorovi, kao u TO19) se preskaču — ovdje idu samo detalji.
+    if (!s.tacke || s.tacke.length === 0) return;
     const o = s.orijentacija || {};
     let redovi = "";
     // 1. red: STANICA (sa svojim koordinatama)
