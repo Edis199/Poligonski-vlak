@@ -134,6 +134,18 @@ function ucitajRedove(redovi) {
   return stanice;
 }
 
+/* Prepoznaje li stanica POLARNU snimku: nema girusa, nego jedan red orijentacije
+   (vizura unazad) + niz detaljnih tačaka. Tipično: prvi red je orijentacija (često
+   horizontalni ugao 0), svaka ostala vizura je zasebna detaljna tačka.               */
+function jePolarnaStanica(m) {
+  if (!m || m.length < 2) return false;
+  const naz = (r) => String(r.vizura || "").trim();
+  const Z = naz(m[0]), P = naz(m[1]);
+  // ako liči na girus (Z,P,P,Z), nije polarna
+  if (m.length >= 4 && naz(m[0]) === Z && naz(m[1]) === P && naz(m[2]) === P && naz(m[3]) === Z) return false;
+  return true;
+}
+
 /* Girus = 4 reda: ZADNJA, PREDNJA, PREDNJA, ZADNJA (isti nazivi tačaka u svakom girusu).
    Redovi iza zadnjeg potpunog girusa su detaljne tačke.                             */
 function razdvojiGirusIDetalje(m, prethodna) {
@@ -145,13 +157,16 @@ function razdvojiGirusIDetalje(m, prethodna) {
     while (j < m.length && j < 2 && naz(m[j]) === String(prethodna).trim()) j++;
     return j > 0 ? { girus: [], detalji: m.slice(j), orijentacija: m.slice(0, j) } : null;
   };
-  if (m.length < 4) return bezGirusa() || { girus: m, detalji: [] };
+  // POLARNA snimka: nema girusa, prvi red je orijentacija (vizura unazad), ostatak su detalji
+  const polarno = () => (m.length >= 2 ? { girus: [], detalji: m.slice(1), orijentacija: m.slice(0, 1) } : null);
+
+  if (m.length < 4) return bezGirusa() || polarno() || { girus: m, detalji: [] };
   const Z = naz(m[0]), P = naz(m[1]);
   let k = 0;
   while (k + 4 <= m.length &&
          naz(m[k]) === Z && naz(m[k + 1]) === P &&
          naz(m[k + 2]) === P && naz(m[k + 3]) === Z) k += 4;
-  if (k === 0) return bezGirusa() || { girus: m, detalji: [] };   // ne liči na girus — neka obrada javi grešku
+  if (k === 0) return bezGirusa() || polarno() || { girus: m, detalji: [] };   // nema girusa → polarna snimka
   return { girus: m.slice(0, k), detalji: m.slice(k) };
 }
 

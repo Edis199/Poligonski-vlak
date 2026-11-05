@@ -123,15 +123,17 @@ function primijeniVrstu() {
   const v = vrstaVlaka();
   ["C", "D"].forEach((k) => {
     const tr = document.getElementById(k + "_naziv").closest("tr");
-    if (tr) tr.style.display = v === "slijepi" ? "none" : "";
+    if (tr) tr.style.display = (v === "slijepi" || v === "polarna") ? "none" : "";
   });
   document.getElementById("vrstaTekst").textContent = ucitaneStanice
-    ? { umetnuti: "UMETNUTI (prepoznat iz zapisnika)", zatvoreni: "ZATVORENI (prepoznat iz zapisnika)", slijepi: "SLIJEPI (prepoznat iz zapisnika)" }[v]
+    ? { umetnuti: "UMETNUTI (prepoznat iz zapisnika)", zatvoreni: "ZATVORENI (prepoznat iz zapisnika)", slijepi: "SLIJEPI (prepoznat iz zapisnika)", polarna: "POLARNA SNIMKA — stanica + orijentacija + detalji (prepoznato iz zapisnika)" }[v]
     : "prepoznaje se automatski iz učitanog zapisnika";
   document.getElementById("napomenaVrste").textContent = v === "slijepi"
     ? "Unesite koordinate i visinu za A (orijentacija) i B (početna stanica). Nema uglovnog ni linearnog odstupanja ni popravki."
-    : v === "zatvoreni" ? "Unesite koordinate i visinu za A i B (C = B, D = A)." : "";
-  if (v === "slijepi") {
+    : v === "zatvoreni" ? "Unesite koordinate i visinu za A i B (C = B, D = A)."
+    : v === "polarna" ? "Nema vlaka — računaju se samo detaljne tačke. Unesite koordinate i visinu za stanicu (B) i orijentacijsku tačku (A). Ako ima više stanica, upišite i njihove koordinate/orijentacije."
+    : "";
+  if (v === "slijepi" || v === "polarna") {
     document.getElementById("redukcijaNacin").value = "nema";
     osvjeziPoljaRedukcije();
   }
@@ -156,6 +158,7 @@ document.getElementById("vrstaVlaka").addEventListener("change", primijeniVrstu)
 
 /* ---------- Izračun ---------- */
 document.getElementById("izracunaj").addEventListener("click", () => {
+  if (vrstaVlaka() === "polarna") { izracunajPolarno(); return; }
   if (vrstaVlaka() === "slijepi") { izracunajSlijepi(); return; }
   if (!obradjeneStanice || !obradjeneStanice.length) {
     alert("Prvo učitajte tahimetrijski zapisnik (mjerenja) — uglovi i dužine se računaju iz njega.");
@@ -293,6 +296,76 @@ function izracunajSlijepi() {
     alert("Greška u izračunu: " + e.message);
     console.error(e);
   }
+}
+
+/* ---------- Polarna snimka (stanica + orijentacija + detalji, bez vlaka) ----------
+   Svaka stanica ima poznate koordinate i orijentaciju na poznatu tačku. Detaljne
+   tačke se računaju polarnom metodom, isto kao kod vlaka. Radi i za više stanica.   */
+function izracunajPolarno() {
+  const ob = obradjeneStanice;
+  if (!ob || !ob.length) { alert("Prvo učitajte tahimetrijski zapisnik."); return; }
+
+  // mapa poznatih koordinata iz tablice datih tačaka (naziv -> {Y,X,H})
+  const poznate = {};
+  ["A", "B", "C", "D"].forEach((k) => {
+    const naz = tekst(k + "_naziv").trim();
+    if (naz) poznate[naz] = { Y: broj(k + "_Y"), X: broj(k + "_X"), H: brojOpc(k + "_H") };
+  });
+
+  // za svaku stanicu: koordinate stanice i njene orijentacijske tačke moraju biti poznate
+  const tocke = [], visine = [], nedostaju = [];
+  ob.forEach((st) => {
+    const ps = poznate[String(st.stanica).trim()];
+    const po = poznate[String(st.nazZadnja).trim()];
+    if (!ps || (!ps.Y && !ps.X)) nedostaju.push("stanica " + st.stanica);
+    if (!po || (!po.Y && !po.X)) nedostaju.push("orijentacija " + st.nazZadnja);
+    tocke.push(ps ? { naziv: st.stanica, Y: ps.Y, X: ps.X } : { naziv: st.stanica, Y: 0, X: 0 });
+    visine.push(ps ? ps.H : null);
+    st._orijTacka = po ? { naziv: st.nazZadnja, Y: po.Y, X: po.X } : null;
+  });
+  if (nedostaju.length) {
+    alert("Unesite koordinate (Y, X) za sve stanice i njihove orijentacijske tačke:\n" + [...new Set(nedostaju)].join(", "));
+    return;
+  }
+
+  // izračun detalja: za svaku stanicu koristi njenu orijentacijsku tačku kao "zadnju"
+  try {
+    const svi = { stanice: [], ukupno: 0, preskoceno: 0 };
+    ob.forEach((st, i) => {
+      const jedna = window.Detalj.izracunajDetalje([st], [tocke[i]], st._orijTacka, [visine[i]]);
+      svi.stanice.push(...jedna.stanice);
+      svi.ukupno += jedna.ukupno;
+      svi.preskoceno += jedna.preskoceno;
+    });
+    zadnjiDetalji = svi;
+    zadnjiRezultat = null;          // nema vlaka
+    zadnjiRezultatVisine = null;
+    prikaziRezultatePolarno(svi, tocke, visine);
+    idiNa("rezultati");
+  } catch (e) {
+    alert("Greška u izračunu detalja: " + e.message);
+    console.error(e);
+  }
+}
+
+function prikaziRezultatePolarno(det, tocke, visine) {
+  document.getElementById("sazetak").innerHTML = `
+    <h2>Polarna snimka detaljnih tačaka</h2>
+    <div class="sazetak-kartice">
+      <div class="sk"><div class="oznaka">Broj stanica</div><div class="vrijednost">${det.stanice.length}</div></div>
+      <div class="sk"><div class="oznaka">Detaljnih tačaka</div><div class="vrijednost">${det.ukupno}</div></div>
+      ${det.preskoceno ? `<div class="sk ne"><div class="oznaka">Preskočeno</div><div class="vrijednost">${det.preskoceno}</div></div>` : ""}
+    </div>`;
+  let html = "";
+  det.stanice.forEach((s) => {
+    html += `<h2>Stanica ${s.stanica} → orijentacija ${s.orijentacija.naziv}</h2>
+      <table class="tabela"><thead><tr><th>Broj tačke</th><th>Y (m)</th><th>X (m)</th><th>H (m)</th><th>Kod</th></tr></thead><tbody>`;
+    s.tacke.forEach((t) => {
+      html += `<tr><td>${t.naziv}</td><td>${t.Y.toFixed(3)}</td><td>${t.X.toFixed(3)}</td><td>${t.H != null ? t.H.toFixed(3) : ""}</td><td>${t.kod || ""}</td></tr>`;
+    });
+    html += `</tbody></table>`;
+  });
+  document.getElementById("rezultatiSadrzaj").innerHTML = html;
 }
 
 /* ---------- Prikaz rezultata ---------- */
@@ -758,7 +831,9 @@ function obradiUcitaneStanice(stanice, ponovo) {
   const duzInputi = document.querySelectorAll(".in-duzina");
   const nazInputi = document.querySelectorAll(".in-naziv");
 
-  const slijepi = validne.length >= 2 && !!validne[validne.length - 1].samoOrijentacija;
+  // polarna snimka: SVE stanice su samo orijentacija + detalji (nema vlaka)
+  const polarna = validne.every((o) => o.samoOrijentacija);
+  const slijepi = !polarna && validne.length >= 2 && !!validne[validne.length - 1].samoOrijentacija;
   validne.forEach((o, i) => {
     if (o.samoOrijentacija) return;   // slijepi vlak: zadnja stanica nema prelomni ugao
     // prelomni ugao upisujemo u čitljivom zapisu SSS°MM'SS" (jezgra ga razumije preko parsiranja)
@@ -776,6 +851,23 @@ function obradiUcitaneStanice(stanice, ponovo) {
   prikaziPanelGirusa(validne);
   if (ponovo) {
     postaviStatus("Izbor girusa promijenjen — uglovi i dužine su ažurirani. Kliknite Izračunaj.", true);
+    return;
+  }
+
+  if (polarna) {
+    postaviVrstu("polarna");
+    document.getElementById("redukcijaNacin").value = "nema";
+    osvjeziPoljaRedukcije();
+    // naziv stanice i orijentacije u polja A (orijentacija) i B (stanica) prve stanice
+    const prva = validne[0];
+    obrisiStareDateTacke({ A: prva.nazZadnja, B: prva.stanica });
+    document.getElementById("A_naziv").value = prva.nazZadnja || document.getElementById("A_naziv").value;
+    document.getElementById("B_naziv").value = prva.stanica;
+    const dodatne = validne.length > 1
+      ? " Ima " + validne.length + " stanica — unesite koordinate za svaku stanicu i njenu orijentacijsku tačku u tablicu datih tačaka."
+      : "";
+    postaviStatus(`Učitana polarna snimka (${validne.length} ${validne.length === 1 ? "stanica" : "stanice/a"}, ${validne.reduce((s, o) => s + (o.detalji ? o.detalji.length : 0), 0)} detaljnih tačaka). Upišite koordinate (Y, X) i visinu (H) za stanicu ${prva.stanica} i orijentaciju ${prva.nazZadnja}, zatim kliknite Izračunaj.${dodatne}`, true);
+    if (greske.length) alert("Napomena:\n" + greske.join("\n"));
     return;
   }
 
@@ -831,8 +923,10 @@ document.querySelectorAll("[data-obrazac]").forEach((btn) => {
 });
 
 document.getElementById("stampajObrazac").addEventListener("click", () => {
+  const samoDetalji = (trenutniObrazac === "det" || trenutniObrazac === "detp");
   if (trenutniObrazac === "tz" && !ucitaneStanice) { alert("Učitajte zapisnik."); return; }
-  if (trenutniObrazac !== "tz" && !zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
+  if (samoDetalji && !zadnjiDetalji) { alert("Nema izračunatih detaljnih tačaka."); return; }
+  if (trenutniObrazac !== "tz" && !samoDetalji && !zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
   // ispiši samo trenutni obrazac (jedan A4)
   ispisiObrasce([trenutniObrazac]);
 });
@@ -851,8 +945,11 @@ document.getElementById("izvozDetaljiTxt").addEventListener("click", () => {
 });
 
 document.getElementById("stampajSve").addEventListener("click", () => {
+  // polarna snimka: nema vlaka — ispiši samo kratki obrazac detalja (koordinate)
+  if (!zadnjiRezultat && zadnjiDetalji) { ispisiObrasce(["det"]); return; }
   if (!zadnjiRezultat) { alert("Prvo izračunajte izravnanje."); return; }
-  // svi dostupni obrasci, redom (samo oni koji su napravljeni)
+  // svi dostupni obrasci, redom (samo oni koji su napravljeni).
+  // Pri ispisu SVIH detalji idu SAMO kao kratki obrazac (koordinate) — "detp" se ispisuje pojedinačno.
   ispisiObrasce(["tz", "to1i2", "to1v", "to18d", "to8", "o19", "to28p", "tok", "det", "o25"]);
 });
 
@@ -1024,6 +1121,9 @@ function generirajObrazacHTML(kod) {
   if (kod === "det") {
     return zadnjiDetalji ? window.Obrasci.obrazacDetalji(zadnjiDetalji) : "";
   }
+  if (kod === "detp") {
+    return zadnjiDetalji ? window.Obrasci.obrazacDetaljiPuni(zadnjiDetalji) : "";
+  }
   if (kod === "tok") {
     return zadnjiRezultatVisine && !zadnjiRezultatVisine.greska
       ? window.Obrasci.obrazacK(zadnjiRezultatVisine) : "";
@@ -1055,7 +1155,9 @@ function prikaziObrazac() {
     return;
   }
 
-  if (!zadnjiRezultat) {
+  // detaljni obrasci rade i bez izravnanja vlaka (npr. polarna snimka)
+  const samoDetalji = (trenutniObrazac === "det" || trenutniObrazac === "detp");
+  if (!zadnjiRezultat && !(samoDetalji && zadnjiDetalji)) {
     el.innerHTML = `<div class="info">Prvo unesite podatke i kliknite „Izračunaj izravnanje" na kartici 1.</div>`;
     return;
   }
@@ -1094,6 +1196,12 @@ function prikaziObrazac() {
       el.innerHTML = `<div class="info">Za ovaj obrazac učitajte tahimetrijski zapisnik koji sadrži i detaljne tačke (npr. 1, 2, 3…), pa kliknite „Izračunaj izravnanje".</div>`;
     } else {
       el.innerHTML = window.Obrasci.obrazacDetalji(zadnjiDetalji);
+    }
+  } else if (trenutniObrazac === "detp") {
+    if (!zadnjiDetalji) {
+      el.innerHTML = `<div class="info">Za ovaj obrazac učitajte tahimetrijski zapisnik koji sadrži i detaljne tačke (npr. 1, 2, 3…), pa kliknite „Izračunaj".</div>`;
+    } else {
+      el.innerHTML = window.Obrasci.obrazacDetaljiPuni(zadnjiDetalji);
     }
   } else if (trenutniObrazac === "tok") {
     if (!zadnjiRezultatVisine || zadnjiRezultatVisine.greska) {

@@ -732,9 +732,79 @@ function obrazacDetalji(rez) {
   </table>`;
 }
 
+/* --------- OBRAZAC: Računanje detaljnih tačaka (PUNI, stari oblik) ---------
+   Prikazuje cijeli polarni račun po stanici: orijentacija, pa za svaku detaljnu tačku
+   pravac (očitani), redukovani direkcioni ugao, zenit, kosa i horizontalna dužina,
+   Δy, Δx te konačne koordinate Y, X i visina H.                                        */
+function obrazacDetaljiPuni(rez) {
+  const G = (typeof window !== "undefined" ? window.Girus : require("./girus.js"));
+  const ug = (dec) => (dec === null || dec === undefined || isNaN(dec)) ? "" : G.decUStr(dec);
+
+  let blokovi = "";
+  (rez.stanice || []).forEach((s) => {
+    const o = s.orijentacija || {};
+    let redovi = "";
+    // red orijentacije (vizura unazad)
+    redovi += `
+      <tr class="tz-stanica">
+        <td class="c">${s.stanica}</td>
+        <td class="c">${o.naziv || ""}</td>
+        <td class="c"></td>
+        <td class="c">${ug(o.pravac)}</td>
+        <td class="c">${ug(o.dir)}</td>
+        <td class="c"></td><td class="d"></td><td class="d"></td>
+        <td class="d"></td><td class="d"></td>
+        <td class="d">${fz(s.Y, 3)}</td><td class="d">${fz(s.X, 3)}</td>
+        <td class="d">${s.H != null ? fz(s.H, 3) : ""}</td>
+      </tr>`;
+    s.tacke.forEach((t) => {
+      redovi += `
+      <tr>
+        <td class="c"></td>
+        <td class="c">${t.naziv}</td>
+        <td class="c">${t.kod || ""}</td>
+        <td class="c">${ug(t.pravac)}</td>
+        <td class="c">${ug(t.dir)}</td>
+        <td class="c">${ug(t.zenit)}</td>
+        <td class="d">${fz(t.kosa, 3)}</td>
+        <td class="d">${fz(t.horizDuzina, 3)}</td>
+        <td class="d">${fz(t.dy, 3)}</td>
+        <td class="d">${fz(t.dx, 3)}</td>
+        <td class="d">${fz(t.Y, 3)}</td>
+        <td class="d">${fz(t.X, 3)}</td>
+        <td class="d">${t.H != null ? fz(t.H, 3) : ""}</td>
+      </tr>`;
+    });
+    blokovi += redovi;
+  });
+
+  return `
+  <div class="obrazac-naslov-linija">Računanje detaljnih tačaka</div>
+  <table class="obrazac obrazacDetaljiPuni">
+    <thead>
+      <tr class="zaglavlje-red">
+        <th>Stanica</th>
+        <th>Vizura<br>(tačka)</th>
+        <th>Kod</th>
+        <th>Pravac<br>(očitani)</th>
+        <th>Direkcioni<br>ugao</th>
+        <th>Zenitni<br>ugao</th>
+        <th>Kosa<br>dužina</th>
+        <th>Horiz.<br>dužina</th>
+        <th>&Delta;y</th>
+        <th>&Delta;x</th>
+        <th>Y</th>
+        <th>X</th>
+        <th>H</th>
+      </tr>
+    </thead>
+    <tbody>${blokovi}</tbody>
+  </table>`;
+}
+
 if (typeof window !== "undefined") {
-  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK, obrazacDetalji };
+  window.Obrasci = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK, obrazacDetalji, obrazacDetaljiPuni };
 }
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK, obrazacDetalji };
+  module.exports = { obrazac25, obrazac19, obrazacTZ, obrazac1i2, obrazac1V, obrazac18D, obrazac8, obrazac28P, obrazacK, obrazacDetalji, obrazacDetaljiPuni };
 }
