@@ -49,7 +49,12 @@
     background:linear-gradient(135deg,var(--plava),var(--plava-tamna));
     color:#fff;padding:16px 28px;box-shadow:0 2px 10px rgba(0,0,0,.18);
   }
-  .zaglavlje .logo{display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .zaglavlje .logo{
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    width:52px;height:52px;border-radius:50%;background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);overflow:hidden;
+  }
+  .zaglavlje .logo img{width:46px;height:auto;object-fit:contain}
   .zaglavlje h1{margin:0;font-size:24px;font-weight:700;letter-spacing:.3px}
   .zaglavlje .naslov-blok{flex:1}
   .zaglavlje .autor{font-size:13px;opacity:.92;white-space:nowrap}
@@ -71,10 +76,12 @@
   }
   .kartica-mreze:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(30,90,168,.20);border-color:var(--plava)}
   .kartica-mreze .ikona{
-    width:118px;height:118px;border-radius:50%;margin-bottom:16px;
+    width:132px;height:132px;margin-bottom:16px;
     display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(circle at 38% 32%, var(--plava-svijetla), var(--plava) 55%, var(--plava-tamna));
-    box-shadow:0 6px 16px rgba(30,90,168,.30);
+  }
+  .kartica-mreze .ikona img{
+    width:124px;height:124px;border-radius:50%;object-fit:cover;
+    box-shadow:0 6px 16px rgba(30,90,168,.28);
   }
   .kartica-mreze h3{margin:0 0 10px;font-size:21px;color:var(--plava-tamna);font-weight:700}
   .kartica-mreze p{margin:0 0 20px;color:var(--siva);font-size:14px;min-height:44px}
@@ -101,27 +108,8 @@
 <body>
 <header class="zaglavlje">
   <div class="logo" aria-hidden="true">
-    <!-- GLAVNI LOGO: totalna stanica sa mrežom tačaka (prizme) -->
-    <svg width="46" height="46" viewBox="0 0 120 120">
-      <g stroke="#ffffff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <!-- mreža linija do prizmi -->
-        <path d="M60 58 L20 30 M60 58 L100 30 M60 58 L18 78 M60 58 L104 74 M60 58 L58 20" opacity=".85"/>
-        <!-- prizme (mali kvadratići na krajevima) -->
-        <g fill="#ffffff" stroke="none">
-          <rect x="14" y="24" width="10" height="10" rx="1.5" transform="rotate(45 19 29)"/>
-          <rect x="95" y="24" width="10" height="10" rx="1.5" transform="rotate(45 100 29)"/>
-          <rect x="12" y="72" width="10" height="10" rx="1.5" transform="rotate(45 17 77)"/>
-          <rect x="99" y="68" width="10" height="10" rx="1.5" transform="rotate(45 104 73)"/>
-          <circle cx="58" cy="20" r="4.5"/>
-        </g>
-      </g>
-      <!-- instrument (totalka) + stativ -->
-      <g stroke="#ffffff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="48" y="46" width="24" height="16" rx="3" fill="#ffffff" stroke="none"/>
-        <circle cx="60" cy="54" r="3.2" fill="#1e5aa8"/>
-        <path d="M60 62 L48 96 M60 62 L72 96 M60 62 L60 92" />
-      </g>
-    </svg>
+    <!-- GLAVNI LOGO: totalna stanica sa mrežom tačaka (slika) -->
+    <img src="ikone/logo_main.png" alt="Geodetske mreže" />
   </div>
   <div class="naslov-blok"><h1>Geodetske mreže</h1></div>
   <div class="autor">Izradio: Malanović Edis</div>
@@ -137,25 +125,7 @@
     <!-- ======== Poligonska mreža ======== -->
     <a class="kartica-mreze" href="poligon-app/index.html">
       <div class="ikona" aria-hidden="true">
-        <svg width="76" height="76" viewBox="0 0 120 120">
-          <g stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <!-- poligonska mreža linija -->
-            <path d="M60 60 L24 32 M60 60 L96 30 M60 60 L22 82 M60 60 L100 76" opacity=".85"/>
-            <g fill="#ffffff" stroke="none">
-              <rect x="18" y="26" width="10" height="10" rx="1.5" transform="rotate(45 23 31)"/>
-              <rect x="91" y="24" width="10" height="10" rx="1.5" transform="rotate(45 96 29)"/>
-              <rect x="16" y="76" width="10" height="10" rx="1.5" transform="rotate(45 21 81)"/>
-              <rect x="95" y="70" width="10" height="10" rx="1.5" transform="rotate(45 100 75)"/>
-            </g>
-          </g>
-          <!-- totalna stanica -->
-          <g fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="47" y="46" width="26" height="18" rx="3" fill="#ffffff" stroke="none"/>
-            <circle cx="60" cy="55" r="3.6" fill="#1e5aa8"/>
-            <path d="M60 64 L46 100 M60 64 L74 100 M60 64 L60 96"/>
-            <path d="M40 100 L52 100 M68 100 L80 100" stroke-width="3"/>
-          </g>
-        </svg>
+        <img src="ikone/icon_poligonska.png" alt="Poligonska mreža" />
       </div>
       <h3>Poligonska mreža</h3>
       <p>Izravnanje poligonskog vlaka (umetnuti, zatvoreni, slijepi) — koordinate i nadmorske visine.</p>
@@ -167,30 +137,7 @@
     <!-- ======== Nivelmanska mreža ======== -->
     <a class="kartica-mreze" href="nivelman-app/index.html">
       <div class="ikona" aria-hidden="true">
-        <svg width="76" height="76" viewBox="0 0 120 120">
-          <!-- nivelmanska letva uspravno iza instrumenta -->
-          <g stroke="#ffffff" stroke-width="3" opacity=".9">
-            <line x1="90" y1="18" x2="90" y2="102"/>
-            <line x1="84" y1="28" x2="96" y2="28"/>
-            <line x1="84" y1="40" x2="96" y2="40"/>
-            <line x1="84" y1="52" x2="96" y2="52"/>
-            <line x1="84" y1="64" x2="96" y2="64"/>
-            <line x1="84" y1="76" x2="96" y2="76"/>
-            <line x1="84" y1="88" x2="96" y2="88"/>
-          </g>
-          <!-- nivelir (teleskop) -->
-          <g fill="#ffffff" stroke="none">
-            <rect x="24" y="48" width="44" height="18" rx="4"/>
-            <rect x="18" y="52" width="8" height="10" rx="2"/>
-            <rect x="66" y="53" width="7" height="8" rx="2"/>
-          </g>
-          <g fill="#1e5aa8" stroke="none"><circle cx="34" cy="57" r="4"/></g>
-          <!-- postolje + horizontalna linija vizure -->
-          <g stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round">
-            <path d="M46 66 L46 82 M36 82 L56 82"/>
-            <line x1="10" y1="57" x2="18" y2="57" stroke-dasharray="3 3"/>
-          </g>
-        </svg>
+        <img src="ikone/icon_nivelmanska.png" alt="Nivelmanska mreža" />
       </div>
       <h3>Nivelmanska mreža</h3>
       <p>Izravnanje nivelmanskog vlaka (geometrijski nivelman) — obrasci N.O.1, N.O.2 i N.O.3, nadmorske visine.</p>
