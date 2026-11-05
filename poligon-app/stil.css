@@ -238,6 +238,9 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
   body.print-obrasci #obrasci h2,
   body.print-obrasci #obrasci .napomena{display:none}
   body.print-obrasci .obrazac{font-size:11px;box-shadow:none;width:100%;margin:0 auto}
+  /* landscape stranica (Detaljne tačke – puni račun): puna širina položenog A4 */
+  body.print-obrasci .obrazac-stranica.ls{padding:8mm 10mm}
+  body.print-obrasci .obrazac-stranica.ls .obrazac{width:100%;font-size:10.5px}
   /* svaki obrazac počinje na novoj A4 strani */
   body.print-obrasci .obrazac-stranica{page-break-after:always;break-after:page}
   body.print-obrasci .obrazac-stranica:last-child{page-break-after:auto;break-after:auto}
