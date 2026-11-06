@@ -140,16 +140,33 @@ function izravnajUmetnutiVlak(ulaz) {
   if (n < 2) greske.push("Premalo prelomnih uglova.");
 
   /* --- KUTNO IZRAVNANJE ---
-     "ima"  = alfaPocetni + Σ(prelomni uglovi)
-     "treba"= alfaKrajnji + n*180
-     fβ = treba - ima   (uz korekciju ±360)                         */
+     Σβ = suma svih prelomnih i veznih uglova.
+
+     ZATVORENI vlak (orijentacija na istu datu tačku na početku i kraju):
+       Početni i završni direkcioni ugao razlikuju se tačno za 180°, pa je
+       teoretska suma uglova višekratnik 180°:
+         fβ = Σβ − n·180°,  gdje je n = cio broj poluobrta (round(Σβ/180)),
+       a NE broj uglova (zavisi od oblika i smjera obilaska poligona).
+
+     UMETNUTI (priključni) vlak:
+       "ima"  = αpoč + Σβ ;  "treba" = αkraj + n·180 ;  fβ = treba − ima  (±360).      */
   const sumaBeta = beta.reduce((s, b) => s + b, 0);
-  const ima = alfaPocetni + sumaBeta;
-  const treba = alfaKrajnji + n * 180;
-  let fBeta = treba - ima;
-  // korekcija (kao u Excelu P50): dovedi u okvir ±360
-  while (fBeta > 180) fBeta -= 360;
-  while (fBeta < -180) fBeta += 360;
+  const zatvoreni = (ulaz.vrsta === "zatvoreni");
+
+  let ima, treba, fBeta;
+  if (zatvoreni) {
+    const poluobrta = Math.round(sumaBeta / 180);   // cio broj poluobrta zatvaranja
+    treba = poluobrta * 180;                         // teoretska suma = n·180°
+    ima = sumaBeta;                                  // Σ izmjerenih uglova
+    fBeta = treba - ima;                             // fβ = n·180 − Σβ
+  } else {
+    ima = alfaPocetni + sumaBeta;
+    treba = alfaKrajnji + n * 180;
+    fBeta = treba - ima;
+    // korekcija (kao u Excelu P50): dovedi u okvir ±360
+    while (fBeta > 180) fBeta -= 360;
+    while (fBeta < -180) fBeta += 360;
+  }
 
   const popravakUgla = fBeta / n;             // na svaki ugao jednako
 

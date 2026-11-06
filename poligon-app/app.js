@@ -216,6 +216,7 @@ document.getElementById("izracunaj").addEventListener("click", () => {
     nazivPocetne: tekst("B_naziv") || "B",
     nazivKrajnje: tekst("C_naziv") || "C",
     tolerancije: "nove",   // dozvoljena odstupanja prema obrascima 2019
+    vrsta: vrstaVlaka(),   // "umetnuti" | "zatvoreni"
   };
 
   try {
