@@ -142,23 +142,32 @@ function izravnajUmetnutiVlak(ulaz) {
   /* --- KUTNO IZRAVNANJE ---
      Σβ = suma svih prelomnih i veznih uglova.
 
-     ZATVORENI vlak (orijentacija na istu datu tačku na početku i kraju):
-       Početni i završni direkcioni ugao razlikuju se tačno za 180°, pa je
-       teoretska suma uglova višekratnik 180°:
-         fβ = Σβ − n·180°,  gdje je n = cio broj poluobrta (round(Σβ/180)),
-       a NE broj uglova (zavisi od oblika i smjera obilaska poligona).
+     ZATVORENI / priključni vlak (orijentacija na istu datu tačku na početku i kraju):
+       Direkcioni prenos kroz vezne uglove:  ν_izračunato = αpoč + Σβ − n·180°.
+       Teoretski se mora vratiti na polazni smjer:  ν_teorijsko = αpoč (mod 360°).
+       Uglovno odstupanje je razlika svedena na najbliže 0 (najmanji po apsolutnoj
+       vrijednosti), jer broj „poluobrta" zavisi od oblika i smjera obilaska:
+         fβ = ν_teorijsko − ν_izračunato = (αpoč + m·360) − (αpoč + Σβ − n·180)
+            ≡ −(Σβ − n·180) sveden na (−180°, 180°].
 
-     UMETNUTI (priključni) vlak:
+     UMETNUTI vlak:
        "ima"  = αpoč + Σβ ;  "treba" = αkraj + n·180 ;  fβ = treba − ima  (±360).      */
   const sumaBeta = beta.reduce((s, b) => s + b, 0);
   const zatvoreni = (ulaz.vrsta === "zatvoreni");
 
   let ima, treba, fBeta;
   if (zatvoreni) {
-    const poluobrta = Math.round(sumaBeta / 180);   // cio broj poluobrta zatvaranja
-    treba = poluobrta * 180;                         // teoretska suma = n·180°
-    ima = sumaBeta;                                  // Σ izmjerenih uglova
-    fBeta = treba - ima;                             // fβ = n·180 − Σβ
+    // ν_izračunato: akumulirani direkcioni prenos kroz vezne uglove od polaznog smjera.
+    //   ν = αpoč + Σβ − n·180°  (desni prelomni uglovi)
+    ima = alfaPocetni + sumaBeta - n * 180;
+    // ν_teorijsko: direkcioni ugao se po zatvaranju vraća na polazni smjer, s tim da se
+    //   polazni i završni razlikuju tačno za 180° za neparan broj poluobrta. Zato biramo
+    //   NAJBLIŽI višekratnik 180° uz αpoč — time fβ ispada najmanji po apsolutnoj vrijednosti.
+    const k = Math.round((ima - alfaPocetni) / 180);
+    treba = alfaPocetni + k * 180;
+    fBeta = treba - ima;                 // najmanje uglovno odstupanje (±90°)
+    while (fBeta > 180) fBeta -= 360;
+    while (fBeta < -180) fBeta += 360;
   } else {
     ima = alfaPocetni + sumaBeta;
     treba = alfaKrajnji + n * 180;
