@@ -1,0 +1,38 @@
+{
+  "name": "Nivelmanska mreža",
+  "short_name": "Nivelman",
+  "description": "Izravnanje nivelmanskog vlaka (geometrijski nivelman) — obrasci N.O.1, N.O.2, N.O.3. Izradio: Malanović Edis.",
+  "lang": "bs",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#eef2f7",
+  "theme_color": "#1e5aa8",
+  "icons": [
+    {
+      "src": "ikona-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ikona-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ikona-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "ikona-totalka.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
