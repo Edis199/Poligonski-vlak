@@ -279,3 +279,54 @@ canvas{border:1px solid var(--obrub);border-radius:8px;max-width:100%;background
 .girus-panel th{background:var(--svijetla);color:var(--plava-tamna)}
 .girus-panel td.isklj{color:#94a3b8;text-decoration:line-through}
 .girus-panel tr.tri-girusa td:first-child{font-weight:700}
+
+/* ===== Poslovi (projekti) ===== */
+.posao-traka{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.posao-oznaka{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;font-size:14px;max-width:320px}
+.posao-oznaka b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
+.posao-oznaka small{opacity:.85;font-size:12px}
+.dugme-zagl{
+  background:#fff;color:var(--plava-tamna);border:none;border-radius:8px;
+  padding:9px 18px;font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+}
+.dugme-zagl:hover{background:var(--svijetla)}
+
+.posao-modal{
+  position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,.55);
+  display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;overflow-y:auto;
+}
+.posao-kutija{
+  background:#fff;border-radius:12px;width:100%;max-width:760px;padding:22px 26px 20px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+}
+.posao-naslov{display:flex;align-items:center;justify-content:space-between}
+.posao-naslov h2{margin:0;border:none;padding:0}
+.posao-x{background:none;border:none;font-size:30px;line-height:1;cursor:pointer;color:var(--siva)}
+.posao-x:hover{color:var(--crvena)}
+.posao-uvod{margin:8px 0 16px}
+.posao-kutija h3{margin:0 0 6px;color:var(--plava-tamna);font-size:17px}
+.posao-forma{background:#f7fbff;border:1px solid var(--obrub);border-left:4px solid var(--plava);border-radius:10px;padding:14px 16px;margin-bottom:20px}
+.posao-forma label{color:var(--tekst);font-size:13px;margin:8px 0 0}
+.posao-forma .opc{color:var(--siva);font-weight:400}
+.posao-red{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.posao-forma #posOtkazi{display:none}
+.posao-forma.uredjivanje #posOtkazi{display:inline-block}
+.posao-lista-naslov{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.posao-uvoz{position:relative;cursor:pointer;margin:0}
+.posao-uvoz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.posao-stavka{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  border:1px solid var(--obrub);border-radius:10px;padding:10px 14px;margin-bottom:8px;background:#fff;
+}
+.posao-stavka.otvoren{border-color:var(--plava);background:#f3f8ff}
+.posao-ime{font-weight:700;color:var(--plava-tamna);word-break:break-word}
+.posao-meta{font-size:12.5px;color:var(--siva)}
+.posao-znak{background:var(--plava);color:#fff;border-radius:999px;font-size:11px;padding:2px 9px;margin-left:6px;font-weight:600}
+.posao-dugmad{display:flex;gap:6px;flex-wrap:wrap}
+.posao-dugmad .dugme{padding:6px 12px;font-size:13px}
+.dugme.opasno{border-color:var(--crvena);color:var(--crvena)}
+.dugme.opasno:hover{background:var(--crvena);color:#fff}
+.posao-podnozje{justify-content:flex-end;margin-top:14px}
+@media (max-width:600px){.posao-red{grid-template-columns:1fr}.posao-traka{margin-left:0;width:100%;justify-content:space-between}}
+@media print{.posao-traka,.posao-modal{display:none!important}}
