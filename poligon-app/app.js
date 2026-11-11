@@ -591,7 +591,7 @@ function nacrtaj(r) {
   ctx.setLineDash([]);
 
   // linije vlaka
-  ctx.strokeStyle = "#1e5aa8";
+  ctx.strokeStyle = "#17407a";
   ctx.lineWidth = 2;
   ctx.beginPath();
   tocke.forEach((t, i) => {

@@ -1,6 +1,6 @@
 :root{
-  --plava:#1e5aa8;
-  --plava-tamna:#17407a;
+  --plava:#17407a;
+  --plava-tamna:#0f2a52;
   --zelena:#1f9d55;
   --crvena:#d64545;
   --siva:#64748b;
@@ -46,12 +46,12 @@ h2:first-child{margin-top:0}
 
 /* callout box — tamnoplavi, čitljiv tekst na blagoj prozirnoj sivo-plavoj pozadini */
 .info{
-  background:rgba(30,90,168,.07);border-left:4px solid var(--plava);
+  background:rgba(23,64,122,.07);border-left:4px solid var(--plava);
   padding:14px 18px;border-radius:8px;margin-bottom:10px;font-size:14px;
   color:var(--plava-tamna);line-height:1.6;
 }
 .info b,.info strong{color:var(--plava-tamna);font-weight:700}
-.info code,code{background:#dde7f3;color:#17407a;padding:1px 6px;border-radius:4px;font-size:13px;font-weight:600}
+.info code,code{background:#dde7f3;color:#0f2a52;padding:1px 6px;border-radius:4px;font-size:13px;font-weight:600}
 
 .mreza2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:720px){.mreza2{grid-template-columns:1fr}}
@@ -64,7 +64,7 @@ input{
   width:100%;padding:8px 10px;border:1px solid var(--obrub);border-radius:6px;
   font-size:14px;font-family:inherit;
 }
-input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,90,168,.15)}
+input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(23,64,122,.15)}
 
 .alatna{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0}
 .alatna input{width:80px}
@@ -114,7 +114,7 @@ input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 2px rgba(30,
   border:1px solid var(--obrub);border-radius:8px;background:#fff;color:var(--tekst);cursor:pointer;
 }
 .redukcija-blok select:hover{border-color:var(--plava)}
-.redukcija-blok select:focus,.redukcija-blok input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 3px rgba(30,90,168,.15)}
+.redukcija-blok select:focus,.redukcija-blok input:focus{outline:none;border-color:var(--plava);box-shadow:0 0 0 3px rgba(23,64,122,.15)}
 .redukcija-blok input{font-size:14px;padding:8px 10px;width:130px;border:1px solid var(--obrub);border-radius:8px}
 .redukcija-blok .napomena{margin-top:10px}
 .redukcija-opis{margin:12px 0 0;padding-left:18px;font-size:13px;color:var(--tekst);line-height:1.6}
