@@ -7,7 +7,7 @@
 
    Čuvanje: localStorage (ovaj preglednik, ovaj uređaj) + izvoz/uvoz .json.
    Aktivan posao pamti se samo za tekuću sesiju (sessionStorage): pri novom
-   ulasku u aplikaciju prikazuje se izbor posla, zadnji se ne otvara sam.
+   ulasku se ništa ne otvara samo — posao se bira klikom na dugme „Poslovi".
    ===================================================================== */
 (function () {
   const PREFIKS = "poligon.posao.";
@@ -410,8 +410,7 @@
     }
     osvjeziOznaku();
 
-    // pri ulasku bez otvorenog posla: ponudi izbor / kreiranje
-    if (!posao) otvoriModal();
+    // prozor „Poslovi" se otvara samo klikom na dugme u zaglavlju (ne sam pri ulasku)
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", pokreni);
