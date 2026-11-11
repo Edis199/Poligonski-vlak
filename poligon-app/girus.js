@@ -6,7 +6,7 @@
      2) PREDNJA (I položaj)
      3) PREDNJA (II položaj / krug desno)
      4) ZADNJA  (II položaj)
-   Može biti 1, 2 ili 3 girusa po stanici (4, 8 ili 12 redova).
+   Broj girusa po stanici nije ograničen (svaki girus = 4 reda).
 
    Rezultat po stanici: prelomni (lijevi) ugao = pravac na PREDNJU,
    kad se pravac na ZADNJU svede na 0 (orijentacija na zadnju).

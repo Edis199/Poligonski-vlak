@@ -860,7 +860,7 @@ function prikaziPanelGirusa(obradjene) {
   html += `<th>Sredina</th></tr></thead><tbody>`;
   obradjene.forEach((o, i) => {
     const pg = o.pregledGirusa || [];
-    html += `<tr class="${pg.length >= 3 ? "tri-girusa" : ""}"><td>${o.stanica}</td>`;
+    html += `<tr><td>${o.stanica}</td>`;
     for (let g = 0; g < maxG; g++) {
       const p = pg[g];
       html += p

@@ -48,7 +48,7 @@ Jedan girus = 4 reda redom:
   3. **prednja** (II položaj / krug desno)
   4. **zadnja** (II položaj)
 
-Dozvoljeno je 1, 2 ili 3 girusa po stanici (4, 8 ili 12 redova).
+Po stanici možete imati više girusa, svaki girus su 4 reda.
 Stanicu i visinu instrumenta upišite **samo u prvom redu** svake stanice
 (ostali redovi te stanice ostaju prazni u tim stupcima).
 
