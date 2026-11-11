@@ -81,6 +81,10 @@
       duzine: vrijednosti(".in-duzina"),
       nazivi: vrijednosti(".in-naziv"),
       date,
+      polarne: [...document.querySelectorAll("#teloPolarne .pol-red")].map((tr) => ({
+        naziv: tr.dataset.naziv,
+        Y: tr.querySelector(".pol-Y").value, X: tr.querySelector(".pol-X").value, H: tr.querySelector(".pol-H").value,
+      })),
       vrsta: val("vrstaVlaka"),
       redukcijaNacin: val("redukcijaNacin"),
       redukcijaFaktor: val("redukcijaFaktor"),
@@ -108,6 +112,16 @@
     }
 
     if (p.vrsta) postaviVrstu(p.vrsta);
+
+    // polarna snimka: ponovo složi tabelu tačaka i upiši sačuvane koordinate
+    if (p.vrsta === "polarna" && typeof izgradiTabeluPolarnih === "function" && obradjeneStanice) {
+      izgradiTabeluPolarnih(obradjeneStanice);
+      (p.polarne || []).forEach((t) => {
+        const tr = [...document.querySelectorAll("#teloPolarne .pol-red")].find((r) => r.dataset.naziv === t.naziv);
+        if (!tr) return;
+        tr.querySelector(".pol-Y").value = t.Y ?? ""; tr.querySelector(".pol-X").value = t.X ?? ""; tr.querySelector(".pol-H").value = t.H ?? "";
+      });
+    }
 
     ["A", "B", "C", "D"].forEach((k) => {
       if (!p.date || !p.date[k]) return;

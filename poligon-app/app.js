@@ -125,13 +125,17 @@ function primijeniVrstu() {
     const tr = document.getElementById(k + "_naziv").closest("tr");
     if (tr) tr.style.display = (v === "slijepi" || v === "polarna") ? "none" : "";
   });
+  const polarna = (v === "polarna");
+  const omotDate = document.getElementById("omotDate"), polBlok = document.getElementById("polarneBlok");
+  if (omotDate) omotDate.style.display = polarna ? "none" : "";
+  if (polBlok) polBlok.style.display = polarna ? "" : "none";
   document.getElementById("vrstaTekst").textContent = ucitaneStanice
     ? { umetnuti: "UMETNUTI (prepoznat iz zapisnika)", zatvoreni: "ZATVORENI (prepoznat iz zapisnika)", slijepi: "SLIJEPI (prepoznat iz zapisnika)", polarna: "POLARNA SNIMKA — stanica + orijentacija + detalji (prepoznato iz zapisnika)" }[v]
     : "prepoznaje se automatski iz učitanog zapisnika";
   document.getElementById("napomenaVrste").textContent = v === "slijepi"
     ? "Unesite koordinate i visinu za A (orijentacija) i B (početna stanica). Nema uglovnog ni linearnog odstupanja ni popravki."
     : v === "zatvoreni" ? "Unesite koordinate i visinu za A i B (C = B, D = A)."
-    : v === "polarna" ? "Nema vlaka — računaju se samo detaljne tačke. Unesite koordinate i visinu za stanicu (B) i orijentacijsku tačku (A). Ako ima više stanica, upišite i njihove koordinate/orijentacije."
+    : v === "polarna" ? "Nema vlaka — računaju se samo detaljne tačke. U tabeli ispod upišite koordinate i visinu za svako stajalište i svaku orijentacijsku tačku iz zapisnika."
     : "";
   if (v === "slijepi" || v === "polarna") {
     document.getElementById("redukcijaNacin").value = "nema";
@@ -308,10 +312,19 @@ function izracunajPolarno() {
 
   // mapa poznatih koordinata iz tablice datih tačaka (naziv -> {Y,X,H})
   const poznate = {};
-  ["A", "B", "C", "D"].forEach((k) => {
-    const naz = tekst(k + "_naziv").trim();
-    if (naz) poznate[naz] = { Y: broj(k + "_Y"), X: broj(k + "_X"), H: brojOpc(k + "_H") };
-  });
+  const polRedovi = [...document.querySelectorAll("#teloPolarne .pol-red")];
+  if (polRedovi.length) {
+    polRedovi.forEach((tr) => {
+      const v = (kl) => parseDec(tr.querySelector("." + kl).value);
+      const h = v("pol-H");
+      poznate[tr.dataset.naziv] = { Y: v("pol-Y") || 0, X: v("pol-X") || 0, H: isNaN(h) ? null : h };
+    });
+  } else {
+    ["A", "B", "C", "D"].forEach((k) => {
+      const naz = tekst(k + "_naziv").trim();
+      if (naz) poznate[naz] = { Y: broj(k + "_Y"), X: broj(k + "_X"), H: brojOpc(k + "_H") };
+    });
+  }
 
   // za svaku stanicu: koordinate stanice i njene orijentacijske tačke moraju biti poznate
   const tocke = [], visine = [], nedostaju = [];
@@ -699,6 +712,69 @@ function preuzmi(blob, ime) {
   });
 })();
 
+/* ---------- Polarna snimka: tabela tačaka (stajališta + orijentacije) ---------- */
+// Jedan red za svaku različitu tačku iz zapisnika, redom prvog pojavljivanja.
+// Vraća opis uloga za poruku (npr. "stajališta P1, P3 i orijentacije P2").
+function izgradiTabeluPolarnih(obradjene) {
+  const uloge = new Map();   // naziv -> { staj, orij }
+  const dodaj = (naz, kljuc) => {
+    naz = String(naz || "").trim();
+    if (!naz) return;
+    if (!uloge.has(naz)) uloge.set(naz, { staj: false, orij: false });
+    uloge.get(naz)[kljuc] = true;
+  };
+  obradjene.forEach((o) => { dodaj(o.stanica, "staj"); dodaj(o.nazZadnja, "orij"); });
+
+  const telo = document.getElementById("teloPolarne");
+  telo.innerHTML = "";
+  const staj = [], orij = [];
+  uloge.forEach((u, naz) => {
+    if (u.staj) staj.push(naz);
+    if (u.orij && !u.staj) orij.push(naz);
+    const tr = document.createElement("tr");
+    tr.className = "pol-red";
+    tr.dataset.naziv = naz;
+    const opis = u.staj && u.orij ? "Stajalište i orijentacija" : (u.staj ? "Stajalište" : "Orijentacija");
+    const td0 = document.createElement("td"); td0.className = "uloga"; td0.textContent = opis; tr.appendChild(td0);
+    const tdN = document.createElement("td"); const inN = document.createElement("input");
+    inN.className = "pol-naziv"; inN.value = naz; inN.readOnly = true; tdN.appendChild(inN); tr.appendChild(tdN);
+    [["pol-Y", "Y"], ["pol-X", "X"], ["pol-H", "H (m)"]].forEach(([kl, ph], k) => {
+      const td = document.createElement("td"); const inp = document.createElement("input");
+      inp.className = kl; inp.type = "text"; inp.inputMode = "decimal"; inp.placeholder = ph; inp.dataset.kol = String(k + 1);
+      td.appendChild(inp); tr.appendChild(td);
+    });
+    telo.appendChild(tr);
+  });
+  return (staj.length ? "stajališta " + staj.join(", ") : "") + (orij.length ? (staj.length ? " i " : "") + "orijentacije " + orij.join(", ") : "");
+}
+
+document.getElementById("teloPolarne").addEventListener("paste", (ev) => {
+  const cilj = ev.target;
+  if (!cilj || !cilj.classList || !cilj.dataset || cilj.dataset.kol === undefined) return;
+  const tekstCB = (ev.clipboardData || window.clipboardData).getData("text");
+  if (!tekstCB) return;
+  const linije = tekstCB.replace(/\r/g, "").split("\n").filter((l) => l.trim() !== "");
+  const imaViseCelija = linije.length > 1 || /[\t;]/.test(linije[0] || "") || /\s/.test((linije[0] || "").trim());
+  if (!imaViseCelija) return;
+  ev.preventDefault();
+  const redovi = [...document.querySelectorAll("#teloPolarne .pol-red")];
+  const r0 = redovi.indexOf(cilj.closest("tr"));
+  const k0 = parseInt(cilj.dataset.kol, 10);
+  const KL = [null, "pol-Y", "pol-X", "pol-H"];
+  linije.forEach((linija, ri) => {
+    const c = (linija.includes("\t") ? linija.split("\t") : linija.includes(";") ? linija.split(";") : linija.trim().split(/\s+/)).map((s) => s.trim());
+    // red počinje nazivom tačke (nije broj) i taj naziv postoji u tabeli → upiši u taj red
+    const poNazivu = c.length >= 3 && isNaN(parseDec(c[0])) ? redovi.find((tr) => tr.dataset.naziv === c[0]) : null;
+    if (poNazivu) {
+      c.slice(1, 4).forEach((v, ci) => { poNazivu.querySelector("." + KL[ci + 1]).value = v; });
+      return;
+    }
+    const tr = redovi[r0 + ri];
+    if (!tr) return;
+    c.forEach((v, ci) => { const kl = KL[k0 + ci]; if (kl) tr.querySelector("." + kl).value = v; });
+  });
+});
+
 /* ---------- Početno stanje ---------- */
 generirajTabelu(4, {
   uglovi: ["", "", "", ""],
@@ -864,10 +940,9 @@ function obradiUcitaneStanice(stanice, ponovo) {
     obrisiStareDateTacke({ A: prva.nazZadnja, B: prva.stanica });
     document.getElementById("A_naziv").value = prva.nazZadnja || document.getElementById("A_naziv").value;
     document.getElementById("B_naziv").value = prva.stanica;
-    const dodatne = validne.length > 1
-      ? " Ima " + validne.length + " stanica — unesite koordinate za svaku stanicu i njenu orijentacijsku tačku u tablicu datih tačaka."
-      : "";
-    postaviStatus(`Učitana polarna snimka (${validne.length} ${validne.length === 1 ? "stanica" : "stanice/a"}, ${validne.reduce((s, o) => s + (o.detalji ? o.detalji.length : 0), 0)} detaljnih tačaka). Upišite koordinate (Y, X) i visinu (H) za stanicu ${prva.stanica} i orijentaciju ${prva.nazZadnja}, zatim kliknite Izračunaj.${dodatne}`, true);
+    const tackePol = izgradiTabeluPolarnih(validne);
+    const brDet = validne.reduce((s, o) => s + (o.detalji ? o.detalji.length : 0), 0);
+    postaviStatus(`Učitana polarna snimka (${validne.length} ${validne.length === 1 ? "stajalište" : "stajališta"}: ${validne.map((o) => o.stanica).join(", ")}; ${brDet} detaljnih tačaka). U tabelu datih tačaka upišite koordinate (Y, X) i visinu (H) za ${tackePol}, zatim kliknite Izračunaj.`, true);
     if (greske.length) alert("Napomena:\n" + greske.join("\n"));
     return;
   }

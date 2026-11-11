@@ -77,7 +77,7 @@
     <p class="napomena">Možete kopirati iz Excela cijeli blok (broj tačke, Y, X, H) i zalijepiti ga
       (<b>Ctrl+V</b>) u prvu ćeliju — vrijednosti se same raspodijele po ćelijama.
       H je potrebno za visinsko izravnanje (B i C obavezno).</p>
-    <div class="tabela-omot">
+    <div class="tabela-omot" id="omotDate">
     <table class="tabela tabela-date" id="tabelaDate">
       <thead>
         <tr><th>Tačka</th><th>Broj tačke</th><th>Y</th><th>X</th><th>H (m)</th></tr>
@@ -113,6 +113,19 @@
         </tr>
       </tbody>
     </table>
+    </div>
+
+    <!-- Polarna snimka (bez vlaka): jedan red za svaku tačku iz zapisnika — stajališta i orijentacije -->
+    <div id="polarneBlok" style="display:none">
+      <p class="napomena"><b>Polarna snimka — više stajališta:</b> upišite koordinate (Y, X) i visinu (H) za
+        <b>svako stajalište</b> i <b>svaku orijentaciju</b> iz zapisnika. Visina H nije obavezna.
+        Možete zalijepiti blok iz Excela (<b>Ctrl+V</b>) u prvu ćeliju Y — redovi idu istim redoslijedom kao u tabeli, ili s nazivom tačke na početku reda.</p>
+      <div class="tabela-omot">
+        <table class="tabela tabela-date" id="tabelaPolarne">
+          <thead><tr><th>Uloga</th><th>Broj tačke</th><th>Y</th><th>X</th><th>H (m)</th></tr></thead>
+          <tbody id="teloPolarne"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="zatvoreni-vlak">
