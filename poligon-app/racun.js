@@ -185,7 +185,10 @@ function izravnajUmetnutiVlak(ulaz) {
   //   "stare"  (raniji Excel):  45″·√n,  n = broj prelomnih uglova
   //   "nove"   (obrasci 2019):  20″·√(n−1) = 20″·√(broj stranica)
   const novaTol = ulaz.tolerancije !== "stare";   // zadano: obrasci 2019
-  const dopustenoFbetaSek = novaTol ? 20 * Math.sqrt(Math.max(1, n - 1)) : 45 * Math.sqrt(n); // u sekundama
+  //   ZATVORENI vlak:  30″·√n,  n = broj prelomnih i veznih uglova
+  const dopustenoFbetaSek = zatvoreni
+    ? 30 * Math.sqrt(n)
+    : (novaTol ? 20 * Math.sqrt(Math.max(1, n - 1)) : 45 * Math.sqrt(n)); // u sekundama
   const fBetaSek = fBeta * 3600;               // fβ u sekundama
 
   // Popravljeni prelomni uglovi
