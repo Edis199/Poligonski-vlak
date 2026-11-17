@@ -257,5 +257,10 @@
 <script src="xlsx.js"></script>
 <script src="app.js"></script>
 <script src="poslovi.js"></script>
+<script>
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("../sw.js").catch(() => {}));
+}
+</script>
 </body>
 </html>

@@ -201,5 +201,10 @@ M270 470 L250 600 M270 470 L430 560 M250 600 L420 650 M430 560 L420 650 M430 560
   <span>Geodetska aplikacija za izravnanje mreža — radi offline u pregledniku</span>
   <span>Pomoć i podrška</span>
 </footer>
+<script>
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+}
+</script>
 </body>
 </html>
