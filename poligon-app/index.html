@@ -43,7 +43,7 @@
 <main>
   <!-- ========== UNOS ========== -->
   <section id="unos" class="panel vidljiv">
-    <details class="uputa">
+    <details class="uputa" open>
       <summary>Kako se koristi (uputa)</summary>
       <div class="info">
         <strong>Uputa:</strong> 1) Preuzmite predložak zapisnika i u njega prebacite mjerenja (TZ). 2) Učitajte zapisnik.
@@ -74,7 +74,7 @@
           (npr. loše mjerenje) isključite kvačicom; sredina se tada računa iz preostalih. Nakon promjene ponovo kliknite „Izračunaj".</p>
         <div id="girusPanel"></div>
       </details>
-        <details class="pomoc">
+        <details class="pomoc" open>
           <summary>Girusna metoda i format uglova</summary>
           <p class="napomena"><b>Girusna metoda:</b> red po stanici ide <b>zadnja → prednja → prednja (II položaj) → zadnja (II položaj)</b>.
             Uglove možete upisati kao <code>254°28'08"</code> ili kao decimalne <code>254.2808</code>.
@@ -96,7 +96,7 @@
 
       <div class="unos-desno">
         <h2>Date (poznate) tačke</h2>
-        <details class="pomoc">
+        <details class="pomoc" open>
           <summary>Kako unijeti ili zalijepiti iz Excela</summary>
           <p class="napomena">Možete kopirati iz Excela cijeli blok (broj tačke, Y, X, H) i zalijepiti ga
             (<b>Ctrl+V</b>) u prvu ćeliju — vrijednosti se same raspodijele po ćelijama.
@@ -168,7 +168,7 @@
               <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" />
             </label>
           </div>
-          <details class="pomoc">
+          <details class="pomoc" open>
             <summary>Šta znače ove opcije</summary>
             <ul class="redukcija-opis">
               <li><b>Dužina u projekcijskoj ravni</b> — horizontalne dužine iz zapisnika (sredina iz obostranih mjerenja) množe se faktorom k i svode na državni koordinatni sistem (spuštanje na nivo mora + ispravka Gauss-Krügerove projekcije). Faktor k aplikacija računa sama iz visina H i koordinate Y datih tačaka. <i>Preporučeno za većinu računanja.</i></li>
