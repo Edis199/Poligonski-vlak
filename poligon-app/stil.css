@@ -333,3 +333,44 @@ a.dugme-zagl{display:inline-flex;align-items:center;gap:8px;text-decoration:none
 .posao-podnozje{justify-content:flex-end;margin-top:14px}
 @media (max-width:600px){.posao-red{grid-template-columns:1fr}.posao-traka{margin-left:0;width:100%;justify-content:space-between}}
 @media print{.posao-traka,.posao-modal{display:none!important}}
+
+/* ===== Kartica „Unos podataka": gust raspored, sve na jednom ekranu ===== */
+.uputa{margin:0 0 12px}
+.uputa>summary,.pomoc>summary{cursor:pointer;color:var(--plava);font-size:13px;font-weight:600;list-style:none;display:inline-block;padding:2px 0}
+.uputa>summary::-webkit-details-marker,.pomoc>summary::-webkit-details-marker{display:none}
+.uputa>summary::before,.pomoc>summary::before{content:"";display:inline-block;margin-right:7px;border:5px solid transparent;border-left:7px solid currentColor;border-right:0;vertical-align:middle}
+.uputa[open]>summary::before,.pomoc[open]>summary::before{border:5px solid transparent;border-top:7px solid currentColor;border-bottom:0;margin-right:6px}
+.uputa .info{margin:8px 0 0}
+.pomoc{margin:6px 0 0}
+.pomoc .napomena{margin:6px 0 0}
+
+.unos-mreza h2{font-size:18px;margin:0 0 10px;padding-bottom:6px}
+.unos-mreza .ucitavanje-okvir{padding:12px;margin-bottom:10px}
+.unos-mreza .alatna{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.unos-mreza .alatna .dugme{padding:8px 12px;font-size:13.5px}
+.unos-mreza .alatna #statusUcitavanja{flex:1 1 100%;font-size:12.5px}
+.unos-mreza .girus-panel{margin-top:8px}
+.unos-mreza .zatvoreni-vlak{margin:10px 0;font-size:13.5px}
+.unos-mreza .redukcija-blok{margin:14px 0 0;padding:12px 14px}
+.unos-mreza .redukcija-naslov{margin-bottom:8px;font-size:14px}
+.unos-mreza .redukcija-opis{margin:8px 0 0}
+.unos-mreza .tabela-date td,.unos-mreza .tabela-date th{padding:5px 8px}
+.unos-mreza .tabela-date td.uloga{white-space:normal;min-width:120px}
+.unos-mreza .tabela-date input{padding:6px 8px;font-size:14px}
+
+/* traka s dugmetom „Izračunaj" uvijek vidljiva pri dnu ekrana */
+.akcije-unos{position:sticky;bottom:0;z-index:5;margin:14px -24px -24px;padding:12px 24px;
+  background:#fff;border-top:1px solid var(--obrub);border-radius:0 0 10px 10px;box-shadow:0 -4px 10px rgba(15,42,82,.06)}
+
+/* široki ekran: dvije kolone (lijevo zapisnik i postavke, desno date tačke) */
+@media (min-width:1050px){
+  main:has(#unos.vidljiv){max-width:1380px}
+  .unos-mreza{display:grid;grid-template-columns:minmax(380px,5fr) 7fr;gap:28px;align-items:start}
+}
+
+/* stisnuti razmaci na kartici Unos (da sve stane na ekran laptopa) */
+main:has(#unos.vidljiv){padding-top:12px}
+#unos.panel{padding:14px 24px 0}
+.uputa{margin:0 0 8px}
+.unos-mreza .redukcija-blok{margin-top:10px}
+.akcije-unos{margin:12px -24px 0;padding:10px 24px}

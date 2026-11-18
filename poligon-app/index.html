@@ -43,13 +43,18 @@
 <main>
   <!-- ========== UNOS ========== -->
   <section id="unos" class="panel vidljiv">
-    <div class="info">
-      <strong>Uputa:</strong> 1) Preuzmite predložak zapisnika i u njega prebacite mjerenja (TZ). 2) Učitajte zapisnik.
-      3) Upišite koordinate i visine datih tačaka. 4) Kliknite „Izračunaj izravnanje".
-    </div>
+    <details class="uputa">
+      <summary>Kako se koristi (uputa)</summary>
+      <div class="info">
+        <strong>Uputa:</strong> 1) Preuzmite predložak zapisnika i u njega prebacite mjerenja (TZ). 2) Učitajte zapisnik.
+        3) Upišite koordinate i visine datih tačaka. 4) Kliknite „Izračunaj izravnanje".
+      </div>
+    </details>
 
-    <h2>Učitavanje tahimetrijskog zapisnika</h2>
-    <div class="ucitavanje-okvir">
+    <div class="unos-mreza">
+      <div class="unos-lijevo">
+        <h2>Tahimetrijski zapisnik</h2>
+        <div class="ucitavanje-okvir">
       <div class="alatna">
         <button id="preuzmiPredlozak" class="dugme dugme-ikona">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
@@ -69,25 +74,42 @@
           (npr. loše mjerenje) isključite kvačicom; sredina se tada računa iz preostalih. Nakon promjene ponovo kliknite „Izračunaj".</p>
         <div id="girusPanel"></div>
       </details>
-      <div class="info" style="font-size:13px">
-        <b>Girusna metoda:</b> red po stanici ide <b>zadnja → prednja → prednja (II položaj) → zadnja (II položaj)</b>.
-        Uglove možete upisati kao <code>254°28'08"</code> ili kao decimalne <code>254.2808</code>.
-        Kolona „Horizontalna dužina" ostaje prazna — aplikacija je sama računa.
-      </div>
-    </div>
+        <details class="pomoc">
+          <summary>Girusna metoda i format uglova</summary>
+          <p class="napomena"><b>Girusna metoda:</b> red po stanici ide <b>zadnja → prednja → prednja (II položaj) → zadnja (II položaj)</b>.
+            Uglove možete upisati kao <code>254°28'08"</code> ili kao decimalne <code>254.2808</code>.
+            Kolona „Horizontalna dužina" ostaje prazna — aplikacija je sama računa.</p>
+        </details>
+        </div>
 
-    <h2>Date (poznate) tačke</h2>
-    <p class="napomena">Možete kopirati iz Excela cijeli blok (broj tačke, Y, X, H) i zalijepiti ga
-      (<b>Ctrl+V</b>) u prvu ćeliju — vrijednosti se same raspodijele po ćelijama.
-      H je potrebno za visinsko izravnanje (B i C obavezno).</p>
-    <div class="tabela-omot" id="omotDate">
+        <div class="zatvoreni-vlak">
+      <b>Vrsta vlaka:</b> <span id="vrstaTekst">prepoznaje se automatski iz učitanog zapisnika</span>
+      <select id="vrstaVlaka" style="display:none" aria-hidden="true">
+        <option value="umetnuti" selected>Umetnuti</option>
+        <option value="zatvoreni">Zatvoreni</option>
+        <option value="slijepi">Slijepi</option>
+        <option value="polarna">Polarna snimka (bez vlaka)</option>
+      </select>
+      <div class="napomena" id="napomenaVrste"></div>
+    </div>
+      </div>
+
+      <div class="unos-desno">
+        <h2>Date (poznate) tačke</h2>
+        <details class="pomoc">
+          <summary>Kako unijeti ili zalijepiti iz Excela</summary>
+          <p class="napomena">Možete kopirati iz Excela cijeli blok (broj tačke, Y, X, H) i zalijepiti ga
+            (<b>Ctrl+V</b>) u prvu ćeliju — vrijednosti se same raspodijele po ćelijama.
+            H je potrebno za visinsko izravnanje (B i C obavezno).</p>
+        </details>
+        <div class="tabela-omot" id="omotDate">
     <table class="tabela tabela-date" id="tabelaDate">
       <thead>
         <tr><th>Tačka</th><th>Broj tačke</th><th>Y</th><th>X</th><th>H (m)</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td class="uloga">A — orijentacijska tačka (pozadi)</td>
+          <td class="uloga">A — orijentacija (pozadi)</td>
           <td><input id="A_naziv" data-red="A" data-kol="0" placeholder="Broj tačke" value="P646" /></td>
           <td><input id="A_Y" data-red="A" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534004.099" /></td>
           <td><input id="A_X" data-red="A" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856781.708" /></td>
@@ -108,7 +130,7 @@
           <td><input id="C_H" data-red="C" data-kol="3" type="text" inputmode="decimal" placeholder="H (m)" value="540.370" /></td>
         </tr>
         <tr>
-          <td class="uloga">D — orijentacijska tačka (naprijed)</td>
+          <td class="uloga">D — orijentacija (naprijed)</td>
           <td><input id="D_naziv" data-red="D" data-kol="0" placeholder="Broj tačke" value="G48" /></td>
           <td><input id="D_Y" data-red="D" data-kol="1" type="text" inputmode="decimal" placeholder="Y" value="6534197.2695" /></td>
           <td><input id="D_X" data-red="D" data-kol="2" type="text" inputmode="decimal" placeholder="X" value="4856958.4162" /></td>
@@ -118,7 +140,7 @@
     </table>
     </div>
 
-    <!-- Polarna snimka (bez vlaka): jedan red za svaku tačku iz zapisnika — stajališta i orijentacije -->
+        <!-- Polarna snimka (bez vlaka): jedan red za svaku tačku iz zapisnika — stajališta i orijentacije -->
     <div id="polarneBlok" style="display:none">
       <p class="napomena"><b>Polarna snimka — više stajališta:</b> upišite koordinate (Y, X) i visinu (H) za
         <b>svako stajalište</b> i <b>svaku orijentaciju</b> iz zapisnika. Visina H nije obavezna.
@@ -131,39 +153,32 @@
       </div>
     </div>
 
-    <div class="zatvoreni-vlak">
-      <b>Vrsta vlaka:</b> <span id="vrstaTekst">prepoznaje se automatski iz učitanog zapisnika</span>
-      <select id="vrstaVlaka" style="display:none" aria-hidden="true">
-        <option value="umetnuti" selected>Umetnuti</option>
-        <option value="zatvoreni">Zatvoreni</option>
-        <option value="slijepi">Slijepi</option>
-        <option value="polarna">Polarna snimka (bez vlaka)</option>
-      </select>
-      <div class="napomena" id="napomenaVrste"></div>
-    </div>
-    </div>
-
-    <div class="redukcija-blok">
-      <div class="redukcija-naslov">Vrsta dužine za izračun</div>
-      <div class="redukcija-red">
-        <select id="redukcijaNacin">
-          <option value="auto" selected>Dužina u projekcijskoj ravni</option>
-          <option value="nema">Horizontalna dužina</option>
-          <option value="rucno">Ručno unesen faktor</option>
-        </select>
-        <label id="faktorBlok" for="redukcijaFaktor">Faktor&nbsp;k:
-          <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none" />
-        </label>
-        <label id="m0Blok" for="redukcijaM0">m<sub>0</sub> (mjerilo na srednjem meridijanu):
-          <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" />
-        </label>
+        <div class="redukcija-blok">
+          <div class="redukcija-naslov">Vrsta dužine za izračun</div>
+          <div class="redukcija-red">
+            <select id="redukcijaNacin">
+              <option value="auto" selected>Dužina u projekcijskoj ravni</option>
+              <option value="nema">Horizontalna dužina</option>
+              <option value="rucno">Ručno unesen faktor</option>
+            </select>
+            <label id="faktorBlok" for="redukcijaFaktor">Faktor&nbsp;k:
+              <input id="redukcijaFaktor" type="text" inputmode="decimal" value="0,99992279" style="display:none" />
+            </label>
+            <label id="m0Blok" for="redukcijaM0">m<sub>0</sub> (mjerilo na srednjem meridijanu):
+              <input id="redukcijaM0" type="text" inputmode="decimal" value="0,9999" />
+            </label>
+          </div>
+          <details class="pomoc">
+            <summary>Šta znače ove opcije</summary>
+            <ul class="redukcija-opis">
+              <li><b>Dužina u projekcijskoj ravni</b> — horizontalne dužine iz zapisnika (sredina iz obostranih mjerenja) množe se faktorom k i svode na državni koordinatni sistem (spuštanje na nivo mora + ispravka Gauss-Krügerove projekcije). Faktor k aplikacija računa sama iz visina H i koordinate Y datih tačaka. <i>Preporučeno za većinu računanja.</i></li>
+              <li><b>Horizontalna dužina</b> — uzimaju se horizontalne dužine kako su izmjerene na terenu (sredina iz obostranih mjerenja), bez svođenja na projekciju (k = 1). Za male/lokalne mreže ili već svedena mjerenja.</li>
+              <li><b>Ručno unesen faktor</b> — sam upisuješ faktor k kojim se množe dužine (npr. kad ga imaš iz drugog izvora).</li>
+            </ul>
+            <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).</div>
+          </details>
+        </div>
       </div>
-      <ul class="redukcija-opis">
-        <li><b>Dužina u projekcijskoj ravni</b> — horizontalne dužine iz zapisnika (sredina iz obostranih mjerenja) množe se faktorom k i svode na državni koordinatni sistem (spuštanje na nivo mora + ispravka Gauss-Krügerove projekcije). Faktor k aplikacija računa sama iz visina H i koordinate Y datih tačaka. <i>Preporučeno za većinu računanja.</i></li>
-        <li><b>Horizontalna dužina</b> — uzimaju se horizontalne dužine kako su izmjerene na terenu (sredina iz obostranih mjerenja), bez svođenja na projekciju (k = 1). Za male/lokalne mreže ili već svedena mjerenja.</li>
-        <li><b>Ručno unesen faktor</b> — sam upisuješ faktor k kojim se množe dužine (npr. kad ga imaš iz drugog izvora).</li>
-      </ul>
-      <div class="napomena">Faktor k = m<sub>0</sub>·(1 − H<sub>m</sub>/R)·(1 + y<sub>m</sub>²/2R²), R = 6377397 m (Bessel).</div>
     </div>
 
     <div id="rucniUnos" style="display:none" aria-hidden="true">
@@ -189,7 +204,7 @@
     </table>
     </div>
 
-    <div class="akcije">
+    <div class="akcije akcije-unos">
       <button id="izracunaj" class="dugme primarno">Izračunaj izravnanje</button>
       <button id="primjer" class="dugme" style="display:none">Učitaj primjer iz Excela</button>
     </div>
