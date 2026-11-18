@@ -1,7 +1,7 @@
 /* sw.js — Service Worker: omogućava instalaciju i rad bez interneta.
    Strategija: MREŽA PRVO, pa keš. Kad ima interneta, uvijek se učita najnovija verzija
-   (i upiše u keš); bez interneta se koristi zadnja sačuvana verzija. */
-const KES = "geodetske-mreze-v1";
+   (i upiše u keš; provjera kod servera se radi svaki put); bez interneta se koristi zadnja sačuvana verzija. */
+const KES = "geodetske-mreze-v2";
 const DATOTEKE = [
   "./",
   "index.html",
@@ -52,7 +52,7 @@ const DATOTEKE = [
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(KES).then((kes) =>
-      Promise.all(DATOTEKE.map((d) => kes.add(d).catch(() => null)))
+      Promise.all(DATOTEKE.map((d) => fetch(d, { cache: "reload" }).then((o) => (o.ok ? kes.put(d, o) : null)).catch(() => null)))
     ).then(() => self.skipWaiting())
   );
 });
@@ -69,7 +69,7 @@ self.addEventListener("fetch", (e) => {
   const zahtjev = e.request;
   if (zahtjev.method !== "GET" || !zahtjev.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    fetch(zahtjev)
+    fetch(zahtjev, { cache: "no-cache" })   // uvijek provjeri kod servera (ne koristi stari HTTP keš)
       .then((odgovor) => {
         if (odgovor && odgovor.ok) {
           const kopija = odgovor.clone();
